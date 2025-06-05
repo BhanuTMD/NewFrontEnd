@@ -6,10 +6,12 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // 🔄 loading state
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token);
+    setIsAuthenticated(!!token); // true if token exists
+    setIsLoading(false); // ✅ auth check done
   }, []);
 
   const login = (token) => {
@@ -23,7 +25,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
