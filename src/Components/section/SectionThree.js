@@ -77,7 +77,7 @@ const SectionThree = () => {
     };
 
     axios
-      .post("http://172.16.2.87:8080/apf/tdmp/saveSectionThree", payload, {
+      .post("http://172.16.2.246:8080/apf/tdmp/saveSectionThree", payload, {
         headers: { "Content-Type": "application/json" },
       })
       .then(() => {

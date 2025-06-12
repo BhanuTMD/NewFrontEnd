@@ -2,41 +2,41 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Validation from "Components/auth/LoginValidation";
 import axios from "axios";
+import { useAuth } from "Components/auth/AuthContext";
 
 function Login() {
   const [values, setValues] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const { login } = useAuth(); // ✅ add this
+
 
   const handleInput = (e) => {
     setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    //  console.log("Login button clicked");
-    const err = Validation(values);
-    console.log(" Validation errors:", err)
-    setErrors(err);
+  e.preventDefault();
+  const err = Validation(values);
+  setErrors(err);
 
-    if (Object.keys(err).length === 0) {
-      axios
-        .post("http://172.16.2.246:8181/auth/login", values)
-        .then((res) => {
-          // API response ke structure ke according isse adjust karo aur si
-          if (res.data.jwtToken) {
-            localStorage.setItem("token", res.data.jwtToken);
-            navigate("/welcomePage");
-          } else {
-            alert(res.data.message || "Login failed");
-          }
-        })
-        .catch((error) => {
-          console.error("Login error:", error);
-          alert("Invalid credentials or server error");
-        });
-    }
-  };
+  if (Object.keys(err).length === 0) {
+    axios
+      .post("http://172.16.2.246:8181/auth/login", values)
+      .then((res) => {
+        if (res.data.jwtToken) {
+          login(res.data.jwtToken); // ✅ This updates both token and isAuthenticated
+          navigate("/welcomePage");
+        } else {
+          alert(res.data.message || "Login failed");
+        }
+      })
+      .catch((error) => {
+        console.error("Login error:", error);
+        alert("Invalid credentials or server error");
+      });
+  }
+};
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-indigo-200 via-white to-indigo-100">
       <div className="bg-white p-6 sm:p-10 w-full max-w-md rounded-xl shadow-xl border">

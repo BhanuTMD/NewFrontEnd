@@ -1,9 +1,10 @@
 import React from 'react';
+
 const SectionTwoPreview = ({ data }) => {
-    
-    const handlePrintRow = (item) => {
-        const newWindow = window.open('', '', 'width=800,height=600');
-        const rowHTML = `
+
+  const handlePrintRow = (item) => {
+    const newWindow = window.open('', '', 'width=800,height=600');
+    const rowHTML = `
           <html>
             <head>
               <title>Print Preview - ${item.iprType || 'IPR Detail'}</title>
@@ -34,51 +35,45 @@ const SectionTwoPreview = ({ data }) => {
             </body>
           </html>
         `;
-        newWindow.document.write(rowHTML);
-        newWindow.document.close();
-    };
+    newWindow.document.write(rowHTML);
+    newWindow.document.close();
+  };
 
-    return (
-        <div className="mt-8">
-            <h2 className="text-xl font-bold mb-4">Section Two - IPR Details</h2>
-            <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border">
-                    <thead>
-                        <tr className="bg-gray-100">
-                            <th className="py-2 px-4 border">TRN No</th>
-                            <th className="py-2 px-4 border">IPR Type</th>
-                            <th className="py-2 px-4 border">Registration No</th>
-                            <th className="py-2 px-4 border">Status</th>
-                            <th className="py-2 px-4 border">Status Date</th>
-                            <th className="py-2 px-4 border">Countries</th>
-                            <th className="py-2 px-4 border">Action</th>
-                            
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {data.sectionTwoList.map((item, index) => (
-                            <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : ''}>
-                                <td className="py-2 px-4 border">{item.technologyRefNo || '-'}</td>
-                                <td className="py-2 px-4 border">{item.iprType || '-'}</td>
-                                <td className="py-2 px-4 border">{item.registrationNo || '-'}</td>
-                                <td className="py-2 px-4 border">{item.status || '-'}</td>
-                                <td className="py-2 px-4 border">{item.statusDate || '-'}</td>
-                                <td className="py-2 px-4 border">{item.countries?.join(', ') || '-'}</td>
-                                <td className="py-2 px-4 border">
-                                    <button
-                                        onClick={() => handlePrintRow(item)}
-                                        className="text-blue-600 hover:underline"
-                                    >
-                                        Print
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+  return (
+    <div className="mt-8">
+      <h2 className="text-xl font-bold mb-4">Section Two - IPR Details</h2>
+      <div className="space-y-6">
+        {data.sectionTwoList.map((item, index) => (
+          <div
+            key={index}
+            className="border p-4 rounded-lg shadow-md bg-white"
+          >
+            {/* Section Title */}
+            <h4 className="text-md font-semibold text-gray-500 mb-1">Section Two</h4>
+            {/* IPR Title */}
+            <h3 className="text-lg font-semibold mb-2 text-blue-700">{item.iprType || 'IPR Detail'}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div><strong>TRN No:</strong> {item.technologyRefNo || '-'}</div>
+              <div><strong>IPR Type:</strong> {item.iprType || '-'}</div>
+              <div><strong>Registration No:</strong> {item.registrationNo || '-'}</div>
+              <div><strong>Status:</strong> {item.status || '-'}</div>
+              <div><strong>Status Date:</strong> {item.statusDate || '-'}</div>
+              <div><strong>Countries:</strong> {item.countries?.join(', ') || '-'}</div>
             </div>
-        </div>
-    );
+            {/* Action buttons */}
+            <div className="mt-4">
+              <button
+                onClick={() => handlePrintRow(item)}
+                className="text-blue-600 hover:underline"
+              >
+                Print
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default SectionTwoPreview;

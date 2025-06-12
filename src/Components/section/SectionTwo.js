@@ -46,7 +46,7 @@ const SectionTwo = () => {
       country: Array.isArray(values.country) ? values.country : [values.country],
     };
 
-    axios.post("http://172.16.2.102:8080/apf/tdmp/saveSectionTwo", payload, {
+    axios.post("http://172.16.2.246:8080/apf/tdmp/saveSectionTwo", payload, {
       headers: { "Content-Type": "application/json" },
     })
       .then(() => Swal.fire("Success!", "Form submitted successfully!", "success"))

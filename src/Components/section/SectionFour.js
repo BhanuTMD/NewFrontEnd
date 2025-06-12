@@ -1,5 +1,4 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -8,12 +7,11 @@ import Header from "Components/common/header";
 import FooterBar from "Components/common/footer";
 import Section from "Components/common/section";
 import NavBar from "Components/common/navBar";
+import Country from "Components/data/country"; // your static list of countries
+import CustomSelect from "Components/utils/CustomSelect"; // assuming this is your reusable Select component
 import "react-datepicker/dist/react-datepicker.css";
 
-
-
 const SectionFour = () => {
-  const [countries, setCountries] = useState([]);
   const navigate = useNavigate();
 
   const initialValues = {
@@ -36,26 +34,10 @@ const SectionFour = () => {
     // deploymentDetails: Yup.string().required("Required"),
   });
 
-  useEffect(() => {
-    const fetchCountries = async () => {
-      try {
-        const { data } = await axios.get("https://restcountries.com/v3.1/all");
-        const formattedCountries = data.map((country) => ({
-          code: country.cca2,
-          name: country.name.common,
-        }));
-        setCountries(formattedCountries);
-      } catch (err) {
-        console.error("Error fetching countries:", err);
-      }
-    };
-    fetchCountries();
-  }, []);
-
   const handleSubmit = async (values) => {
     try {
       const res = await axios.post(
-        "http://172.16.2.102:8080/apf/tdmp/saveSectionFour",
+        "http://172.16.2.246:8080/apf/tdmp/saveSectionFour",
         values,
         { headers: { "Content-Type": "application/json" } }
       );
@@ -70,7 +52,7 @@ const SectionFour = () => {
   return (
     <>
       <Header />
-      <NavBar/>
+      <NavBar />
       <div className="p-8 bg-blue-200 border">
         <Section sectionLine="Section 4 : Commercialization / Deployment Details - Add / Modify Sub Form" />
 
@@ -117,17 +99,16 @@ const SectionFour = () => {
               </label>
               <Field
                 name="country"
-                as="select"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-              >
-                <option value="">--Please Select--</option>
-                {countries.map((country) => (
-                  <option key={country.code} value={country.code}>
-                    {country.name} ({country.code})
-                  </option>
-                ))}
-              </Field>
-              <ErrorMessage name="country" component="div" className="text-red-500" />
+                options={Country} // use your imported Country list here
+                component={CustomSelect}
+                placeholder="Select a Country..."
+                isMulti={false} // single select
+              />
+              <ErrorMessage
+                name="country"
+                component="div"
+                className="text-red-500"
+              />
             </div>
 
             {/* Nodal Contact Person */}

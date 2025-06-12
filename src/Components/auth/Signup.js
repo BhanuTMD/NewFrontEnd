@@ -2,35 +2,28 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Validation from "Components/auth/SignupValidation";
 import axios from "axios";
-import { lab } from "Components/pages/techSearch/techSearchOptions";
-
+// import { lab } from "Components/pages/techSearch/techSearchOptions";
+import { lab } from "Components/data/lab";
 function Signup() {
   const [values, setValues] = useState({
     name: "",
     designation: "",
     lab: "",
-    email: "", 
-    phoneNumber: "", 
-    password: "",
-    employeeId: "" 
+    email: "",    phoneNumber: "",
+    password: "",    employeeId: ""
   });
-
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   const handleInput = (e) => {
-    setValues({ ...values, [e.target.name]: e.target.value });
-  };
-
+    setValues({ ...values, [e.target.name]: e.target.value });  };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationErrors = Validation(values);
-    setErrors(validationErrors);
-
+    const validationErrors = Validation(values);    setErrors(validationErrors);
     if (
       values.name &&
       values.designation &&
-      values.lab &&
+      values.leadLaboratory &&
       values.email &&
       values.phoneNumber &&
       values.password &&
@@ -46,14 +39,14 @@ function Signup() {
             },
           }
         );
-
-        console.log("Response data:", response.data);
-
-        if (response?.data?.success) {
+        console.log("Response data ******************************************************:", response.data);
+        // Check if the response structure is as expected
+        if (response.status === 201) { // Check for 201 Created status
           alert("Registration successful!");
           navigate("/login");
         } else {
-          alert(response?.data?.message || "Registration failed");
+          console.error("Registration failed:", response.data);
+          alert(response.data.message || "Registration failed");
         }
       } catch (error) {
         console.error("Signup error:", error);
@@ -61,7 +54,6 @@ function Signup() {
       }
     }
   };
-
   return (
     <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-200 to-indigo-200 overflow-hidden">
       <div className="w-[90%] sm:w-[70%] md:w-[50%] lg:w-[38%] bg-white p-6 rounded-xl shadow-lg">
@@ -87,7 +79,6 @@ function Signup() {
             </select>
             {errors.designation && <Error text={errors.designation} />}
           </div>
-
           <div>
             <label className="block text-sm font-medium mb-1">CSIR-Lab</label>
             <select
@@ -135,9 +126,6 @@ const Input = ({ label, name, type, value, onChange, error }) => (
     {error && <Error text={error} />}
   </div>
 );
-
 const Error = ({ text }) => (
-  <p className="text-red-500 text-xs mt-1">{text}</p>
-);
-
+  <p className="text-red-500 text-xs mt-1">{text}</p>);
 export default Signup;

@@ -9,8 +9,6 @@ import SectionTwoPreview from 'Components/pages/techSearch/SectionTwoPreview';
 import SectionThreePreview from 'Components/pages/techSearch/SectionThreePreview';
 import SectionFourPreview from 'Components/pages/techSearch/SectionFourPreview';
 
-
-
 const TechSearch = () => {
     const initialValues = {
         industrialSector: "",
@@ -19,11 +17,9 @@ const TechSearch = () => {
         trnNo: "",
         sectionSelect: ""
     };
-
     const validationSchema = Yup.object({
         // Validation schema
     });
-
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedSection, setSelectedSection] = useState('');
@@ -41,7 +37,7 @@ const TechSearch = () => {
     const fetchData = async (values) => {
         setLoading(true);
         try {
-            const response = await fetch('http://172.16.2.236:8080/apf/tdmp/search', {
+            const response = await fetch('http://172.16.2.246:8080/apf/tdmp/search', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -63,10 +59,9 @@ const TechSearch = () => {
             setLoading(false);
         }
     };
-
     return (
         <>
-            <NavBar />
+         <NavBar />
             <div className="flex">
                 <div className="bg-gray-800"></div>
                 <div className="flex-1 p-8 bg-blue-200 border">
@@ -82,7 +77,6 @@ const TechSearch = () => {
                             />
                         </Form>
                     </Formik>
-
                     {(loading && <div className="text-center py-8">Loading...</div>) || (
                         <>
                             {(!selectedSection || selectedSection === 'SectionOne') && data.sectionOneList && (
