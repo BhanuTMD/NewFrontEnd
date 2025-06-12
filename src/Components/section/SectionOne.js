@@ -11,11 +11,8 @@ import { useNavigate } from "react-router-dom";
 import { industrialSector } from "Components/data/industrialSector";
 import { theme } from "Components/data/theme";
 import { stakeHolders } from "Components/data/stakeHolders";
-import { leadLaboratory } from "Components/data/leadLaboratory";
-import { associateInstitute } from "Components/data/associateInstitute";
-
+import { lab } from "Components/data/lab";
 const SectionOne = () => {
-  // console.log("industrialSector options:", industrialSector);
   const initialValues = {
     technologyRefNo: "",
     keywordTechnology: "",
@@ -23,8 +20,8 @@ const SectionOne = () => {
     industrialSector: [],
     theme: [],
     multiLabInstitute: "",
-    associateInstitute: [],
     leadLaboratory: "",
+    associateInstitute: [],
     technologyLevel: "",
     scaleDevelopment: "",
     yearDevelopment: "",
@@ -34,16 +31,16 @@ const SectionOne = () => {
     stakeHolders: [],
     environmentalStatutory: "",
     marketPotential: "",
-    picture: null, // Assuming this is a file input
+    file: null, // Assuming this is a file input
     laboratoryDetail: "",
   };
-
   const validationSchema = Yup.object({
     // technologyRefNo: Yup.string().required("Required"),
     // keywordTechnology: Yup.string().required("Required"),
     // nameTechnology: Yup.string().required("Required"),
     // industrialSector: Yup.array().required("Required"), // Ensure this is an array
     // leadLaboratory: Yup.string().required("Required"),
+    // associateInstitute: Yup.string().required("Required"),
     // technologyLevel: Yup.string().required("Required"),
     // scaleDevelopment: Yup.string().required("Required"),
     // yearDevelopment: Yup.string().required("Required"),
@@ -54,48 +51,72 @@ const SectionOne = () => {
     // environmentalStatutory: Yup.string().required("Required"),
     // laboratoryDetail: Yup.string().required("Required"),
   });
-
-  
   const navigate = useNavigate();
 
   const handleSubmit = (values) => {
-    console.log("handle submit is calling******************", values);
-    const url = "http://172.16.2.102:8080/apf/tdmp/saveSectionOne";
-    const config = {
-      headers: { "Content-Type": "application/json" }, // Set to multipart/form-data for FormData if needed
-    };
+    console.log("handle submit is calling********", values);
 
-    // Create the payload based on the values received
-    const payload = {
-      technologyRefNo: values.technologyRefNo,
-      keywordTechnology: values.keywordTechnology,
-      nameTechnology: values.nameTechnology,
-      industrialSector: Array.isArray(values.industrialSector)
-        ? values.industrialSector
-        : [values.industrialSector],
-      theme: Array.isArray(values.theme) ? values.theme : [values.theme],
-      multiLabInstitute: values.multiLabInstitute,
-      associateInstitute: Array.isArray(values.associateInstitute)
-        ? values.associateInstitute
-        : [values.associateInstitute],
-      leadLaboratory: values.leadLaboratory,
-      technologyLevel: values.technologyLevel,
-      scaleDevelopment: values.scaleDevelopment,
-      yearDevelopment: values.yearDevelopment,
-      briefTech: values.briefTech,
-      competitivePosition: values.competitivePosition,
-      technoEconomics: values.technoEconomics,
-      stakeHolders: Array.isArray(values.stakeHolders)
-        ? values.stakeHolders
-        : [values.stakeHolders],
-      environmentalStatutory: values.environmentalStatutory,
-      marketPotential: values.marketPotential,
-      picture: values.picture, // Assuming this is a file input
-      laboratoryDetail: values.laboratoryDetail,
-    };
+    const url = "http://172.16.2.246:8080/apf/tdmp/saveSectionOne";
 
+    // Create FormData object
+    const formData = new FormData();
+
+    // Append simple fields
+    formData.append("technologyRefNo", values.technologyRefNo);
+    formData.append("keywordTechnology", values.keywordTechnology);
+    formData.append("nameTechnology", values.nameTechnology);
+
+    // Append arrays
+    if (values.industrialSector && Array.isArray(values.industrialSector)) {
+      values.industrialSector.forEach((item) =>
+        formData.append("industrialSector", item)
+      );
+    }
+
+    if (values.theme && Array.isArray(values.theme)) {
+      values.theme.forEach((item) => formData.append("theme", item));
+    }
+
+    if (values.associateInstitute && Array.isArray(values.associateInstitute)) {
+      values.associateInstitute.forEach((item) =>
+        formData.append("associateInstitute", item)
+      );
+    }
+
+    // Single field
+    formData.append("leadLaboratory", values.leadLaboratory);
+
+    // Rest of the fields
+    formData.append("technologyLevel", values.technologyLevel);
+    formData.append("scaleDevelopment", values.scaleDevelopment);
+    formData.append("yearDevelopment", values.yearDevelopment);
+    formData.append("briefTech", values.briefTech);
+    formData.append("competitivePosition", values.competitivePosition);
+    formData.append("technoEconomics", values.technoEconomics);
+
+    if (values.stakeHolders && Array.isArray(values.stakeHolders)) {
+      values.stakeHolders.forEach((item) =>
+        formData.append("stakeHolders", item)
+      );
+    }
+
+    formData.append("environmentalStatutory", values.environmentalStatutory);
+    formData.append("marketPotential", values.marketPotential);
+
+    // File field
+    if (values.file) {
+      formData.append("file", values.file); // Changed 'file' to 'file'
+    }
+
+    formData.append("laboratoryDetail", values.laboratoryDetail);
+
+    // Now post the formData (no need to set Content-Type manually)
     axios
-      .post(url, payload, config)
+      .post(url, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // Explicitly set the content type
+        },
+      })
       .then((response) => {
         console.log("Response data:", response.data);
         Swal.fire({
@@ -115,6 +136,7 @@ const SectionOne = () => {
         });
       });
   };
+
   return (
     <>
       <Header />
@@ -123,7 +145,9 @@ const SectionOne = () => {
         <div className="bg-gray-800  "></div>
         {/* Form */}
         <div className="flex-1 p-8 bg-blue-200 border">
-          <Section sectionLine="Section 1 : Key Details - Add New Technology / Knowhow Information" />
+          <Section
+            sectionLine="Section 1 : Key Details - Add New Technology / Knowhow Information"
+          />
           <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
@@ -138,7 +162,7 @@ const SectionOne = () => {
                   >
                     Technology /Knowhow Ref No:
                     <span className="Hint block text-xs text-red-500 inline text-end">
-                      *Mandatory Field*
+                      Mandatory Field
                     </span>
                   </label>
                   <Field
@@ -215,10 +239,10 @@ const SectionOne = () => {
                   </label>
                   <Field
                     name="leadLaboratory"
-                    options={leadLaboratory}
+                    options={lab}
                     component={CustomSelect}
                     placeholder="Select a Lab..."
-                  // isMulti={true}
+                    // isMulti={true}
                   ></Field>
                 </div>
                 <div className="form-group mb-4">
@@ -231,7 +255,6 @@ const SectionOne = () => {
                     component={CustomSelect}
                     placeholder="Select a Theme..."
                     isMulti={true}
-                
                   >
                     <ErrorMessage
                       name="theme"
@@ -280,17 +303,17 @@ const SectionOne = () => {
                 </div>
 
                 <div className="form-group mb-4">
-                  <label className="font-bold" htmlFor="associateInstitute">
+                  <label className="font-bold" htmlFor="lab">
                     If Yes,Please Specify Labs/Institutes
                   </label>
 
                   <Field
-                    name="associateInstitute"
-                    options={associateInstitute}
+                    name="lab"
+                    options={lab}
                     component={CustomSelect}
                     placeholder="Select List Of Multilabs From here..."
                     isMulti={true}
-                  //className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    //className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   ></Field>
                 </div>
 
@@ -409,7 +432,7 @@ const SectionOne = () => {
                     component={CustomSelect}
                     placeholder="Select Ministry List from here..."
                     isMulti={true}
-                  //className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    //className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   ></Field>
                   <ErrorMessage
                     name="stakeHolders"
@@ -485,12 +508,12 @@ const SectionOne = () => {
                   />
                 </div>
                 <div className="form-group mb-4">
-                  <label className="font-bold" htmlFor="picture">
-                    Upload High-Resolution Picture (Optional)
+                  <label className="font-bold" htmlFor="file">
+                    Upload High-Resolution file (Optional)
                   </label>
                   <input
                     type="file"
-                    name="picture"
+                    name="file"
                     accept=".jpg,.jpeg,.png,.pdf"
                     className="w-full p-2 text-lg outline-0.1 rounded-md"
                     onChange={(e) => {
@@ -512,7 +535,7 @@ const SectionOne = () => {
                         }
 
                         // Set file if valid
-                        setFieldValue("picture", file);
+                        setFieldValue("file", file);
                       }
                     }}
                   />

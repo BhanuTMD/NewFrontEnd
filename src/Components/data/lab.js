@@ -1,4 +1,4 @@
- export const leadLaboratory = [
+ export const lab = [
   {
     label:
       "CSIR-Advanced Materials and Processes Research Institute (CSIR-AMPRI), Bhopal",
