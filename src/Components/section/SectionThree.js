@@ -520,7 +520,6 @@ const SectionThree = () => {
                     readOnly
                   />
                 </div>
-
                 {/* Buttons */}
                 <div className="flex justify-center items-center gap-4 mt-4">
                   <button
@@ -530,20 +529,18 @@ const SectionThree = () => {
                   >
                     Previous
                   </button>
-
+                  <button
+                    type="submit"
+                    className="bg-green-600 text-white px-6 py-3 rounded"
+                  >
+                    Save
+                  </button>
                   <button
                     type="button"
                     onClick={() => navigate("/sectionFour")}
                     className="bg-indigo-600 text-white px-6 py-3 rounded"
                   >
                     Next
-                  </button>
-
-                  <button
-                    type="submit"
-                    className="bg-green-600 text-white px-6 py-3 rounded"
-                  >
-                    Submit
                   </button>
                 </div>
 

@@ -37,6 +37,7 @@ const SectionFourPreview = ({ data }) => {
     `;
     newWindow.document.write(rowHTML);
     newWindow.document.close();
+    
   };
   return (
     <div className="mt-8">
