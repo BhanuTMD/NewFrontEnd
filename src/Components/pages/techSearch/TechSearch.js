@@ -8,7 +8,6 @@ import SectionOnePreview from 'Components/pages/techSearch/SectionOnePreview';
 import SectionTwoPreview from 'Components/pages/techSearch/SectionTwoPreview';
 import SectionThreePreview from 'Components/pages/techSearch/SectionThreePreview';
 import SectionFourPreview from 'Components/pages/techSearch/SectionFourPreview';
-
 const TechSearch = () => {
     const initialValues = {
         industrialSector: "",

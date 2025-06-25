@@ -82,10 +82,8 @@ const SectionOne = () => {
         formData.append("associateInstitute", item)
       );
     }
-
     // Single field
     formData.append("leadLaboratory", values.leadLaboratory);
-
     // Rest of the fields
     formData.append("technologyLevel", values.technologyLevel);
     formData.append("scaleDevelopment", values.scaleDevelopment);
@@ -99,17 +97,13 @@ const SectionOne = () => {
         formData.append("stakeHolders", item)
       );
     }
-
     formData.append("environmentalStatutory", values.environmentalStatutory);
     formData.append("marketPotential", values.marketPotential);
-
     // File field
     if (values.file) {
       formData.append("file", values.file); // Changed 'file' to 'file'
     }
-
     formData.append("laboratoryDetail", values.laboratoryDetail);
-
     // Now post the formData (no need to set Content-Type manually)
     axios
       .post(url, formData, {
@@ -232,7 +226,6 @@ const SectionOne = () => {
                     className="text-red-500"
                   />
                 </div>
-
                 <div className="form-group mb-4">
                   <label className="font-bold" htmlFor="leadLaboratory">
                     Lead Laboratory / Institute

@@ -8,7 +8,7 @@ import SectionThree from "Components/section/SectionThree";
 import SectionFour from "Components/section/SectionFour";
 import TechSearch from "Components/pages/techSearch/TechSearch";
 import WelcomePage from "Components/pages/welcomePage/WelcomePage";
-import OTPLoginVerify from "Components/auth/OtpLoginVerify";
+// import OTPLoginVerify from "Components/auth/OtpLoginVerify";
 import PreviewPopUp from "Components/pages/techSearch/PreviewPopUp";
 import PrivateRoute from "Components/auth/privateRoute";
 
@@ -19,7 +19,7 @@ const AppRoutes = () => {
       <Route path="welcomePage" element={<WelcomePage />} />
       <Route path="signup" element={<Signup />} />
       <Route path="Login" element={<Login />} />
-      <Route path="otpLoginVerify" element={<OTPLoginVerify />} />
+      {/* <Route path="otpLoginVerify" element={<OTPLoginVerify />} /> */}
 
       {/* Protected Routes */}
       <Route
