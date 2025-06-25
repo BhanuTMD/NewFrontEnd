@@ -54,9 +54,9 @@ const SectionOne = () => {
   const navigate = useNavigate();
 
   const handleSubmit = (values) => {
-    console.log("handle submit is calling********", values);
+  console.log("handle submit is calling********", values);
 
-    const url = "http://172.16.2.246:8080/apf/tdmp/saveSectionOne";
+  const url = "http://172.16.2.246:8080/apf/tdmp/saveSectionOne";
 
     // Create FormData object
     const formData = new FormData();

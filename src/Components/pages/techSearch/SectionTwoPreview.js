@@ -61,7 +61,14 @@ const SectionTwoPreview = ({ data }) => {
               <div><strong>Countries:</strong> {item.countries?.join(', ') || '-'}</div>
             </div>
             {/* Action buttons */}
-            <div className="mt-4">
+            {/* Action Buttons */}
+            <div className="mt-4 space-x-2">
+              <button
+                onClick={() => handlePrintRow(item)}
+                className="text-green-600 hover:underline"
+              >
+                Preview
+              </button>
               <button
                 onClick={() => handlePrintRow(item)}
                 className="text-blue-600 hover:underline"

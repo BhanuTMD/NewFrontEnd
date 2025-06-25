@@ -58,9 +58,10 @@ const TechSearch = () => {
             setLoading(false);
         }
     };
+    
     return (
         <>
-         <NavBar />
+            <NavBar />
             <div className="flex">
                 <div className="bg-gray-800"></div>
                 <div className="flex-1 p-8 bg-blue-200 border">
@@ -70,7 +71,7 @@ const TechSearch = () => {
                         onSubmit={handleSubmit}
                     >
                         <Form>
-                            <TechSearchForm 
+                            <TechSearchForm
                                 selectedSection={selectedSection}
                                 handleSectionChange={handleSectionChange}
                             />
@@ -78,19 +79,23 @@ const TechSearch = () => {
                     </Formik>
                     {(loading && <div className="text-center py-8">Loading...</div>) || (
                         <>
-                            {(!selectedSection || selectedSection === 'SectionOne') && data.sectionOneList && (
-                                <SectionOnePreview data={data}  />
+                            {!selectedSection && data.sectionOneList && (
+                                <AllSectionPreview data={data} />
                             )}
 
-                            {(!selectedSection || selectedSection === 'SectionTwo') && data.sectionTwoList && (
+                            {selectedSection === 'SectionOne' && data.sectionOneList && (
+                                <SectionOnePreview data={data} />
+                            )}
+
+                            {selectedSection === 'SectionTwo' && data.sectionTwoList && (
                                 <SectionTwoPreview data={data} />
                             )}
 
-                            {(!selectedSection || selectedSection === 'SectionThree') && data.sectionThreeList && (
+                            {selectedSection === 'SectionThree' && data.sectionThreeList && (
                                 <SectionThreePreview data={data} />
                             )}
 
-                            {(!selectedSection || selectedSection === 'SectionFour') && data.sectionFourList && (
+                            {selectedSection === 'SectionFour' && data.sectionFourList && (
                                 <SectionFourPreview data={data} />
                             )}
                         </>

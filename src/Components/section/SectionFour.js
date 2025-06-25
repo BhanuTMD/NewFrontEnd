@@ -138,10 +138,10 @@ const SectionFour = () => {
               </button>
               <button
                 type="button"
-                className="px-4 py-2 bg-blue-500 text-white rounded-md ml-4"
+                className="px-4 py-2 bg-green-600 text-white rounded-md ml-4"
                 onClick={() => navigate("/PreviewPopUp")}
               >
-                Preview
+                Save & Preview
               </button>
               <button
                 type="submit"
