@@ -1,25 +1,20 @@
 import React, { useState } from 'react';
 import PreviewPopUp from './PreviewPopUp';
-
 const SectionOnePreview = ({ data }) => {
   const [previewItem, setPreviewItem] = useState(null);
-
   const handlePreviewRow = (item) => {
     setPreviewItem(item);
   };
-
   return (
     <div className="mt-8">
       <h2 className="text-xl font-bold mb-4">Section One - Technology Details</h2>
       <div className="space-y-6">
         {data.sectionOneList.map((item, index) => (
           <div key={index} className="border p-4 rounded-lg shadow-md bg-white">
-            <h4 className="text-md font-bold text-blue-700 mb-1">Section One</h4>
-
-            <h3 className="text-lg font-semibold mb-2 text-red-500">
+            <h4 className="text-md font-bold text-red-600 mb-1">Section One</h4>
+            <h3 className="text-lg font-semibold mb-2 text-blue-600">
               {item.nameTechnology || 'Technology'}
             </h3>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div><strong>TRN No:</strong> {item.technologyRefNo || '-'}</div>
               <div><strong>Keywords:</strong> {item.keywordTechnology || '-'}</div>
@@ -47,7 +42,6 @@ const SectionOnePreview = ({ data }) => {
               </div>
               <div><strong>Laboratory Details:</strong> {item.laboratoryDetail || '-'}</div>
             </div>
-
             <div className="mt-4">
               <button
                 onClick={() => handlePreviewRow(item)}
@@ -59,7 +53,6 @@ const SectionOnePreview = ({ data }) => {
           </div>
         ))}
       </div>
-
       {previewItem && (
         <PreviewPopUp
           item={previewItem}
@@ -70,5 +63,4 @@ const SectionOnePreview = ({ data }) => {
     </div>
   );
 };
-
 export default SectionOnePreview;
