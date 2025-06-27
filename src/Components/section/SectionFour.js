@@ -7,12 +7,16 @@ import Header from "Components/common/header";
 import FooterBar from "Components/common/footer";
 import Section from "Components/common/section";
 import NavBar from "Components/common/navBar";
-import Country from "Components/data/country"; // your static list of countries
-import CustomSelect from "Components/utils/CustomSelect"; // assuming this is your reusable Select component
+import Country from "Components/data/country";
+import CustomSelect from "Components/utils/CustomSelect";
+import PreviewPopUp from "Components/pages/techSearch/PreviewPopUp";
 import "react-datepicker/dist/react-datepicker.css";
+import { useState } from "react";
 
 const SectionFour = () => {
   const navigate = useNavigate();
+  const [previewItem, setPreviewItem] = useState(null);
+  const [editMode, setEditMode] = useState(false);
 
   const initialValues = {
     technologyRefNo: "",
@@ -24,29 +28,43 @@ const SectionFour = () => {
     deploymentDetails: "",
   };
 
-  const validationSchema = Yup.object({
-    // technologyRefNo: Yup.string().required("Required"),
-    // clientName: Yup.string().required("Required"),
-    // clientAddress: Yup.string().required("Required"),
-    // city: Yup.string().required("Required"),
-    // country: Yup.string().required("Required"),
-    // nodalContactPerson: Yup.string().required("Required"),
-    // deploymentDetails: Yup.string().required("Required"),
-  });
+  const validationSchema = Yup.object({});
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values, { setValues }) => {
     try {
       const res = await axios.post(
         "http://172.16.2.246:8080/apf/tdmp/saveSectionFourAndFetchAll",
         values,
         { headers: { "Content-Type": "application/json" } }
       );
-      console.log("Response:", res.data);
-      Swal.fire("Success!", "Form submitted successfully!", "success");
+
+      if (res.data) {
+        const formattedPreviewItem = {
+          ...res.data.sectionOne,
+          sectionTwo: res.data.sectionTwo ? [res.data.sectionTwo] : [],
+          sectionThree: res.data.sectionThree ? [res.data.sectionThree] : [],
+          sectionFour: res.data.sectionFour ? [res.data.sectionFour] : [],
+        };
+
+        setPreviewItem(formattedPreviewItem);
+        setEditMode(false);
+        Swal.fire("Success", "Form submitted successfully!", "success");
+      }
     } catch (err) {
       console.error("Submission error:", err);
-      Swal.fire("Error!", "Form submission failed. Please try again.", "error");
+      Swal.fire("Error", "Form submission failed. Please try again.", "error");
     }
+  };
+
+  const handleEdit = () => {
+    if (previewItem?.sectionFour?.[0]) {
+      setEditMode(true);
+    }
+  };
+
+  const handleClosePreview = () => {
+    setPreviewItem(null);
+    setEditMode(false);
   };
 
   return (
@@ -57,12 +75,12 @@ const SectionFour = () => {
         <Section sectionLine="Section 4 : Commercialization / Deployment Details - Add / Modify Sub Form" />
 
         <Formik
-          initialValues={initialValues}
+          initialValues={editMode && previewItem?.sectionFour?.[0] ? previewItem.sectionFour[0] : initialValues}
+          enableReinitialize
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
           <Form>
-            {/* Technology Ref No */}
             <FormField
               label="Technology / Knowhow Ref No:"
               name="technologyRefNo"
@@ -70,14 +88,12 @@ const SectionFour = () => {
               placeholder="Enter New Information"
             />
 
-            {/* Client Name */}
             <FormField
               label="Name of Client:"
               name="clientName"
               note="Max. 300 Characters"
             />
 
-            {/* Client Address */}
             <FormField
               label="Address of Client:"
               name="clientAddress"
@@ -85,24 +101,20 @@ const SectionFour = () => {
               textarea
             />
 
-            {/* City */}
             <FormField
               label="City"
               name="city"
               note="Max. 300 Characters"
             />
 
-            {/* Country Dropdown */}
             <div className="form-group mb-4">
-              <label className="font-bold" htmlFor="country">
-                Country
-              </label>
+              <label className="font-bold" htmlFor="country">Country</label>
               <Field
                 name="country"
-                options={Country} // use your imported Country list here
+                options={Country}
                 component={CustomSelect}
                 placeholder="Select a Country..."
-                isMulti={false} // single select
+                isMulti={false}
               />
               <ErrorMessage
                 name="country"
@@ -111,7 +123,6 @@ const SectionFour = () => {
               />
             </div>
 
-            {/* Nodal Contact Person */}
             <FormField
               label="Name and Address of Nodal Contact Person:"
               name="nodalContactPerson"
@@ -119,7 +130,6 @@ const SectionFour = () => {
               textarea
             />
 
-            {/* Deployment Details */}
             <FormField
               label="Deployment Details"
               name="deploymentDetails"
@@ -127,7 +137,6 @@ const SectionFour = () => {
               textarea
             />
 
-            {/* Buttons */}
             <div className="form-group mb-4 flex justify-center">
               <button
                 type="button"
@@ -139,28 +148,32 @@ const SectionFour = () => {
               <button
                 type="submit"
                 className="px-4 py-2 bg-green-600 text-white rounded-md ml-4"
-                onClick={() => navigate("/sectionFour")}
               >
                 Save & Preview
               </button>
-              
             </div>
           </Form>
         </Formik>
       </div>
       <FooterBar />
+
+      {previewItem && (
+        <PreviewPopUp
+          item={previewItem}
+          activeSection="all"
+          onClose={handleClosePreview}
+          onEdit={handleEdit}
+        />
+      )}
     </>
   );
 };
 
-// Reusable form field component
 const FormField = ({ label, name, note, mandatory, textarea, placeholder }) => (
   <div className="form-group mb-4">
     <label className="font-bold flex justify-between" htmlFor={name}>
       {label}
-      {mandatory && (
-        <span className="text-xs text-red-500">*Mandatory Field*</span>
-      )}
+      {mandatory && <span className="text-xs text-red-500">*Mandatory Field*</span>}
     </label>
     <Field
       as={textarea ? "textarea" : "input"}
