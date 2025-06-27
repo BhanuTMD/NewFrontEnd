@@ -17,7 +17,7 @@ const SectionFourPreview = ({ data }) => {
             key={index}
             className="border p-4 rounded-lg shadow-md bg-white"
           >
-            <h4 className="text-md font-semibold text-gray-500 mb-1">Section Four</h4>
+            <h4 className="text-md font-semibold text-red-600 mb-1">Section Four</h4>
             <h3 className="text-lg font-semibold mb-2 text-blue-700">
               {item.clientName || 'Deployment Detail'}
             </h3>

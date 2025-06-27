@@ -93,13 +93,14 @@ const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose }) => {
     newWindow.document.close();
   };
 
-  const Section = ({ title, children }) => (
-    <div className="mt-6 avoid-break">
-      <h2 className="bg-gray-800 text-white text-lg font-semibold px-4 py-2 rounded print:break-before-page">{title}</h2>
-      <div className="overflow-x-auto mt-2">{children}</div>
-    </div>
-  );
-
+const Section = ({ title, children, bgColor = 'bg-gray-800' }) => (
+  <div className="mt-6 avoid-break">
+    <h2 className={`${bgColor} text-white text-lg font-semibold px-4 py-2 rounded print:break-before-page`}>
+      {title}
+    </h2>
+    <div className="overflow-x-auto mt-2">{children}</div>
+  </div>
+);
   const renderTable = (rows) => (
     <table className="min-w-full text-sm shadow-md rounded overflow-hidden">
       <tbody>
@@ -112,7 +113,6 @@ const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose }) => {
       </tbody>
     </table>
   );
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white rounded-xl shadow-lg max-w-5xl w-full p-6 overflow-auto max-h-[90vh]">
@@ -155,7 +155,7 @@ const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose }) => {
           )}
 
           {showSection('sectionTwo') && previewItem.sectionTwo.length > 0 && (
-            <Section title="Section Two - IPR Details">
+           <Section title="Section Two - IPR Details" bgColor="bg-blue-600">
               {previewItem.sectionTwo.map((row, i) => (
                 <div key={i} className="mb-4 avoid-break">
                   {renderTable([
@@ -172,7 +172,7 @@ const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose }) => {
           )}
 
           {showSection('sectionThree') && previewItem.sectionThree.length > 0 && (
-            <Section title="Section Three - Licensing Details">
+         <Section title="Section Three - Licensing Details" bgColor="bg-green-600">
               {previewItem.sectionThree.map((row, i) => (
                 <div key={i} className="mb-4 avoid-break">
                   {renderTable([
@@ -187,6 +187,9 @@ const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose }) => {
                     ['Payment Terms', row.paymentTerms || '-'],
                     ['Royalty', row.royalty?.map(r => `₹${r.amount} on ${r.date}`).join(', ') || '-'],
                     ['Premia', row.premia?.map(p => `₹${p.amount} on ${p.date}`).join(', ') || '-'],
+                    ['Sub Total Royalty', `₹${row.subTotalRoyalty || '0'}`],
+                    ['Sub Total Premia', `₹${row.subTotalPremia || '0'}`],
+                    ['Grand Total', `₹${row.grandTotal || '0'}`],
                   ])}
                 </div>
               ))}
@@ -194,7 +197,7 @@ const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose }) => {
           )}
 
           {showSection('sectionFour') && previewItem.sectionFour.length > 0 && (
-            <Section title="Section Four - Deployment Details">
+             <Section title="Section Four - Deployment Details" bgColor="bg-purple-600">
               {previewItem.sectionFour.map((row, i) => (
                 <div key={i} className="mb-4 avoid-break">
                   {renderTable([
@@ -210,7 +213,6 @@ const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose }) => {
             </Section>
           )}
         </div>
-
         <div className="mt-6 flex justify-between print:hidden">
           <button
             onClick={handlePrint}

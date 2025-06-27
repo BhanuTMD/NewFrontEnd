@@ -82,6 +82,10 @@ const AllSectionPreview = ({ data }) => {
                   <Detail label="License Date" value={sectionThree[0].dateOfLicense} />
                   <Detail label="Validity" value={sectionThree[0].licenseValidUntil} />
                   <Detail label="Payment Terms" value={sectionThree[0].paymentTerms} />
+                  <Detail label="Sub Total Royalty" value={`₹${sectionThree[0].subTotalRoyalty || '0'}`} />
+                  <Detail label="Sub Total Premia" value={`₹${sectionThree[0].subTotalPremia || '0'}`} />
+                  <Detail label="Grand Total" value={`₹${sectionThree[0].grandTotal || '0'}`} />
+
                   <div className="col-span-2">
                     <strong>Royalty:</strong>
                     {(sectionThree[0].royalty || []).map((r, i) => (
@@ -94,10 +98,12 @@ const AllSectionPreview = ({ data }) => {
                       <div key={i}>₹{p.amount} on {p.date}</div>
                     ))}
                   </div>
-                </div>
+                  <div className="col-span-2">
+                    <strong>Grand Total:</strong> ₹{sectionThree[0].grandTotal || '0'}
+                  </div>
+                </div>              
               </div>
             )}
-
             {/* Section Four */}
             {sectionFour.length > 0 && (
               <div className={`${sectionStyles.four} pl-4`}>
@@ -111,7 +117,6 @@ const AllSectionPreview = ({ data }) => {
                 </div>
               </div>
             )}
-
             {/* Button */}
             <div className="mt-4">
               <button
