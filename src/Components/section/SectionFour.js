@@ -37,7 +37,7 @@ const SectionFour = () => {
   const handleSubmit = async (values) => {
     try {
       const res = await axios.post(
-        "http://172.16.2.246:8080/apf/tdmp/saveSectionFour",
+        "http://172.16.2.246:8080/apf/tdmp/saveSectionFourAndFetchAll",
         values,
         { headers: { "Content-Type": "application/json" } }
       );
@@ -137,18 +137,13 @@ const SectionFour = () => {
                 Previous
               </button>
               <button
-                type="button"
+                type="submit"
                 className="px-4 py-2 bg-green-600 text-white rounded-md ml-4"
-                onClick={() => navigate("/PreviewPopUp")}
+                onClick={() => navigate("/sectionFour")}
               >
                 Save & Preview
               </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-blue-500 text-white rounded-md ml-4"
-              >
-                Submit
-              </button>
+              
             </div>
           </Form>
         </Formik>
