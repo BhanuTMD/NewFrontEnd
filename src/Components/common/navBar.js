@@ -5,12 +5,13 @@ import { useAuth } from "Components/auth/AuthContext";
 
 function NavBar() {
   const { isAuthenticated, logout, isLoading } = useAuth();
-  // const location = useLocation();
   const navigate = useNavigate();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const name = localStorage.getItem("userName");
 
   const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
   const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
@@ -27,31 +28,28 @@ function NavBar() {
 
   const handleLogout = () => {
     logout();
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userEmail");
     navigate("/Login");
   };
 
-  if (isLoading) {
-    return null; // or spinner
-  }
+  if (isLoading) return null;
 
   return (
     <nav className="w-full bg-indigo-300 text-blue-600 font-semibold shadow-md">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-        {/* Left: Logo & Links */}
+        {/* Left: Logo & Nav Items */}
         <div className="flex items-center space-x-6">
-          {/* Mobile Hamburger */}
           <div className="sm:hidden">
             <button onClick={toggleMobileMenu}>
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
 
-          {/* Desktop Nav */}
           <div className="hidden sm:flex sm:items-center space-x-6">
             <Link to="/welcomePage" className="hover:text-blue-900 text-lg font-bold">
               Home
             </Link>
-
             {isAuthenticated && (
               <>
                 <Link to="/techSearch" className="hover:text-blue-900 text-lg font-bold">
@@ -81,12 +79,15 @@ function NavBar() {
           </div>
         </div>
 
-        {/* Right Side: Auth buttons */}
-        <div className="hidden sm:block">
+        {/* Right: User Info */}
+        <div className="hidden sm:flex items-center space-x-4">
           {isAuthenticated ? (
-            <button onClick={handleLogout} className="text-lg font-bold hover:text-blue-900">
-              Logout
-            </button>
+            <>
+              <span className="text-lg font-bold text-blue-900">Welcome, {name}</span>
+              <button onClick={handleLogout} className="text-lg font-bold hover:text-blue-900 ml-4">
+                Logout
+              </button>
+            </>
           ) : (
             <>
               <Link to="/Login" className="text-lg font-bold hover:text-blue-900">

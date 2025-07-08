@@ -27,9 +27,7 @@ const SectionFour = () => {
     nodalContactPerson: "",
     deploymentDetails: "",
   };
-
   const validationSchema = Yup.object({});
-
   const handleSubmit = async (values, { setValues }) => {
     try {
       const res = await axios.post(
@@ -55,18 +53,15 @@ const SectionFour = () => {
       Swal.fire("Error", "Form submission failed. Please try again.", "error");
     }
   };
-
   const handleEdit = () => {
     if (previewItem?.sectionFour?.[0]) {
       setEditMode(true);
     }
   };
-
   const handleClosePreview = () => {
     setPreviewItem(null);
     setEditMode(false);
   };
-
   return (
     <>
       <Header />
@@ -106,7 +101,6 @@ const SectionFour = () => {
               name="city"
               note="Max. 300 Characters"
             />
-
             <div className="form-group mb-4">
               <label className="font-bold" htmlFor="country">Country</label>
               <Field
@@ -122,21 +116,18 @@ const SectionFour = () => {
                 className="text-red-500"
               />
             </div>
-
             <FormField
               label="Name and Address of Nodal Contact Person:"
               name="nodalContactPerson"
               note="Max. 300 Characters"
               textarea
             />
-
             <FormField
               label="Deployment Details"
               name="deploymentDetails"
               note="Max. 300 Characters"
               textarea
             />
-
             <div className="form-group mb-4 flex justify-center">
               <button
                 type="button"
@@ -168,7 +159,6 @@ const SectionFour = () => {
     </>
   );
 };
-
 const FormField = ({ label, name, note, mandatory, textarea, placeholder }) => (
   <div className="form-group mb-4">
     <label className="font-bold flex justify-between" htmlFor={name}>

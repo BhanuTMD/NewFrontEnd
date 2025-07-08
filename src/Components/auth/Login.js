@@ -8,35 +8,54 @@ function Login() {
   const [values, setValues] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-  const { login } = useAuth(); // ✅ add this
-
+  const { login } = useAuth();
 
   const handleInput = (e) => {
     setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
-
   const handleSubmit = (e) => {
-  e.preventDefault();
-  const err = Validation(values);
-  setErrors(err);
+    e.preventDefault();
+    const err = Validation(values);
+    setErrors(err);
+    if (Object.keys(err).length === 0) {
+      axios
+        .post("http://172.16.2.246:8181/auth/login", values)
+        .then((res) => {
+          if (res.data.jwtToken) {
+            // 1. Save token using your AuthContext login method
+            login(res.data.jwtToken);
 
-  if (Object.keys(err).length === 0) {
-    axios
-      .post("http://172.16.2.246:8181/auth/login", values)
-      .then((res) => {
-        if (res.data.jwtToken) {
-          login(res.data.jwtToken); // ✅ This updates both token and isAuthenticated
-          navigate("/welcomePage");
-        } else {
-          alert(res.data.message || "Login failed");
-        }
-      })
-      .catch((error) => {
-        console.error("Login error:", error);
-        alert("Invalid credentials or server error");
-      });
-  }
-};
+            // 2. Fetch user profile by email
+            axios
+              .get(`http://172.16.2.246:8181/user/${encodeURIComponent(values.email)}`, {
+                headers: {
+                  Authorization: `Bearer ${res.data.jwtToken}`,
+                },
+              })
+              .then((userRes) => {
+                const user = userRes.data;
+                // ✅ Save name and email to localStorage
+                localStorage.setItem("userName", user.name);  // this will be used on welcome page
+                localStorage.setItem("userEmail", user.email);
+
+                navigate("/welcomePage");
+              })
+              .catch((err) => {
+                console.error("User fetch failed:", err);
+                alert("Login successful, but failed to load user details.");
+              });
+          } else {
+            alert(res.data.message || "Login failed");
+          }
+        })
+        .catch((err) => {
+          console.error("Login error:", err);
+          alert("Invalid credentials or server error");
+        });
+    }
+  };
+  // Render the login form
+  // Using Tailwind CSS for styling
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-indigo-200 via-white to-indigo-100">
       <div className="bg-white p-6 sm:p-10 w-full max-w-md rounded-xl shadow-xl border">
@@ -54,7 +73,6 @@ function Login() {
             />
             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
           </div>
-
           <div className="mb-5">
             <label htmlFor="password" className="block font-semibold mb-2">Password</label>
             <input
@@ -80,10 +98,7 @@ function Login() {
           </p>
 
           <div className="mt-2 text-center">
-            <Link
-              to="/signup"
-              className="text-indigo-600 hover:underline font-medium"
-            >
+            <Link to="/signup" className="text-indigo-600 hover:underline font-medium">
               Register Here
             </Link>
           </div>

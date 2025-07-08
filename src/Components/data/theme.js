@@ -10,11 +10,11 @@ export const theme = [
     value: "(CLP)",
   },
   {
-    label: "Ecology, Environment, Earth & Ocean & Science and Water (ESS)",
+    label: "Ecology, Environment & Sustainability (ESS)",
     value: "(ESS)",
   },
   {
-    label: "Ecology, Environment, Earth & Ocean & Science and Water (EOW)",
+    label: " Earth,Ocean and Water (EOW)",
     value: "(EOW)",
   },
   {

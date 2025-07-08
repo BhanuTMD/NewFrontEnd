@@ -1,14 +1,13 @@
-.marquee-animation {
-  display: inline-block;
-  white-space: nowrap;
+/* .marquee-animation {
   animation: scroll-left 15s linear infinite;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 @keyframes scroll-left {
   0% {
     transform: translateX(100%);
   }
-
   100% {
     transform: translateX(-100%);
   }
@@ -26,4 +25,4 @@
   100% {
     transform: translateX(-100%);
   }
-} */
+} */ 

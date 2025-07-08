@@ -1,10 +1,11 @@
 import React, { useRef } from 'react';
 
-const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose }) => {
+const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose, onEdit }) => {
   const printRef = useRef();
 
   const previewItem = {
     ...item,
+    sectionOne: activeSection === 'sectionOne' || activeSection === 'all' ? item.sectionOne || item : {},
     sectionTwo: item.sectionTwo?.length ? item.sectionTwo : [],
     sectionThree: item.sectionThree?.length ? item.sectionThree : [],
     sectionFour: item.sectionFour?.length ? item.sectionFour : [],
@@ -93,9 +94,21 @@ const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose }) => {
     newWindow.document.close();
   };
 
-  const Section = ({ title, children }) => (
+  const Section = ({ sectionKey, title, children, bgColor = 'bg-gray-800' }) => (
     <div className="mt-6 avoid-break">
-      <h2 className="bg-gray-800 text-white text-lg font-semibold px-4 py-2 rounded print:break-before-page">{title}</h2>
+      <div className="flex justify-between items-center">
+        <h2 className={`${bgColor} text-white text-lg font-semibold px-4 py-2 rounded print:break-before-page`}>
+          {title}
+        </h2>
+        {onEdit && (
+          <button
+            onClick={() => onEdit(sectionKey)}
+            className="ml-4 bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded print:hidden"
+          >
+            Edit
+          </button>
+        )}
+      </div>
       <div className="overflow-x-auto mt-2">{children}</div>
     </div>
   );
@@ -118,30 +131,30 @@ const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose }) => {
       <div className="bg-white rounded-xl shadow-lg max-w-5xl w-full p-6 overflow-auto max-h-[90vh]">
         <div ref={printRef} className="text-gray-900">
           {showSection('sectionOne') && (
-            <Section title={`Technology Detail - ${previewItem.nameTechnology || '-'}`}>
+            <Section title={`Technology Detail - ${previewItem.sectionOne?.nameTechnology || '-'}`} sectionKey="sectionOne">
               {renderTable([
-                ['TRN No', previewItem.technologyRefNo || '-'],
-                ['Technology Name', previewItem.nameTechnology || '-'],
-                ['Keywords', previewItem.keywordTechnology || '-'],
-                ['Industrial Sector', previewItem.industrialSector?.join(', ') || '-'],
-                ['Multi Lab Institute', previewItem.multiLabInstitute || '-'],
-                ['Lead Lab', previewItem.leadLaboratory || '-'],
-                ['Associate Institutes', previewItem.associateInstitute?.join(', ') || '-'],
-                ['Theme', previewItem.theme?.join(', ') || '-'],
-                ['Technology Level', previewItem.technologyLevel || '-'],
-                ['Scale of Development', previewItem.scaleDevelopment || '-'],
-                ['Year of Development', previewItem.yearDevelopment || '-'],
-                ['Brief', previewItem.briefTech || '-'],
-                ['Competitive Position', previewItem.competitivePosition || '-'],
-                ['Stakeholders', previewItem.stakeHolders?.join(', ') || '-'],
-                ['Techno Economics', previewItem.technoEconomics || '-'],
-                ['Market Potential', previewItem.marketPotential || '-'],
-                ['Environmental Statutory', previewItem.environmentalStatutory || '-'],
+                ['TRN No', previewItem.sectionOne.technologyRefNo || '-'],
+                ['Technology Name', previewItem.sectionOne.nameTechnology || '-'],
+                ['Keywords', previewItem.sectionOne.keywordTechnology || '-'],
+                ['Industrial Sector', previewItem.sectionOne.industrialSector?.join(', ') || '-'],
+                ['Multi Lab Institute', previewItem.sectionOne.multiLabInstitute || '-'],
+                ['Lead Lab', previewItem.sectionOne.leadLaboratory || '-'],
+                ['Associate Institutes', previewItem.sectionOne.associateInstitute?.join(', ') || '-'],
+                ['Theme', previewItem.sectionOne.theme?.join(', ') || '-'],
+                ['Technology Level', previewItem.sectionOne.technologyLevel || '-'],
+                ['Scale of Development', previewItem.sectionOne.scaleDevelopment || '-'],
+                ['Year of Development', previewItem.sectionOne.yearDevelopment || '-'],
+                ['Brief', previewItem.sectionOne.briefTech || '-'],
+                ['Competitive Position', previewItem.sectionOne.competitivePosition || '-'],
+                ['Stakeholders', previewItem.sectionOne.stakeHolders?.join(', ') || '-'],
+                ['Techno Economics', previewItem.sectionOne.technoEconomics || '-'],
+                ['Market Potential', previewItem.sectionOne.marketPotential || '-'],
+                ['Environmental Statutory', previewItem.sectionOne.environmentalStatutory || '-'],
                 [
                   'File',
-                  previewItem.technologyRefNo ? (
+                  previewItem.sectionOne.technologyRefNo ? (
                     <img
-                      src={`http://172.16.2.246:8080/apf/tdmp/images/${previewItem.technologyRefNo}`}
+                      src={`http://172.16.2.246:8080/apf/tdmp/images/${previewItem.sectionOne.technologyRefNo}`}
                       alt="Preview"
                       className="w-40 h-40 object-contain"
                     />
@@ -149,13 +162,13 @@ const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose }) => {
                     '-'
                   ),
                 ],
-                ['Laboratory Details', previewItem.laboratoryDetail || '-'],
+                ['Laboratory Details', previewItem.sectionOne.laboratoryDetail || '-'],
               ])}
             </Section>
           )}
 
           {showSection('sectionTwo') && previewItem.sectionTwo.length > 0 && (
-            <Section title="Section Two - IPR Details">
+            <Section title="Section Two - IPR Details" sectionKey="sectionTwo" bgColor="bg-blue-600">
               {previewItem.sectionTwo.map((row, i) => (
                 <div key={i} className="mb-4 avoid-break">
                   {renderTable([
@@ -172,7 +185,7 @@ const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose }) => {
           )}
 
           {showSection('sectionThree') && previewItem.sectionThree.length > 0 && (
-            <Section title="Section Three - Licensing Details">
+            <Section title="Section Three - Licensing Details" sectionKey="sectionThree" bgColor="bg-green-600">
               {previewItem.sectionThree.map((row, i) => (
                 <div key={i} className="mb-4 avoid-break">
                   {renderTable([
@@ -195,9 +208,9 @@ const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose }) => {
               ))}
             </Section>
           )}
-          
+
           {showSection('sectionFour') && previewItem.sectionFour.length > 0 && (
-            <Section title="Section Four - Deployment Details">
+            <Section title="Section Four - Deployment Details" sectionKey="sectionFour" bgColor="bg-purple-600">
               {previewItem.sectionFour.map((row, i) => (
                 <div key={i} className="mb-4 avoid-break">
                   {renderTable([
@@ -207,13 +220,13 @@ const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose }) => {
                     ['City', row.city || '-'],
                     ['Country', row.country || '-'],
                     ['Nodal Contact Person', row.nodalContactPerson || '-'],
+                    ['Deployment Details', row.deploymentDetails || '-'],
                   ])}
                 </div>
               ))}
             </Section>
           )}
         </div>
-
         <div className="mt-6 flex justify-between print:hidden">
           <button
             onClick={handlePrint}
@@ -232,5 +245,6 @@ const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose }) => {
     </div>
   );
 };
-
 export default PreviewPopUp;
+
+// Note: The above code is a React component that renders a preview popup for technology details.

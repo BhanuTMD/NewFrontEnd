@@ -7,7 +7,6 @@ const SectionTwoPreview = ({ data }) => {
   const handlePreviewRow = (item) => {
     setPreviewItem(item);
   };
-
   return (
     <div className="mt-8">
       <h2 className="text-xl font-bold mb-4">Section Two - IPR Details</h2>

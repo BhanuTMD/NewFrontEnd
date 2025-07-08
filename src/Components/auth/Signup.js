@@ -9,60 +9,58 @@ function Signup() {
     name: "",
     designation: "",
     lab: "",
-    email: "",    phoneNumber: "",
-    password: "",    employeeId: ""
+    email: "",
+    phoneNumber: "",
+    password: "",
+    employeeId: ""
   });
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-
   const handleInput = (e) => {
-    setValues({ ...values, [e.target.name]: e.target.value });  };
+    setValues({ ...values, [e.target.name]: e.target.value });
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationErrors = Validation(values);    setErrors(validationErrors);
+    const validationErrors = Validation(values); setErrors(validationErrors);
     if (
       values.name &&
       values.designation &&
-      values.leadLaboratory &&
+      values.lab &&
       values.email &&
       values.phoneNumber &&
       values.password &&
       values.employeeId
-    ) {
-      try {
-        const response = await axios.post(
-          "http://172.16.2.246:8181/auth/register",
-          values,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        console.log("Response data ******************************************************:", response.data);
-        // Check if the response structure is as expected
-        if (response.status === 201) { // Check for 201 Created status
-          alert("Registration successful!");
-          navigate("/login");
-        } else {
-          console.error("Registration failed:", response.data);
-          alert(response.data.message || "Registration failed");
+    )  {
+    try {
+      const response = await axios.post(
+        "http://172.16.2.246:8181/auth/register",
+        values,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      } catch (error) {
-        console.error("Signup error:", error);
-        alert("Something went wrong during registration.");
+      );
+      console.log("Response data:", response.data);
+      if (response.status === 201) {
+        alert("Registration successful!");
+        navigate("/login");
+      } else {
+        alert(response.data.message || "Registration failed");
       }
+    } catch (error) {
+      console.error("Signup error:", error);
+      alert("Something went wrong during registration.");
     }
-  };
+  }
+};
   return (
     <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-200 to-indigo-200 overflow-hidden">
       <div className="w-[90%] sm:w-[70%] md:w-[50%] lg:w-[38%] bg-white p-6 rounded-xl shadow-lg">
         <h2 className="text-2xl font-bold text-center mb-4">Sign-Up</h2>
         <form onSubmit={handleSubmit} className="space-y-3">
           <Input label="Name" name="name" type="text" value={values.name} onChange={handleInput} error={errors.name} />
-
           <Input label="Employee ID" name="employeeId" type="text" value={values.employeeId} onChange={handleInput} error={errors.employeeId} />
-
           <div>
             <label className="block text-sm font-medium mb-1">Designation</label>
             <select
@@ -111,7 +109,6 @@ function Signup() {
     </div>
   );
 }
-
 const Input = ({ label, name, type, value, onChange, error }) => (
   <div>
     <label className="block text-sm font-medium mb-1">{label}</label>
