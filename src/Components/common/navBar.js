@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useAuth } from "Components/auth/AuthContext";
-
 function NavBar() {
   const { isAuthenticated, logout, isLoading } = useAuth();
   const navigate = useNavigate();

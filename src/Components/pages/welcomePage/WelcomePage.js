@@ -114,7 +114,7 @@ const WelcomePage = () => {
       </div>
     </div>
   );
-};
+    };
 
 export default WelcomePage;
 
