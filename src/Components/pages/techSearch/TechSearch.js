@@ -37,10 +37,16 @@ const TechSearch = () => {
     const fetchData = async (values) => {
         setLoading(true);
         try {
+            // ✅ Token localStorage se lo
+            const token = localStorage.getItem('token');
+            console.log("Using token:", token);
+
             const response = await fetch('http://172.16.2.246:8080/apf/tdmp/search', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    // ✅ Token bhejo Authorization header mein
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     theme: values.themeNo,
@@ -52,6 +58,7 @@ const TechSearch = () => {
                 }),
             });
             const result = await response.json();
+            console.log("Fetched Data:", result);
             setData(result);
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -59,7 +66,7 @@ const TechSearch = () => {
             setLoading(false);
         }
     };
-    
+
     return (
         <>
             <NavBar />

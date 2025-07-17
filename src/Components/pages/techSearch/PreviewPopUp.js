@@ -93,7 +93,6 @@ const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose, onEdit }) => 
     `);
     newWindow.document.close();
   };
-
   const Section = ({ sectionKey, title, children, bgColor = 'bg-gray-800' }) => (
     <div className="mt-6 avoid-break">
       <div className="flex justify-between items-center">

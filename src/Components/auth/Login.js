@@ -19,7 +19,7 @@ function Login() {
     setErrors(err);
     if (Object.keys(err).length === 0) {
       axios
-        .post("http://172.16.2.246:8181/auth/login", values)
+        .post("http://172.16.2.246:8080/auth/login", values)
         .then((res) => {
           if (res.data.jwtToken) {
             // 1. Save token using your AuthContext login method
@@ -27,7 +27,7 @@ function Login() {
 
             // 2. Fetch user profile by email
             axios
-              .get(`http://172.16.2.246:8181/user/${encodeURIComponent(values.email)}`, {
+              .get(`http://172.16.2.246:8080/user/${encodeURIComponent(values.email)}`, {
                 headers: {
                   Authorization: `Bearer ${res.data.jwtToken}`,
                 },
@@ -96,7 +96,6 @@ function Login() {
           <p className="mt-6 text-center text-gray-600 text-sm">
             Don't have an account?
           </p>
-
           <div className="mt-2 text-center">
             <Link to="/signup" className="text-indigo-600 hover:underline font-medium">
               Register Here

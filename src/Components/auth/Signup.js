@@ -33,7 +33,7 @@ function Signup() {
     )  {
     try {
       const response = await axios.post(
-        "http://172.16.2.246:8181/auth/register",
+        "http://172.16.2.246:8080/auth/register",
         values,
         {
           headers: {

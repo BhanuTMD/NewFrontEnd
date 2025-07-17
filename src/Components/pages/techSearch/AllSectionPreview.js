@@ -140,7 +140,6 @@ const AllSectionPreview = ({ data }) => {
     </div>
   );
 };
-
 const Detail = ({ label, value }) => (
   <div>
     <strong>{label}:</strong> {value || '-'}
