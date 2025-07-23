@@ -2,7 +2,6 @@ import React, { useRef } from 'react';
 
 const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose, onEdit }) => {
   const printRef = useRef();
-
   const previewItem = {
     ...item,
     sectionOne: activeSection === 'sectionOne' || activeSection === 'all' ? item.sectionOne || item : {},
@@ -10,10 +9,8 @@ const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose, onEdit }) => 
     sectionThree: item.sectionThree?.length ? item.sectionThree : [],
     sectionFour: item.sectionFour?.length ? item.sectionFour : [],
   };
-
   const showSection = (sectionName) =>
     activeSection === 'all' || activeSection === sectionName;
-
   const handlePrint = () => {
     const printContents = printRef.current.innerHTML;
     const newWindow = window.open('', '', 'width=800,height=600');
@@ -182,7 +179,7 @@ const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose, onEdit }) => 
               ))}
             </Section>
           )}
-
+        
           {showSection('sectionThree') && previewItem.sectionThree.length > 0 && (
             <Section title="Section Three - Licensing Details" sectionKey="sectionThree" bgColor="bg-green-600">
               {previewItem.sectionThree.map((row, i) => (
@@ -246,4 +243,3 @@ const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose, onEdit }) => 
 };
 export default PreviewPopUp;
 
-// Note: The above code is a React component that renders a preview popup for technology details.

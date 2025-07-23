@@ -6,21 +6,24 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // 🔄 loading state
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token); // true if token exists
-    setIsLoading(false); // ✅ auth check done
+    // ✅ Same key used for login & check
+    const token = localStorage.getItem("jwtToken");
+    setIsAuthenticated(!!token);
+    setIsLoading(false);
   }, []);
 
   const login = (token) => {
-    localStorage.setItem("token", token);
+    localStorage.setItem("jwtToken", token); // same key
     setIsAuthenticated(true);
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("jwtToken");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userEmail");
     setIsAuthenticated(false);
   };
 

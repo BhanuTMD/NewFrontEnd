@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useAuth } from "Components/auth/AuthContext";
+
 function NavBar() {
   const { isAuthenticated, logout, isLoading } = useAuth();
   const navigate = useNavigate();
@@ -10,11 +11,18 @@ function NavBar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const name = localStorage.getItem("userName");
+  const [name, setName] = useState("");
+
+  // Get name from localStorage (update if changes happen)
+  useEffect(() => {
+    const userName = localStorage.getItem("userName");
+    if (userName) setName(userName);
+  }, [isAuthenticated]);
 
   const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
   const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
 
+  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -26,25 +34,28 @@ function NavBar() {
   }, []);
 
   const handleLogout = () => {
-    logout();
+    logout(); // Clear token via AuthContext
     localStorage.removeItem("userName");
     localStorage.removeItem("userEmail");
+    setName(""); // Clear local state too
     navigate("/Login");
   };
 
-  if (isLoading) return null;
+  if (isLoading) return null; // Prevent flicker until token check is done
 
   return (
     <nav className="w-full bg-indigo-300 text-blue-600 font-semibold shadow-md">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         {/* Left: Logo & Nav Items */}
         <div className="flex items-center space-x-6">
+          {/* Mobile Menu Toggle */}
           <div className="sm:hidden">
             <button onClick={toggleMobileMenu}>
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
 
+          {/* Desktop Menu */}
           <div className="hidden sm:flex sm:items-center space-x-6">
             <Link to="/welcomePage" className="hover:text-blue-900 text-lg font-bold">
               Home
@@ -54,6 +65,7 @@ function NavBar() {
                 <Link to="/techSearch" className="hover:text-blue-900 text-lg font-bold">
                   View
                 </Link>
+                {/* Technology Dropdown */}
                 <div className="relative" ref={dropdownRef}>
                   <div
                     className="cursor-pointer hover:text-blue-900 text-lg font-bold"
@@ -62,13 +74,20 @@ function NavBar() {
                     Technology
                   </div>
                   {isDropdownOpen && (
-                    <div className="absolute bg-indigo-200 mt-1 rounded shadow-md z-10">
+                    <div className="absolute w-48 bg-indigo-200 mt-1 rounded shadow-md z-10 text-sm">
                       <Link
                         to="/SectionOne"
                         className="block px-4 py-2 hover:bg-indigo-100"
                         onClick={() => setIsDropdownOpen(false)}
                       >
                         Add New Technology
+                      </Link>
+                      <Link
+                        to="/PendingData"
+                        className="block px-4 py-2 hover:bg-indigo-100"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        Pending Technology
                       </Link>
                     </div>
                   )}
@@ -127,6 +146,16 @@ function NavBar() {
                       }}
                     >
                       Add New Technology
+                    </Link>
+                    <Link
+                      to="/PendingData"
+                      className="block px-4 py-2 hover:bg-indigo-100"
+                      onClick={() => {
+                        setIsDropdownOpen(false);
+                        toggleMobileMenu();
+                      }}
+                    >
+                      Pending Technology
                     </Link>
                   </div>
                 )}
