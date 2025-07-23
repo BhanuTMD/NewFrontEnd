@@ -54,9 +54,9 @@ const SectionOne = () => {
   const navigate = useNavigate();
 
   const handleSubmit = (values) => {
-  console.log("handle submit is calling********", values);
+    console.log("handle submit is calling********", values);
 
-  const url = "http://172.16.2.246:8080/apf/tdmp/saveSectionOne";
+    const url = "http://172.16.2.246:8080/apf/tdmp/saveSectionOne";
 
     // Create FormData object
     const formData = new FormData();
@@ -105,12 +105,14 @@ const SectionOne = () => {
     }
     formData.append("laboratoryDetail", values.laboratoryDetail);
     // Now post the formData (no need to set Content-Type manually)
-    axios
-      .post(url, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data", // Explicitly set the content type
-        },
-      })
+    const token = localStorage.getItem('token');
+
+    axios.post(url, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`  // ✅ Add the token here
+      },
+    })
       .then((response) => {
         console.log("Response data:", response.data);
         Swal.fire({
@@ -235,7 +237,7 @@ const SectionOne = () => {
                     options={lab}
                     component={CustomSelect}
                     placeholder="Select a Lab..."
-                    // isMulti={true}
+                  // isMulti={true}
                   ></Field>
                 </div>
                 <div className="form-group mb-4">
@@ -306,7 +308,7 @@ const SectionOne = () => {
                     component={CustomSelect}
                     placeholder="Select List Of Multilabs From here..."
                     isMulti={true}
-                    //className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  //className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   ></Field>
                 </div>
 
@@ -425,7 +427,7 @@ const SectionOne = () => {
                     component={CustomSelect}
                     placeholder="Select Ministry List from here..."
                     isMulti={true}
-                    //className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  //className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   ></Field>
                   <ErrorMessage
                     name="stakeHolders"
