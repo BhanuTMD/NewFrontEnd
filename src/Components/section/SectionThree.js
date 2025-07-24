@@ -10,12 +10,15 @@ import Swal from "sweetalert2";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+
 
 const SectionThree = () => {
   const navigate = useNavigate();
 
   // Local state
-  const [technologyRefNo, setTechnologyRefNo] = useState("");
+  const location = useLocation();
+  const [technologyRefNo] = useState(location.state?.technologyRefNo || "");
   const [licenseName, setLicenseName] = useState("");
   const [dateOfAgreementSigning, setDateOfAgreementSigning] = useState(null);
   const [typeOfLicense, setTypeOfLicense] = useState("");
@@ -177,10 +180,9 @@ const SectionThree = () => {
                   </label>
                   <input
                     type="text"
-                    className="w-half p-1 text-lg outline-0.1 rounded-md"
-                    placeholder="Enter New Information"
+                    className="w-half p-1 text-lg outline-0.1 rounded-md bg-gray-200"
                     value={technologyRefNo}
-                    onChange={(e) => setTechnologyRefNo(e.target.value)}
+                    readOnly
                   />
                 </div>
 
@@ -193,7 +195,7 @@ const SectionThree = () => {
                     </span>
                   </label>
                   <Field
-                  as="textarea"
+                    as="textarea"
                     maxLength="300"
                     name="licenseName"
                     type="text"
@@ -524,7 +526,7 @@ const SectionThree = () => {
                 <div className="flex justify-center items-center gap-4 mt-4">
                   <button
                     type="button"
-                    onClick={() => navigate("/sectionTwo")}
+                    onClick={() => navigate("/sectionTwo", { state: { technologyRefNo } })}
                     className="bg-blue-600 text-white px-6 py-3 rounded"
                   >
                     Previous
@@ -537,13 +539,13 @@ const SectionThree = () => {
                   </button>
                   <button
                     type="button"
-                    onClick={() => navigate("/sectionFour")}
+                    onClick={() => navigate("/sectionFour", { state: { technologyRefNo } })}
                     className="bg-indigo-600 text-white px-6 py-3 rounded"
                   >
                     Next
                   </button>
                 </div>
-                
+
 
               </Form>
             )}

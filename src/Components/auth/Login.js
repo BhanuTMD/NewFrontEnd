@@ -13,31 +13,26 @@ function Login() {
   const handleInput = (e) => {
     setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const err = Validation(values);
     setErrors(err);
+
     if (Object.keys(err).length === 0) {
       axios
         .post("http://172.16.2.246:8080/auth/login", values)
         .then((res) => {
           if (res.data.jwtToken) {
-            // 1. Save token using your AuthContext login method
-            login(res.data.jwtToken);
+            login(res.data.jwtToken); // ✅ This sets global axios header
 
-            // 2. Fetch user profile by email
+            // ✅ No need to manually add Authorization header below
             axios
-              .get(`http://172.16.2.246:8080/user/${encodeURIComponent(values.email)}`, {
-                headers: {
-                  Authorization: `Bearer ${res.data.jwtToken}`,
-                },
-              })
+              .get(`http://172.16.2.246:8080/user/${encodeURIComponent(values.email)}`)
               .then((userRes) => {
                 const user = userRes.data;
-                // ✅ Save name and email to localStorage
-                localStorage.setItem("userName", user.name);  // this will be used on welcome page
+                localStorage.setItem("userName", user.name);
                 localStorage.setItem("userEmail", user.email);
-
                 navigate("/welcomePage");
               })
               .catch((err) => {
@@ -54,8 +49,8 @@ function Login() {
         });
     }
   };
-  // Render the login form
-  // Using Tailwind CSS for styling
+
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-indigo-200 via-white to-indigo-100">
       <div className="bg-white p-6 sm:p-10 w-full max-w-md rounded-xl shadow-xl border">

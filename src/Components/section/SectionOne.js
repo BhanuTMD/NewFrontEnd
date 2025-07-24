@@ -7,13 +7,20 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 import CustomSelect from "../utils/CustomSelect";
 import * as Yup from "yup";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { industrialSector } from "Components/data/industrialSector";
 import { theme } from "Components/data/theme";
 import { stakeHolders } from "Components/data/stakeHolders";
 import { lab } from "Components/data/lab";
+
 const SectionOne = () => {
-  const initialValues = {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const passedTRN = location.state?.technologyRefNo || "";
+
+  const [generatedRefNo, setGeneratedRefNo] = useState(passedTRN);
+  const [initialValues, setInitialValues] = useState({
     technologyRefNo: "",
     keywordTechnology: "",
     nameTechnology: "",
@@ -31,146 +38,90 @@ const SectionOne = () => {
     stakeHolders: [],
     environmentalStatutory: "",
     marketPotential: "",
-    file: null, // Assuming this is a file input
+    file: null,
     laboratoryDetail: "",
-  };
-  const validationSchema = Yup.object({
-    // technologyRefNo: Yup.string().required("Required"),
-    // keywordTechnology: Yup.string().required("Required"),
-    // nameTechnology: Yup.string().required("Required"),
-    // industrialSector: Yup.array().required("Required"), // Ensure this is an array
-    // leadLaboratory: Yup.string().required("Required"),
-    // associateInstitute: Yup.string().required("Required"),
-    // technologyLevel: Yup.string().required("Required"),
-    // scaleDevelopment: Yup.string().required("Required"),
-    // yearDevelopment: Yup.string().required("Required"),
-    // briefTech: Yup.string().required("Required"),
-    // competitivePosition: Yup.string().required("Required"),
-    // technoEconomics: Yup.string().required("Required"),
-    // marketPotential: Yup.string().required("Required"),
-    // environmentalStatutory: Yup.string().required("Required"),
-    // laboratoryDetail: Yup.string().required("Required"),
   });
-  const navigate = useNavigate();
 
-  const handleSubmit = (values) => {
-    console.log("handle submit is calling********", values);
+  useEffect(() => {
+    if (passedTRN) {
+      const token = localStorage.getItem("token");
+      axios.get(`http://172.16.2.246:8080/apf/tdmp/getSectionOne/${passedTRN}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => {
+          setInitialValues(res.data);
+          setGeneratedRefNo(passedTRN);
+        })
+        .catch((err) => {
+          console.error("Error fetching section data", err);
+        });
+    }
+  }, [passedTRN]);
 
+  const validationSchema = Yup.object({});
+
+  const handleSubmit = (values, { setSubmitting }) => {
     const url = "http://172.16.2.246:8080/apf/tdmp/saveSectionOne";
-
-    // Create FormData object
     const formData = new FormData();
 
-    // Append simple fields
-    formData.append("technologyRefNo", values.technologyRefNo);
-    formData.append("keywordTechnology", values.keywordTechnology);
-    formData.append("nameTechnology", values.nameTechnology);
-
-    // Append arrays
-    if (values.industrialSector && Array.isArray(values.industrialSector)) {
-      values.industrialSector.forEach((item) =>
-        formData.append("industrialSector", item)
-      );
+    for (let key in values) {
+      if (Array.isArray(values[key])) {
+        values[key].forEach((item) => formData.append(key, item));
+      } else if (key === "file" && values.file) {
+        formData.append("file", values.file);
+      } else {
+        formData.append(key, values[key]);
+      }
     }
 
-    if (values.theme && Array.isArray(values.theme)) {
-      values.theme.forEach((item) => formData.append("theme", item));
-    }
-
-    if (values.associateInstitute && Array.isArray(values.associateInstitute)) {
-      values.associateInstitute.forEach((item) =>
-        formData.append("associateInstitute", item)
-      );
-    }
-    // Single field
-    formData.append("leadLaboratory", values.leadLaboratory);
-    // Rest of the fields
-    formData.append("technologyLevel", values.technologyLevel);
-    formData.append("scaleDevelopment", values.scaleDevelopment);
-    formData.append("yearDevelopment", values.yearDevelopment);
-    formData.append("briefTech", values.briefTech);
-    formData.append("competitivePosition", values.competitivePosition);
-    formData.append("technoEconomics", values.technoEconomics);
-
-    if (values.stakeHolders && Array.isArray(values.stakeHolders)) {
-      values.stakeHolders.forEach((item) =>
-        formData.append("stakeHolders", item)
-      );
-    }
-    formData.append("environmentalStatutory", values.environmentalStatutory);
-    formData.append("marketPotential", values.marketPotential);
-    // File field
-    if (values.file) {
-      formData.append("file", values.file); // Changed 'file' to 'file'
-    }
-    formData.append("laboratoryDetail", values.laboratoryDetail);
-    // Now post the formData (no need to set Content-Type manually)
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
 
     axios.post(url, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`  // ✅ Add the token here
+        Authorization: `Bearer ${token}`,
       },
     })
-      .then((response) => {
-        console.log("Response data:", response.data);
-        Swal.fire({
-          title: "Success!",
-          text: "Form submitted successfully!",
-          icon: "success",
-          confirmButtonText: "OK",
-        });
+      .then((res) => {
+        const techRef = res.data.technologyRefNo;
+        setGeneratedRefNo(techRef);
+        Swal.fire("Success!", "Form submitted successfully!", "success");
+        // navigate("/sectionTwo", { state: { technologyRefNo: techRef } });
       })
-      .catch((error) => {
-        console.error("Error:", error);
-        Swal.fire({
-          title: "Error!",
-          text: "Form submission failed. Please try again.",
-          icon: "error",
-          confirmButtonText: "OK",
-        });
+      .catch((err) => {
+        console.error("Submission error", err);
+        Swal.fire("Error!", "Failed to submit. Try again.", "error");
+      })
+      .finally(() => {
+        setSubmitting(false);
       });
   };
-
   return (
     <>
       <Header />
       <NavBar />
       <div className="flex">
-        <div className="bg-gray-800  "></div>
-        {/* Form */}
+        <div className="bg-gray-800"></div>
         <div className="flex-1 p-8 bg-blue-200 border">
-          <Section
-            sectionLine="Section 1 : Key Details - Add New Technology / Knowhow Information"
-          />
+          <Section sectionLine="Section 1 : Key Details - Add New Technology / Knowhow Information" />
           <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
-            {({ setFieldValue }) => (
+            {({ setFieldValue, isSubmitting }) => (
               <Form>
                 <div className="form-group mb-4">
-                  <label
-                    className="font-bold flex justify-between"
-                    htmlFor="technologyRefNo"
-                  >
+                  <label className="font-bold flex justify-between" htmlFor="technologyRefNo">
                     Technology /Knowhow Ref No:
-                    <span className="Hint block text-xs text-red-500 inline text-end">
-                      Mandatory Field
-                    </span>
+                    <span className="Hint block text-xs text-red-500 inline text-end">Mandatory Field</span>
                   </label>
-                  <Field
+                  <input
                     type="text"
                     name="technologyRefNo"
-                    className="w-full p-2 text-lg outline-0.1 rounded-md"
-                    placeholder="Enter New Information"
-                  />
-                  <ErrorMessage
-                    name="technologyRefNo"
-                    component="div"
-                    className="text-red-500"
+                    value={generatedRefNo ? generatedRefNo : "Will be generated after submission"}
+                    readOnly
+                    className="w-full p-2 text-lg outline-0.1 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
                   />
                 </div>
                 <div className="form-group">
@@ -569,7 +520,8 @@ const SectionOne = () => {
                   <button
                     type="button"
                     className="px-4 py-2 bg-blue-500 text-white rounded-md ml-4"
-                    onClick={() => navigate("/sectionTwo")}
+                    onClick={() => navigate("/sectionTwo", { state: { technologyRefNo: generatedRefNo } })}
+
                   >
                     Next
                   </button>

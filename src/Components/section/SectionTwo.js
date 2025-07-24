@@ -1,25 +1,28 @@
-import axios from "axios";
 import React, { useState } from "react";
-import { Formik, Field, Form, ErrorMessage } from "formik";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import DatePicker from "react-datepicker";
-import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import "react-datepicker/dist/react-datepicker.css";
+import axios from "axios";
 
+import "react-datepicker/dist/react-datepicker.css";
 import Header from "Components/common/header";
+import NavBar from "Components/common/navBar";
 import FooterBar from "Components/common/footer";
 import Section from "Components/common/section";
-import NavBar from "Components/common/navBar";
 import Country from "Components/data/country";
 import CustomSelect from "Components/utils/CustomSelect";
 
 const SectionTwo = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedDate, setSelectedDate] = useState(null);
 
+  const technologyRefNo = location.state?.technologyRefNo || "";
+
   const initialValues = {
-    technologyRefNo: "",
+    technologyRefNo,
     iprType: "",
     registrationNo: "",
     status: "",
@@ -35,28 +38,26 @@ const SectionTwo = () => {
     country: Yup.array().min(1, "At least one country is required").required(),
   });
 
-  const formatDate = (date) => {
-    return date ? new Date(date).toLocaleDateString("en-GB") : null;
-  };
-
   const handleSubmit = (values) => {
     const payload = {
       ...values,
-      statusDate: formatDate(values.statusDate),
-      country: Array.isArray(values.country) ? values.country : [values.country],
+      statusDate: values.statusDate
+        ? new Date(values.statusDate).toLocaleDateString("en-GB")
+        : null,
     };
 
-    axios.post("http://172.16.2.246:8080/apf/tdmp/saveSectionTwo", payload, {
-      headers: { "Content-Type": "application/json" },
-    })
+    axios
+      .post("http://172.16.2.246:8080/apf/tdmp/saveSectionTwo", payload, {
+        headers: { "Content-Type": "application/json" },
+      })
       .then(() => Swal.fire("Success!", "Form submitted successfully!", "success"))
-      .catch(() => Swal.fire("Error!", "Form submission failed. Please try again.", "error"));
+      .catch(() => Swal.fire("Error!", "Form submission failed.", "error"));
   };
 
   return (
     <>
       <Header />
-      <NavBar/>
+      <NavBar />
       <div className="flex bg-blue-200 min-h-screen">
         <div className="flex-1 p-8">
           <Section sectionLine="Section 2 : IPR Status - Add/Modify" />
@@ -64,32 +65,60 @@ const SectionTwo = () => {
             initialValues={initialValues}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
+            enableReinitialize
           >
             {({ setFieldValue }) => (
               <Form className="space-y-6">
-                {[
-                  { label: "Technology /Knowhow Ref No:", name: "technologyRefNo", type: "text", placeholder: "Enter Ref No" },
-                  { label: "IPR Type", name: "iprType", as: "select", options: ["Patent", "Industrial Design", "Trademark", "Copyright", "Other"] },
-                  { label: "Registration No.", name: "registrationNo", type: "text", placeholder: "Enter Registration No" },
-                  { label: "Status", name: "status", as: "select", options: ["Filed", "Pending for Grant", "Granted", "Lapsed", "Abandoned"] }
-                ].map((field, idx) => (
-                  <div className="form-group" key={idx}>
-                    <label className="font-bold" htmlFor={field.name}>{field.label}</label>
-                    <Field
-                      name={field.name}
-                      as={field.as || "input"}
-                      type={field.type || "text"}
-                      placeholder={field.placeholder}
-                      className="w-full p-2 text-lg rounded-md"
-                    >
-                      {field.options && [<option key="" value="">--Please Select--</option>, ...field.options.map(opt => <option key={opt} value={opt.toLowerCase()}>{opt}</option>)]}
-                    </Field>
-                    <ErrorMessage name={field.name} component="div" className="text-red-500 text-sm" />
-                  </div>
-                ))}
 
-                <div className="form-group">
-                  <label className="font-bold" htmlFor="statusDate">Status Date</label>
+                {/* TRN (Read-only) */}
+                <div>
+                  <label className="font-bold">Technology Ref No:</label>
+                  <Field
+                    name="technologyRefNo"
+                    type="text"
+                    readOnly
+                    className="w-full p-2 rounded-md bg-gray-100 text-gray-600"
+                  />
+                </div>
+
+                {/* IPR Type */}
+                <div>
+                  <label className="font-bold">IPR Type</label>
+                  <Field as="select" name="iprType" className="w-full p-2 rounded-md">
+                    <option value="">--Select--</option>
+                    {["Patent", "Industrial Design", "Trademark", "Copyright", "Other"].map((opt) => (
+                      <option key={opt} value={opt.toLowerCase()}>{opt}</option>
+                    ))}
+                  </Field>
+                  <ErrorMessage name="iprType" component="div" className="text-red-500" />
+                </div>
+
+                {/* Registration No */}
+                <div>
+                  <label className="font-bold">Registration No.</label>
+                  <Field
+                    name="registrationNo"
+                    type="text"
+                    className="w-full p-2 rounded-md"
+                  />
+                  <ErrorMessage name="registrationNo" component="div" className="text-red-500" />
+                </div>
+
+                {/* Status */}
+                <div>
+                  <label className="font-bold">Status</label>
+                  <Field as="select" name="status" className="w-full p-2 rounded-md">
+                    <option value="">--Select--</option>
+                    {["Filed", "Pending for Grant", "Granted", "Lapsed", "Abandoned"].map((opt) => (
+                      <option key={opt} value={opt.toLowerCase()}>{opt}</option>
+                    ))}
+                  </Field>
+                  <ErrorMessage name="status" component="div" className="text-red-500" />
+                </div>
+
+                {/* Status Date */}
+                <div>
+                  <label className="font-bold">Status Date</label>
                   <DatePicker
                     selected={selectedDate}
                     onChange={(date) => {
@@ -97,29 +126,49 @@ const SectionTwo = () => {
                       setFieldValue("statusDate", date);
                     }}
                     dateFormat="dd/MM/yyyy"
-                    className="w-full p-2 text-lg rounded-md"
+                    className="w-full p-2 rounded-md"
                     placeholderText="Select date"
                   />
-                  <ErrorMessage name="statusDate" component="div" className="text-red-500 text-sm" />
+                  <ErrorMessage name="statusDate" component="div" className="text-red-500" />
                 </div>
 
-                <div className="form-group">
-                  <label className="font-bold" htmlFor="country">Country</label>
+                {/* Country */}
+                <div>
+                  <label className="font-bold">Country</label>
                   <Field
                     name="country"
                     component={CustomSelect}
                     options={Country}
                     isMulti={true}
-                    placeholder="Select country"
+                    placeholder="Select countries"
                   />
-                  <ErrorMessage name="country" component="div" className="text-red-500 text-sm" />
+                  <ErrorMessage name="country" component="div" className="text-red-500" />
                 </div>
 
+                {/* Buttons */}
                 <div className="flex justify-center gap-4">
-                  <button type="button" onClick={() => navigate("/sectionOne")} className="px-4 py-2 bg-blue-500 text-white rounded-md">Previous</button>
-                  <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded-md">Save</button>
-                  <button type="button" onClick={() => navigate("/sectionThree")} className="px-4 py-2 bg-blue-500 text-white rounded-md">Next</button>
+                  <button
+                    type="button"
+                    onClick={() => navigate("/sectionOne", { state: { technologyRefNo } })}
+                    className="bg-blue-600 text-white px-6 py-3 rounded"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-green-600 text-white rounded-md"
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigate("/sectionThree", { state: { technologyRefNo } })}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md"
+                  >
+                    Next
+                  </button>
                 </div>
+
               </Form>
             )}
           </Formik>

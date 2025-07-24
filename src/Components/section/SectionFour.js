@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Swal from "sweetalert2";
@@ -11,23 +11,31 @@ import Country from "Components/data/country";
 import CustomSelect from "Components/utils/CustomSelect";
 import PreviewPopUp from "Components/pages/techSearch/PreviewPopUp";
 import "react-datepicker/dist/react-datepicker.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const SectionFour = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [previewItem, setPreviewItem] = useState(null);
   const [editMode, setEditMode] = useState(false);
-
-  const initialValues = {
-    technologyRefNo: "",
+  const [initialValues, setInitialValues] = useState({
+    technologyRefNo: location.state?.technologyRefNo || "",
     clientName: "",
     clientAddress: "",
     city: "",
     country: "",
     nodalContactPerson: "",
     deploymentDetails: "",
-  };
+  });
+
+  useEffect(() => {
+    if (location.state?.technologyRefNo) {
+      setInitialValues(prev => ({ ...prev, technologyRefNo: location.state.technologyRefNo }));
+    }
+  }, [location.state]);
+
   const validationSchema = Yup.object({});
+
   const handleSubmit = async (values, { setValues }) => {
     try {
       const res = await axios.post(
@@ -53,15 +61,18 @@ const SectionFour = () => {
       Swal.fire("Error", "Form submission failed. Please try again.", "error");
     }
   };
+
   const handleEdit = () => {
     if (previewItem?.sectionFour?.[0]) {
       setEditMode(true);
     }
   };
+
   const handleClosePreview = () => {
     setPreviewItem(null);
     setEditMode(false);
   };
+
   return (
     <>
       <Header />
@@ -81,6 +92,7 @@ const SectionFour = () => {
               name="technologyRefNo"
               mandatory
               placeholder="Enter New Information"
+              readOnly
             />
 
             <FormField
@@ -132,7 +144,7 @@ const SectionFour = () => {
               <button
                 type="button"
                 className="px-4 py-2 bg-blue-500 text-white rounded-md ml-4"
-                onClick={() => navigate("/sectionThree")}
+                onClick={() => navigate("/sectionThree", { state: { technologyRefNo: initialValues.technologyRefNo } })}
               >
                 Previous
               </button>
@@ -159,7 +171,8 @@ const SectionFour = () => {
     </>
   );
 };
-const FormField = ({ label, name, note, mandatory, textarea, placeholder }) => (
+
+const FormField = ({ label, name, note, mandatory, textarea, placeholder, readOnly }) => (
   <div className="form-group mb-4">
     <label className="font-bold flex justify-between" htmlFor={name}>
       {label}
@@ -171,6 +184,7 @@ const FormField = ({ label, name, note, mandatory, textarea, placeholder }) => (
       name={name}
       placeholder={placeholder}
       className="w-full p-2 text-lg outline-0.1 rounded-md"
+      readOnly={readOnly}
     />
     {note && <p className="text-sm text-red-500">{note}</p>}
     <ErrorMessage name={name} component="div" className="text-red-500" />
