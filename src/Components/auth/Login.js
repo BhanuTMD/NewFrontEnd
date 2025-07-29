@@ -20,7 +20,12 @@ function Login() {
     if (Object.keys(err).length === 0) {
       axios
         .post("http://172.16.2.246:8080/auth/login", values)
-        .then(() => {
+        .then((res) => {
+          const userName = res.data.name; // <-- Change according to your API response
+          const userEmail = values.email;
+          // ✅ Store in localStorage
+          localStorage.setItem("userName", userName);
+          localStorage.setItem("userEmail", userEmail);
           // OTP successfully sent → go to OTP verify page
           navigate("/otpLoginVerify", { state: { email: values.email } });
         })
