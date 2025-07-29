@@ -2,13 +2,11 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Validation from "Components/auth/LoginValidation";
 import axios from "axios";
-import { useAuth } from "Components/auth/AuthContext";
 
 function Login() {
   const [values, setValues] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-  const { login } = useAuth();
 
   const handleInput = (e) => {
     setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -22,34 +20,16 @@ function Login() {
     if (Object.keys(err).length === 0) {
       axios
         .post("http://172.16.2.246:8080/auth/login", values)
-        .then((res) => {
-          if (res.data.jwtToken) {
-            login(res.data.jwtToken); // ✅ This sets global axios header
-
-            // ✅ No need to manually add Authorization header below
-            axios
-              .get(`http://172.16.2.246:8080/user/${encodeURIComponent(values.email)}`)
-              .then((userRes) => {
-                const user = userRes.data;
-                localStorage.setItem("userName", user.name);
-                localStorage.setItem("userEmail", user.email);
-                navigate("/welcomePage");
-              })
-              .catch((err) => {
-                console.error("User fetch failed:", err);
-                alert("Login successful, but failed to load user details.");
-              });
-          } else {
-            alert(res.data.message || "Login failed");
-          }
+        .then(() => {
+          // OTP successfully sent → go to OTP verify page
+          navigate("/otpLoginVerify", { state: { email: values.email } });
         })
         .catch((err) => {
-          console.error("Login error:", err);
+          console.error("Login init error:", err);
           alert("Invalid credentials or server error");
         });
     }
   };
-
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-indigo-200 via-white to-indigo-100">

@@ -69,11 +69,14 @@ function Signup() {
               onChange={handleInput}
               className="w-full p-2 border rounded"
             >
-              <option value="">Select designation</option>
-              <option value="developer">Developer</option>
-              <option value="designer">Designer</option>
-              <option value="project_manager">Project Manager</option>
-              <option value="qa">QA Engineer</option>
+              <option value="">Select Designation</option>
+              <option value="Director/Head">Director/Head</option>
+               <option value="Chief Scientist">Chief Scientist</option>
+              <option value="Senior Principal Scientist">Senior Principal Scientist</option>
+              <option value="Senior Scientist">Senior Scientist</option>
+              <option value="Scientist">Scientist</option>
+              <option value="Technical Officer">Technical Officer</option>
+              <option value="Technical Assistant">Technical Assistant</option>
             </select>
             {errors.designation && <Error text={errors.designation} />}
           </div>

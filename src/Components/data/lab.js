@@ -177,7 +177,11 @@
     value: "CSIR-CMC",
   },
   {
+    label: "CSIR-Council of Scientific & Industrial Research (CSIR-HQ), Delhi",
+    value: "CSIR-HQ",
+  },
+  {
     label: "Other than CSIR",
-    value: "CSIR",
+    value: "Other",
   },
 ];

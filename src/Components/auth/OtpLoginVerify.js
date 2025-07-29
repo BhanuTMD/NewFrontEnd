@@ -1,94 +1,110 @@
-// import React, { useState, useRef } from "react";
-// import { useLocation, useNavigate } from "react-router-dom";
-// import axios from "axios";
+import React, { useState, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
-// const OTPLoginVerify = () => {
-//   const [otp, setOtp] = useState("");
-//   const inputRefs = useRef([]); // Array of refs for each input field
-//   const location = useLocation();
-//   const navigate = useNavigate();
+const OTPLoginVerify = () => {
+  const [otp, setOtp] = useState("");
+  const inputRefs = useRef([]);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-//   const { values } = location.state || {}; // Retrieve values from state
+  const { email } = location.state || {};
 
-//   const handleChange = (e, index) => {
-//     const value = e.target.value;
-//     if (/^\d?$/.test(value)) {
-//       // Allow only single digit numbers
-//       let otpArray = otp.split("");
-//       otpArray[index] = value;
-//       setOtp(otpArray.join(""));
+  const handleChange = (e, index) => {
+    const value = e.target.value;
+    if (/^\d?$/.test(value)) {
+      let otpArray = otp.split("");
+      otpArray[index] = value;
+      setOtp(otpArray.join(""));
 
-//       // Move to the next input if a value is entered
-//       if (value && index < inputRefs.current.length - 1) {
-//         inputRefs.current[index + 1].focus();
-//       }
-//     }
-//   };
+      if (value && index < inputRefs.current.length - 1) {
+        inputRefs.current[index + 1].focus();
+      }
+    }
+  };
 
-//   const handleKeyDown = (e, index) => {
-//     if (e.key === "Backspace" && !otp[index] && index > 0) {
-//       inputRefs.current[index - 1].focus();
-//     }
-//   };
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      inputRefs.current[index - 1].focus();
+    }
+  };
 
-//   const handleSubmit = (event) => {
-//     event.preventDefault();
-//     const payload = { ...values, otp };
-//     axios
-//       .post("http://localhost:8081/login", payload)
-//       .then((res) => {
-//         if (res.data.message === "Login successful") {
-//           navigate("/welcomePage");
-//         } else {
-//           alert("No record existed");
-//         }
-//       })
-//       .catch((err) => console.log(err));
-//   };
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-//   return (
-//     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-//       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
-//         <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">
-//           Verify OTP
-//         </h2>
-//         <p className="text-sm text-gray-600 text-center mb-6">
-//           Enter the 6-digit OTP sent to your mobile number.
-//         </p>
-//         <form onSubmit={handleSubmit}>
-//           <div className="flex justify-between mb-6">
-//             {Array.from({ length: 6 }).map((_, index) => (
-//               <input
-//                 key={index}
-//                 type="text"
-//                 maxLength="1"
-//                 className="w-12 h-12 text-center border rounded-lg shadow-sm text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-//                 value={otp[index] || ""}
-//                 onChange={(e) => handleChange(e, index)}
-//                 onKeyDown={(e) => handleKeyDown(e, index)}
-//                 ref={(el) => (inputRefs.current[index] = el)}
-//               />
-//             ))}
-//           </div>
-//           <button
-//             type="submit"
-//             className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-//           >
-//             Verify OTP
-//           </button>
-//         </form>
-//         <div className="mt-4 text-center">
-//           <button
-//             type="button"
-//             className="text-blue-500 hover:underline"
-//             onClick={() => alert("Resend OTP")}
-//           >
-//             Resend OTP
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
+    if (otp.length !== 6) {
+      alert("Please enter 6 digit OTP");
+      return;
+    }
 
-// export default OTPLoginVerify;
+    try {
+      const res = await axios.post(
+        `http://172.16.2.246:8080/auth/login/verify-otp?email=${email}&otp=${otp}`
+      );
+      const { jwtToken, username } = res.data;
+      localStorage.setItem("token", jwtToken);
+      localStorage.setItem("username", username);
+      navigate("/welcomePage");
+    } catch (err) {
+      if (err.response && err.response.status === 400) {
+        alert("Invalid or expired OTP");
+      } else {
+        console.error(err);
+        alert("Something went wrong");
+      }
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-200 px-4">
+      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-2xl border border-gray-100">
+        {/* Header */}
+        <h2 className="text-3xl font-extrabold text-center text-indigo-700 mb-3">
+          OTP Verification
+        </h2>
+        <p className="text-center text-gray-600 text-sm mb-8">
+          Enter the 6-digit OTP sent to <span className="font-medium">{email}</span>
+        </p>
+
+        {/* OTP Input Fields */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="flex justify-between">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <input
+                key={index}
+                type="text"
+                maxLength="1"
+                className="w-12 h-14 text-center border-2 border-gray-300 rounded-xl text-xl font-bold focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 transition-all"
+                value={otp[index] || ""}
+                onChange={(e) => handleChange(e, index)}
+                onKeyDown={(e) => handleKeyDown(e, index)}
+                ref={(el) => (inputRefs.current[index] = el)}
+              />
+            ))}
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-lg shadow-md transition duration-200"
+          >
+            Verify OTP
+          </button>
+
+          {/* Resend OTP */}
+          <div className="text-center mt-4">
+            <button
+              type="button"
+              onClick={() => alert("Resend OTP")}
+              className="text-indigo-600 font-medium hover:underline hover:text-indigo-700"
+            >
+              Resend OTP
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default OTPLoginVerify;

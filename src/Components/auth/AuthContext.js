@@ -1,19 +1,10 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-} from "react";
+import React, {createContext,useContext, useState,useEffect,useCallback,} from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode"; // 🔥 Install this if not already
-
+import { jwtDecode } from "jwt-decode"; 
 
 const AuthContext = createContext();
-
 export const useAuth = () => useContext(AuthContext);
-
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -44,12 +35,11 @@ export const AuthProvider = ({ children }) => {
       return true; // Invalid token, treat as expired
     }
   };
-
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       if (isTokenExpired(token)) {
-        console.warn("⛔ Token expired. Logging out...");
+        console.log("⛔ Token expired. Logging out...");
         logout();
       } else {
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -64,18 +54,16 @@ export const AuthProvider = ({ children }) => {
       (response) => response,
       (error) => {
         if (error.response?.status === 401) {
-          console.warn("⛔ Token expired or unauthorized. Logging out...");
+          console.log("⛔ Token expired or unauthorized. Logging out...");
           logout();
         }
         return Promise.reject(error);
       }
     );
-
     return () => {
       axios.interceptors.response.eject(interceptor);
     };
   }, [logout]);
-
   return (
     <AuthContext.Provider
       value={{ isAuthenticated, login, logout, isLoading }}
