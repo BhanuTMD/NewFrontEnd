@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PreviewPopUp from 'Components/pages/techSearch/PreviewPopUp';
 
 const sectionStyles = {
@@ -7,19 +7,32 @@ const sectionStyles = {
   three: 'border-l-8 border-yellow-500',
   four: 'border-l-8 border-purple-500',
 };
-const AllSectionPreview = ({ data }) => {
+
+const AllSectionPreview = ({ data, currentPage, totalPages, onPageChange }) => {
   const [previewItem, setPreviewItem] = useState(null);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentPage]);
+
+  const sectionOneList = data.sectionOneList || [];
+
   const handlePreviewRow = (item) => setPreviewItem(item);
+
   return (
     <div className="mt-8 space-y-6">
-      <h2 className="text-2xl font-bold text-center text-indigo-700 mb-8">All Sections - Technology Details</h2>
-      {data.sectionOneList.map((item, index) => {
+      <h2 className="text-2xl font-bold text-center text-indigo-700 mb-8">
+        All Sections - Technology Details
+      </h2>
+
+      {sectionOneList.map((item, index) => {
         const sectionTwo = data.sectionTwoList?.filter(s => s.technologyRefNo === item.technologyRefNo) || [];
         const sectionThree = data.sectionThreeList?.filter(s => s.technologyRefNo === item.technologyRefNo) || [];
         const sectionFour = data.sectionFourList?.filter(s => s.technologyRefNo === item.technologyRefNo) || [];
+
         return (
           <div key={index} className="border rounded-lg shadow-lg p-6 bg-white space-y-4">
-            {/* Section One */}
+            {/* --- Section One --- */}
             <div className={`${sectionStyles.one} pl-4`}>
               <h3 className="text-xl font-semibold text-blue-600 mb-2">Section One - Technology Details</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -50,7 +63,8 @@ const AllSectionPreview = ({ data }) => {
                 <Detail label="Laboratory Details" value={item.laboratoryDetail} />
               </div>
             </div>
-            {/* Section Two */}
+
+            {/* --- Section Two --- */}
             {sectionTwo.length > 0 && (
               <div className={`${sectionStyles.two} pl-4`}>
                 <h3 className="text-xl font-semibold text-green-600 mb-2">Section Two - IPR Details</h3>
@@ -59,11 +73,12 @@ const AllSectionPreview = ({ data }) => {
                   <Detail label="Registration No" value={sectionTwo[0].registrationNo} />
                   <Detail label="Status" value={sectionTwo[0].status} />
                   <Detail label="Status Date" value={sectionTwo[0].statusDate} />
-                  <Detail label="Countries" value={sectionTwo[0].countries?.join(', ')} />
+                  <Detail label="Countries" value={sectionTwo[0].country?.join(', ')} />
                 </div>
               </div>
             )}
-            {/* Section Three */}
+
+            {/* --- Section Three --- */}
             {sectionThree.length > 0 && (
               <div className={`${sectionStyles.three} pl-4`}>
                 <h3 className="text-xl font-semibold text-yellow-600 mb-2">Section Three - Licensing Details</h3>
@@ -79,25 +94,11 @@ const AllSectionPreview = ({ data }) => {
                   <Detail label="Sub Total Royalty" value={`₹${sectionThree[0].subTotalRoyalty || '0'}`} />
                   <Detail label="Sub Total Premia" value={`₹${sectionThree[0].subTotalPremia || '0'}`} />
                   <Detail label="Grand Total" value={`₹${sectionThree[0].grandTotal || '0'}`} />
-                  <div className="col-span-2">
-                    <strong>Royalty:</strong>
-                    {(sectionThree[0].royalty || []).map((r, i) => (
-                      <div key={i}>₹{r.amount} on {r.date}</div>
-                    ))}
-                  </div>
-                  <div className="col-span-2">
-                    <strong>Premia:</strong>
-                    {(sectionThree[0].premia || []).map((p, i) => (
-                      <div key={i}>₹{p.amount} on {p.date}</div>
-                    ))}
-                  </div>
-                  <div className="col-span-2">
-                    <strong>Grand Total:</strong> ₹{sectionThree[0].grandTotal || '0'}
-                  </div>
-                </div>              
+                </div>
               </div>
             )}
-            {/* Section Four */}
+
+            {/* --- Section Four --- */}
             {sectionFour.length > 0 && (
               <div className={`${sectionStyles.four} pl-4`}>
                 <h3 className="text-xl font-semibold text-purple-600 mb-2">Section Four - Deployment Details</h3>
@@ -110,16 +111,12 @@ const AllSectionPreview = ({ data }) => {
                 </div>
               </div>
             )}
-            {/* Button */}
+
+            {/* --- Preview Button --- */}
             <div className="mt-4">
               <button
                 onClick={() =>
-                  handlePreviewRow({
-                    ...item,
-                    sectionTwo,
-                    sectionThree,
-                    sectionFour,
-                  })
+                  handlePreviewRow({ ...item, sectionTwo, sectionThree, sectionFour })
                 }
                 className="px-4 py-2 bg-green-600 text-white rounded shadow hover:bg-green-700"
               >
@@ -129,6 +126,27 @@ const AllSectionPreview = ({ data }) => {
           </div>
         );
       })}
+
+      {/* --- Pagination Buttons --- */}
+      <div className="flex justify-center mt-6 space-x-4">
+        <button
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 0}
+          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50 hover:bg-gray-400"
+        >
+          Previous
+        </button>
+        <span className="self-center text-sm font-semibold text-gray-700">
+          Page {currentPage + 1} of {totalPages}
+        </span>
+        <button
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage + 1 >= totalPages}
+          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50 hover:bg-gray-400"
+        >
+          Next
+        </button>
+      </div>
 
       {previewItem && (
         <PreviewPopUp
@@ -140,6 +158,7 @@ const AllSectionPreview = ({ data }) => {
     </div>
   );
 };
+
 const Detail = ({ label, value }) => (
   <div>
     <strong>{label}:</strong> {value || '-'}

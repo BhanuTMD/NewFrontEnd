@@ -42,14 +42,35 @@ const SectionOne = () => {
     laboratoryDetail: "",
   });
 
+  // Prefill from localStorage or API
   useEffect(() => {
     if (passedTRN) {
+      const saved = localStorage.getItem("sectionOneData");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.technologyRefNo === passedTRN) {
+          setInitialValues({
+            ...initialValues,
+            ...parsed,
+            file: null, // File can't be restored
+          });
+          setGeneratedRefNo(passedTRN);
+          return;
+        }
+      }
+
+      // Fallback to API
       const token = localStorage.getItem("token");
-      axios.get(`http://172.16.2.246:8080/apf/tdmp/getSectionOne/${passedTRN}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      axios
+        .get(`http://172.16.2.246:8080/apf/tdmp/getSectionOne/${passedTRN}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
         .then((res) => {
-          setInitialValues(res.data);
+          setInitialValues({
+            ...initialValues,
+            ...res.data,
+            file: null,
+          });
           setGeneratedRefNo(passedTRN);
         })
         .catch((err) => {
@@ -61,41 +82,64 @@ const SectionOne = () => {
   const validationSchema = Yup.object({});
 
   const handleSubmit = (values, { setSubmitting }) => {
-    const url = "http://172.16.2.246:8080/apf/tdmp/saveSectionOne";
-    const formData = new FormData();
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to submit this form now?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Submit it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const url = "http://172.16.2.246:8080/apf/tdmp/saveSectionOne";
+        const formData = new FormData();
 
-    for (let key in values) {
-      if (Array.isArray(values[key])) {
-        values[key].forEach((item) => formData.append(key, item));
-      } else if (key === "file" && values.file) {
-        formData.append("file", values.file);
+        for (let key in values) {
+          if (Array.isArray(values[key])) {
+            values[key].forEach((item) => formData.append(key, item));
+          } else if (key === "file" && values.file) {
+            formData.append("file", values.file);
+          } else {
+            formData.append(key, values[key]);
+          }
+        }
+
+        const token = localStorage.getItem("token");
+
+        axios
+          .post(url, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          .then((res) => {
+            const responseData = res.data;
+            const techRef = responseData.technologyRefNo;
+
+            setGeneratedRefNo(techRef);
+            localStorage.setItem("sectionOneData", JSON.stringify(responseData));
+
+            Swal.fire("Success!", "Form submitted successfully!", "success");
+
+            navigate("/sectionTwo", {
+              state: { technologyRefNo: techRef },
+            });
+          })
+          .catch((err) => {
+            console.error("Submission error", err);
+            Swal.fire("Error!", "Failed to submit. Try again.", "error");
+          })
+          .finally(() => {
+            setSubmitting(false);
+          });
       } else {
-        formData.append(key, values[key]);
-      }
-    }
-
-    const token = localStorage.getItem("token");
-
-    axios.post(url, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => {
-        const techRef = res.data.technologyRefNo;
-        setGeneratedRefNo(techRef);
-        Swal.fire("Success!", "Form submitted successfully!", "success");
-        // navigate("/sectionTwo", { state: { technologyRefNo: techRef } });
-      })
-      .catch((err) => {
-        console.error("Submission error", err);
-        Swal.fire("Error!", "Failed to submit. Try again.", "error");
-      })
-      .finally(() => {
         setSubmitting(false);
-      });
+      }
+    });
   };
+
   return (
     <>
       <Header />
@@ -105,10 +149,11 @@ const SectionOne = () => {
         <div className="flex-1 p-8 bg-blue-200 border">
           <Section sectionLine="Section 1 : Key Details - Add New Technology / Knowhow Information" />
           <Formik
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-            onSubmit={handleSubmit}
-          >
+          enableReinitialize={true}
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
             {({ setFieldValue, isSubmitting }) => (
               <Form>
                 <div className="form-group mb-4">
@@ -510,7 +555,7 @@ const SectionOne = () => {
                   />
                 </div>
 
-                <div className="form-group mb-4 flex justify-center ">
+                {/* <div className="form-group mb-4 flex justify-center ">
                   <button
                     type="submit"
                     className="px-4 py-2 bg-green-600 text-white rounded-md "
@@ -525,7 +570,16 @@ const SectionOne = () => {
                   >
                     Next
                   </button>
-                </div>
+                </div> */}
+                <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting..." : "Submit & Next"}
+                </button>
+              </div>
                 {/* <MyForm/> */}
               </Form>
             )}
