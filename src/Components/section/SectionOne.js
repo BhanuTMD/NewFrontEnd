@@ -40,42 +40,31 @@ const SectionOne = () => {
     marketPotential: "",
     file: null,
     laboratoryDetail: "",
+    lab: []
   });
 
-  // Prefill from localStorage or API
   useEffect(() => {
     if (passedTRN) {
       const saved = localStorage.getItem("sectionOneData");
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed.technologyRefNo === passedTRN) {
-          setInitialValues({
-            ...initialValues,
-            ...parsed,
-            file: null, // File can't be restored
-          });
+          setInitialValues(prev => ({ ...prev, ...parsed, file: null }));
           setGeneratedRefNo(passedTRN);
           return;
         }
       }
 
-      // Fallback to API
       const token = localStorage.getItem("token");
       axios
-        .get(`http://172.16.2.246:8080/apf/tdmp/getSectionOne/${passedTRN}`, {
+        .get(`http://172.16.2.246:8080/apf/tdmp/sectionOne/${passedTRN}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => {
-          setInitialValues({
-            ...initialValues,
-            ...res.data,
-            file: null,
-          });
+          setInitialValues(prev => ({ ...prev, ...res.data, file: res.data.file || null }));
           setGeneratedRefNo(passedTRN);
         })
-        .catch((err) => {
-          console.error("Error fetching section data", err);
-        });
+        .catch((err) => console.error("Error fetching section data", err));
     }
   }, [passedTRN]);
 
@@ -117,23 +106,16 @@ const SectionOne = () => {
           .then((res) => {
             const responseData = res.data;
             const techRef = responseData.technologyRefNo;
-
             setGeneratedRefNo(techRef);
             localStorage.setItem("sectionOneData", JSON.stringify(responseData));
-
             Swal.fire("Success!", "Form submitted successfully!", "success");
-
-            navigate("/sectionTwo", {
-              state: { technologyRefNo: techRef },
-            });
+            navigate("/sectionTwo", { state: { technologyRefNo: techRef } });
           })
           .catch((err) => {
             console.error("Submission error", err);
             Swal.fire("Error!", "Failed to submit. Try again.", "error");
           })
-          .finally(() => {
-            setSubmitting(false);
-          });
+          .finally(() => setSubmitting(false));
       } else {
         setSubmitting(false);
       }
@@ -149,11 +131,11 @@ const SectionOne = () => {
         <div className="flex-1 p-8 bg-blue-200 border">
           <Section sectionLine="Section 1 : Key Details - Add New Technology / Knowhow Information" />
           <Formik
-          enableReinitialize={true}
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={handleSubmit}
-        >
+            enableReinitialize
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
             {({ setFieldValue, isSubmitting }) => (
               <Form>
                 <div className="form-group mb-4">
@@ -531,6 +513,13 @@ const SectionOne = () => {
                     }}
                   />
 
+                  {initialValues.file && (
+                    <img
+                      src={`data:image/jpeg;base64,${initialValues.file}`}
+                      alt="Preview"
+                      className="mt-2 max-h-40"
+                    />
+                  )}
                 </div>
 
                 <div className="form-group mb-4">
@@ -555,14 +544,14 @@ const SectionOne = () => {
                   />
                 </div>
 
-                {/* <div className="form-group mb-4 flex justify-center ">
+                <div className="form-group mb-4 flex justify-center ">
                   <button
                     type="submit"
                     className="px-4 py-2 bg-green-600 text-white rounded-md "
                   >
                     Save
                   </button>
-                  <button
+                   <button
                     type="button"
                     className="px-4 py-2 bg-blue-500 text-white rounded-md ml-4"
                     onClick={() => navigate("/sectionTwo", { state: { technologyRefNo: generatedRefNo } })}
@@ -570,16 +559,16 @@ const SectionOne = () => {
                   >
                     Next
                   </button>
+                </div>
+                {/* <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Submitting..." : "Submit & Next"}
+                  </button>
                 </div> */}
-                <div className="flex justify-end">
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white px-4 py-2 rounded-md"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Submitting..." : "Submit & Next"}
-                </button>
-              </div>
                 {/* <MyForm/> */}
               </Form>
             )}

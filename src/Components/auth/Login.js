@@ -21,7 +21,7 @@ function Login() {
       axios
         .post("http://172.16.2.246:8080/auth/login", values)
         .then((res) => {
-          const userName = res.data.name; // <-- Change according to your API response
+          const userName = res.data.userName; // <-- Change according to your API response
           const userEmail = values.email;
           // ✅ Store in localStorage
           localStorage.setItem("userName", userName);

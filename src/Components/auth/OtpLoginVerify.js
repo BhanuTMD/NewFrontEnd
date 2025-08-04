@@ -41,9 +41,9 @@ const OTPLoginVerify = () => {
       const res = await axios.post(
         `http://172.16.2.246:8080/auth/login/verify-otp?email=${email}&otp=${otp}`
       );
-      const { jwtToken, username } = res.data;
+      const { jwtToken, userName } = res.data;
       localStorage.setItem("token", jwtToken);
-      localStorage.setItem("username", username);
+      localStorage.setItem("userName", userName);
       navigate("/welcomePage");
     } catch (err) {
       if (err.response && err.response.status === 400) {

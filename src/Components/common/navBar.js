@@ -16,6 +16,7 @@ function NavBar() {
   // Get name from localStorage (update if changes happen)
   useEffect(() => {
     const userName = localStorage.getItem("userName");
+    console.log("User Name from localStorage:", userName);
     if (userName) setName(userName);
   }, [isAuthenticated]);
 

@@ -1,40 +1,55 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu } from "lucide-react";
 import axios from "axios";
 
 const PendingData = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isTechOpen, setIsTechOpen] = useState(false);
-  const [pendingItems, setPendingItems] = useState([]); // API data ke liye state
-  const [loading, setLoading] = useState(true); // Loading state
+  const [pendingItems, setPendingItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  // Fetch pending data from API
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await axios.get("http://172.16.2.246:8080/apf/tdmp/sectionStatus");
-        setPendingItems(res.data); // API response set kar do
+        setPendingItems(res.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
+  const handleEdit = (item) => {
+    const statusToRoute = {
+      "SectionOne": "/sectionOne",
+      "SectionTwo": "/sectionTwo",
+      "SectionThree": "/sectionThree",
+      "SectionFour": "/sectionFour",
+    };
+
+    const route = statusToRoute[item.status];
+    if (route) {
+      navigate(route, {
+        state: { technologyRefNo: item.technologyRefNo },
+      });
+    } else {
+      alert("No valid section found for status: " + item.status);
+    }
+  };
+
   return (
     <div>
-      {/* NavBar */}
+      {/* ✅ NavBar */}
       <nav className="bg-indigo-600 text-white px-6 py-3 relative">
         <div className="flex justify-between items-center">
-          {/* <h1 className="text-xl font-bold">Home</h1> */}
           <Link to="/WelcomePage" className="text-white hover:underline text-lg font-bold">
             Home
           </Link>
-
           <div className="relative">
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -42,7 +57,6 @@ const PendingData = () => {
             >
               <Menu className="w-6 h-6 text-white" />
             </button>
-
             {isDropdownOpen && (
               <div
                 className="absolute right-0 mt-2 w-52 bg-indigo-100 text-black rounded shadow-md text-sm z-20"
@@ -65,7 +79,6 @@ const PendingData = () => {
                 >
                   View
                 </Link>
-
                 <div>
                   <button
                     onClick={() => setIsTechOpen(!isTechOpen)}
@@ -73,7 +86,6 @@ const PendingData = () => {
                   >
                     Technology ▾
                   </button>
-
                   {isTechOpen && (
                     <div className="pl-6 bg-indigo-50">
                       <Link
@@ -116,7 +128,10 @@ const PendingData = () => {
                   <td className="border px-4 py-2">{item.technologyName}</td>
                   <td className="border px-4 py-2">{item.status}</td>
                   <td className="border px-4 py-2">
-                    <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                    <button
+                      onClick={() => handleEdit(item)}
+                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                    >
                       Edit
                     </button>
                   </td>

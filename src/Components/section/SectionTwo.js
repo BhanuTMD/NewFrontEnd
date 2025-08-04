@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -18,17 +18,38 @@ const SectionTwo = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedDate, setSelectedDate] = useState(null);
-
-  const technologyRefNo = location.state?.technologyRefNo || "";
-
-  const initialValues = {
-    technologyRefNo,
+  const [initialValues, setInitialValues] = useState({
+    technologyRefNo: "",
     iprType: "",
     registrationNo: "",
     status: "",
     statusDate: null,
     country: [],
-  };
+  });
+
+  const technologyRefNo = location.state?.technologyRefNo || "";
+
+  useEffect(() => {
+    if (technologyRefNo) {
+      axios
+        .get(`http://172.16.2.246:8080/apf/tdmp/sectionTwo/${technologyRefNo}`)
+        .then((response) => {
+          const data = response.data;
+          setInitialValues({
+            technologyRefNo: data.technologyRefNo || technologyRefNo,
+            iprType: data.iprType || "",
+            registrationNo: data.registrationNo || "",
+            status: data.status || "",
+            statusDate: data.statusDate ? new Date(data.statusDate) : null,
+            country: data.country || [],
+          });
+          setSelectedDate(data.statusDate ? new Date(data.statusDate) : null);
+        })
+        .catch((error) => {
+          console.error("Error fetching SectionTwo data:", error);
+        });
+    }
+  }, [technologyRefNo]);
 
   const validationSchema = Yup.object({
     iprType: Yup.string().required("Required"),
@@ -67,9 +88,8 @@ const SectionTwo = () => {
             onSubmit={handleSubmit}
             enableReinitialize
           >
-            {({ setFieldValue }) => (
+            {({ setFieldValue, values }) => (
               <Form className="space-y-6">
-
                 {/* TRN (Read-only) */}
                 <div>
                   <label className="font-bold">Technology Ref No:</label>
@@ -168,7 +188,6 @@ const SectionTwo = () => {
                     Next
                   </button>
                 </div>
-
               </Form>
             )}
           </Formik>
