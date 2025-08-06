@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
 
-const SectionThree = () => {
+const EditSectionThree = () => {
   const navigate = useNavigate();
 
   // Local state
@@ -80,7 +80,7 @@ const SectionThree = () => {
     };
 
     axios
-      .post("http://172.16.2.246:8080/apf/tdmp/saveSectionThree", payload, {
+      .post("http://172.16.2.246:8080/apf/tdmp/EditSectionThree", payload, {
         headers: { "Content-Type": "application/json" },
       })
       .then(() => {
@@ -557,4 +557,4 @@ const SectionThree = () => {
   );
 };
 
-export default SectionThree;
+export default EditSectionThree;

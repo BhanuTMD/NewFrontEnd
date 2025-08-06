@@ -26,10 +26,10 @@ const PendingData = () => {
 
   const handleEdit = (item) => {
     const statusToRoute = {
-      "SectionOne": "/sectionOne",
-      "SectionTwo": "/sectionTwo",
-      "SectionThree": "/sectionThree",
-      "SectionFour": "/sectionFour",
+      "EditSectionOne": "/EditSectionOne",
+      "EditSectionTwo": "/EditSectionTwo",
+      "EditSectionThree": "/EditSectionThree",
+      "EditSectionFour": "/EditSectionFour",
     };
 
     const route = statusToRoute[item.status];

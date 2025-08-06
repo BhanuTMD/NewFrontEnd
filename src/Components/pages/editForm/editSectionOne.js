@@ -4,7 +4,7 @@ import Section from "Components/common/section";
 import NavBar from "Components/common/navBar";
 import FooterBar from "Components/common/footer";
 import { Formik, Field, Form, ErrorMessage } from "formik";
-import CustomSelect from "../utils/CustomSelect";
+import CustomSelect from "Components/utils/CustomSelect";
 import * as Yup from "yup";
 import Swal from "sweetalert2";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -14,7 +14,7 @@ import { theme } from "Components/data/theme";
 import { stakeHolders } from "Components/data/stakeHolders";
 import { lab } from "Components/data/lab";
 
-const SectionOne = () => {
+const EditSectionOne = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const passedTRN = location.state?.technologyRefNo || "";
@@ -44,7 +44,7 @@ const SectionOne = () => {
 
   useEffect(() => {
     if (passedTRN) {
-      const saved = localStorage.getItem("sectionOneData");
+      const saved = localStorage.getItem("EditSectionOneData");
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed.technologyRefNo === passedTRN) {
@@ -56,7 +56,7 @@ const SectionOne = () => {
 
       const token = localStorage.getItem("token");
       axios
-        .get(`http://172.16.2.246:8080/apf/tdmp/sectionOne/${passedTRN}`, {
+        .get(`http://172.16.2.246:8080/apf/tdmp/EditSectionOne/${passedTRN}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => {
@@ -80,7 +80,7 @@ const SectionOne = () => {
       confirmButtonText: "Yes, Submit it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        const url = "http://172.16.2.246:8080/apf/tdmp/saveSectionOne";
+        const url = "http://172.16.2.246:8080/apf/tdmp/EditSectionOne";
         const formData = new FormData();
 
         for (let key in values) {
@@ -106,7 +106,7 @@ const SectionOne = () => {
             const responseData = res.data;
             const techRef = responseData.technologyRefNo;
             setGeneratedRefNo(techRef);
-            localStorage.setItem("sectionOneData", JSON.stringify(responseData));
+            localStorage.setItem("EditSectionOneData", JSON.stringify(responseData));
             Swal.fire("Success!", "Form submitted successfully!", "success");
             navigate("/sectionTwo", { state: { technologyRefNo: techRef } });
           })
@@ -579,4 +579,4 @@ const SectionOne = () => {
   );
 };
 
-export default SectionOne;
+export default EditSectionOne;

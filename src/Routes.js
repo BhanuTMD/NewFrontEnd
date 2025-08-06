@@ -10,7 +10,11 @@ import TechSearch from "Components/pages/techSearch/TechSearch";
 import WelcomePage from "Components/pages/welcomePage/WelcomePage";
 import PreviewPopUp from "Components/pages/techSearch/PreviewPopUp";
 import PrivateRoute from "Components/auth/privateRoute";
-import PendingData from "Components/pages/pendingData";
+import PendingData from "Components/pages/pendingPage/pendingData";
+import EditSectionOne from "Components/pages/editForm/editSectionOne";
+import EditSectionTwo from "Components/pages/editForm/editSectionTwo";
+import EditSectionThree from "Components/pages/editForm/editSectionThree";
+import EditSectionFour from "Components/pages/editForm/EditSectionFour";    
 import OTPLoginVerify from "Components/auth/OtpLoginVerify";
 import ForgetPassword from "Components/auth/forgetPassword";
 
@@ -74,7 +78,71 @@ const AppRoutes = () => {
           </PrivateRoute>
         }
       />
-    </Routes>
+      <Route
+  path="editSectionOne"
+  element={
+    <PrivateRoute>
+      <EditSectionOne />
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="editSectionTwo"
+  element={
+    <PrivateRoute>
+      <EditSectionTwo />
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="editSectionThree"
+  element={
+    <PrivateRoute>
+      <EditSectionThree />
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="editSectionFour"
+  element={
+    <PrivateRoute>
+      <EditSectionFour />
+    </PrivateRoute>
+  }
+/>
+      <Route
+        path="EditSectionOne"
+        element={
+          <PrivateRoute>
+            <EditSectionOne />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="EditSectionTwo"
+        element={
+          <PrivateRoute>
+            <EditSectionTwo />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="EditSectionThree"
+        element={
+          <PrivateRoute>
+            <EditSectionThree />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="EditSectionFour"
+        element={
+          <PrivateRoute>
+            <EditSectionFour />
+          </PrivateRoute>
+        }
+      />
+    </Routes> 
   );
 };
 

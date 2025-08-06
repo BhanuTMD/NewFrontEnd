@@ -14,7 +14,7 @@ import Section from "Components/common/section";
 import Country from "Components/data/country";
 import CustomSelect from "Components/utils/CustomSelect";
 
-const SectionTwo = () => {
+const EditSectionTwo = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedDate, setSelectedDate] = useState(null);
@@ -32,7 +32,7 @@ const SectionTwo = () => {
   useEffect(() => {
     if (technologyRefNo) {
       axios
-        .get(`http://172.16.2.246:8080/apf/tdmp/sectionTwo/${technologyRefNo}`)
+        .get(`http://172.16.2.246:8080/apf/tdmp/EditSectionTwo/${technologyRefNo}`)
         .then((response) => {
           const data = response.data;
           setInitialValues({
@@ -46,7 +46,7 @@ const SectionTwo = () => {
           setSelectedDate(data.statusDate ? new Date(data.statusDate) : null);
         })
         .catch((error) => {
-          console.error("Error fetching SectionTwo data:", error);
+          console.error("Error fetching EditSectionTwo data:", error);
         });
     }
   }, [technologyRefNo]);
@@ -68,7 +68,7 @@ const SectionTwo = () => {
     };
 
     axios
-      .post("http://172.16.2.246:8080/apf/tdmp/saveSectionTwo", payload, {
+      .post("http://172.16.2.246:8080/apf/tdmp/EditSectionTwo", payload, {
         headers: { "Content-Type": "application/json" },
       })
       .then(() => Swal.fire("Success!", "Form submitted successfully!", "success"))
@@ -199,4 +199,4 @@ const SectionTwo = () => {
   );
 };
 
-export default SectionTwo;
+export default EditSectionTwo;

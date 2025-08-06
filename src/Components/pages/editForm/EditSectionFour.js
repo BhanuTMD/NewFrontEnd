@@ -13,7 +13,7 @@ import PreviewPopUp from "Components/pages/techSearch/PreviewPopUp";
 import "react-datepicker/dist/react-datepicker.css";
 import { useEffect, useState } from "react";
 
-const SectionFour = () => {
+const EditSectionFour = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [previewItem, setPreviewItem] = useState(null);
@@ -48,7 +48,7 @@ const SectionFour = () => {
         const formattedPreviewItem = {
           ...res.data.sectionOne,
           sectionTwo: res.data.sectionTwo ? [res.data.sectionTwo] : [],
-          sectionThree: res.data.sectionThree ? [res.data.sectionThree] : [],
+          EditSectionThree: res.data.EditSectionThree ? [res.data.EditSectionThree] : [],
           sectionFour: res.data.sectionFour ? [res.data.sectionFour] : [],
         };
 
@@ -144,7 +144,7 @@ const SectionFour = () => {
               <button
                 type="button"
                 className="px-4 py-2 bg-blue-500 text-white rounded-md ml-4"
-                onClick={() => navigate("/sectionThree", { state: { technologyRefNo: initialValues.technologyRefNo } })}
+                onClick={() => navigate("/EditSectionThree", { state: { technologyRefNo: initialValues.technologyRefNo } })}
               >
                 Previous
               </button>
@@ -191,4 +191,4 @@ const FormField = ({ label, name, note, mandatory, textarea, placeholder, readOn
   </div>
 );
 
-export default SectionFour;
+export default EditSectionFour;
