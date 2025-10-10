@@ -10,6 +10,7 @@ import Swal from "sweetalert2";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { industrialSector } from "Components/data/industrialSector";
+import {potentialMinistries} from "Components/data/potentialMinistries";
 import { theme } from "Components/data/theme";
 import { stakeHolders } from "Components/data/stakeHolders";
 import { lab } from "Components/data/lab";
@@ -35,6 +36,7 @@ const SectionOne = () => {
     competitivePosition: "",
     technoEconomics: "",
     stakeHolders: [],
+    potentialMinistries: [],
     environmentalStatutory: "",
     marketPotential: "",
     file: null,
@@ -128,7 +130,7 @@ const SectionOne = () => {
       <div className="flex">
         <div className="bg-gray-800"></div>
         <div className="flex-1 p-8 bg-blue-200 border">
-          <Section sectionLine="Section 1 : Key Details - Add New Technology / Knowhow Information" />
+          <Section sectionLine="Section 1 : Key Details of the Technology / Knowhow " />
           <Formik
             enableReinitialize
             initialValues={initialValues}
@@ -150,24 +152,7 @@ const SectionOne = () => {
                     className="w-full p-2 text-lg outline-0.1 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
                   />
                 </div>
-                <div className="form-group">
-                  <label className="font-bold" htmlFor="keywordTechnology">
-                    Keywords for Technology / Knowhow
-                  </label>
-                  <Field
-                    type="text"
-                    name="keywordTechnology"
-                    defaultValue="CSIR/ANB/BIOT/01" // Default value here
-                    className="w-full p-2 text-lg outline-0.1 rounded-md"
-                  />
-                  <ErrorMessage
-                    name="keywordTechnology"
-                    component="div"
-                    className="text-red-500"
-                  />
-                </div>
-
-                <div className="form-group">
+                     <div className="form-group">
                   <label className="font-bold" htmlFor="nameTechnology">
                     Name of Technology / Knowhow: &nbsp;
                     <span className="Hint block text-sm text-red-500 inline">
@@ -187,7 +172,25 @@ const SectionOne = () => {
                     className="text-red-500"
                   />
                 </div>
-
+                <div className="form-group">
+                  <label className="font-bold" htmlFor="keywordTechnology">
+                    Keywords for Technology / Knowhow &nbsp;
+                    <span className="Hint block text-sm text-red-500 inline">
+                     ( 5 to 8 Words)
+                    </span>
+                  </label>
+                  <Field
+                    type="text"
+                    name="keywordTechnology"
+                    defaultValue="CSIR/ANB/BIOT/01" // Default value here
+                    className="w-full p-2 text-lg outline-0.1 rounded-md"
+                  />
+                  <ErrorMessage
+                    name="keywordTechnology"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
                 <div className="form-group mb-4">
                   <label className="font-bold" htmlFor="industrialSector">
                     Industrial Sector
@@ -237,7 +240,7 @@ const SectionOne = () => {
                 </div>
                 <div className="form-group flex items-center mb-4">
                   <label className="font-bold" htmlFor="multiLabInstitute">
-                    Multi Laboratories / Institutes
+                    Multi Laboratories / Institutes Involved
                   </label>
                   <div className="ml-4 flex space-x-4">
                     <label htmlFor="multiLabYes" className="flex items-center">
@@ -396,7 +399,7 @@ const SectionOne = () => {
                 </div>
                 <div className="form-group mb-4">
                   <label className="font-bold" htmlFor="stakeHolders">
-                    Potential Stakeholders
+                    Potential Applicant
                   </label>
                   <Field
                     name="stakeHolders"
@@ -408,6 +411,24 @@ const SectionOne = () => {
                   ></Field>
                   <ErrorMessage
                     name="stakeHolders"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+                        <div className="form-group mb-4">
+                  <label className="font-bold" htmlFor="ministertialStakeHolders">
+                     Potential Ministries
+                  </label>
+                  <Field
+                    name="potentialMinistries"
+                    options={potentialMinistries}
+                    component={CustomSelect}
+                    placeholder="Select Ministry List from here..."
+                    isMulti={true}
+                  //className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  ></Field>
+                  <ErrorMessage
+                    name="potentialMinistries"
                     component="div"
                     className="text-red-500"
                   />
@@ -481,7 +502,7 @@ const SectionOne = () => {
                 </div>
                 <div className="form-group mb-4">
                   <label className="font-bold" htmlFor="file">
-                    Upload High-Resolution file (Optional)
+                    Upload High-Resolution file (Maximum 10 MB)
                   </label>
                   <input
                     type="file"

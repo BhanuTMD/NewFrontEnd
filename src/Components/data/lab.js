@@ -1,4 +1,4 @@
- export const lab = [
+export const lab = [
   {
     label:
       "CSIR-Advanced Materials and Processes Research Institute (CSIR-AMPRI), Bhopal",
@@ -9,7 +9,8 @@
     value: "CSIR-CBRI",
   },
   {
-    label: "CSIR-Center for Cellular Molecular Biology (CSIR-CCMB), Hyderabad",
+    label:
+      "CSIR-Centre for Cellular and Molecular Biology (CSIR-CCMB), Hyderabad",
     value: "CSIR-CCMB",
   },
   {
@@ -18,7 +19,7 @@
   },
   {
     label:
-      "CSIR-Central ElectroChemical Research Institute (CSIR-CECRI), Karaikudi",
+      "CSIR-Central Electrochemical Research Institute (CSIR-CECRI), Karaikudi",
     value: "CSIR-CECRI",
   },
   {
@@ -70,7 +71,7 @@
     value: "CSIR-CSMCRI",
   },
   {
-    label: "CSIR-Central Fourth Paradigm Institute (CSIR-4PI), Bengaluru",
+    label: "CSIR Fourth Paradigm Institute (CSIR-4PI), Bengaluru",
     value: "CSIR-4PI",
   },
   {
@@ -107,21 +108,17 @@
   },
   {
     label:
-      "CSIR-Institute of Minerals and Materials Technology (CSIR-IIMT), Bhubaneswar",
-    value: "CSIR-IIMT",
-  },
-  {
-    label: "CSIR-Institute of Microbial Technology (CSIR-IMT)",
-    value: "CSIR-IMT",
+      "CSIR-Institute of Minerals and Materials Technology (CSIR-IMMT), Bhubaneswar",
+    value: "CSIR-IMMT",
   },
   {
     label:
-      "CSIR-Institute of Minerals and Materials Technology (CSIR-IMTECH), Chandigarh",
+      "CSIR-Institute of Microbial Technology (CSIR-IMTECH), Chandigarh",
     value: "CSIR-IMTECH",
   },
   {
     label: "CSIR-National Aerospace Laboratories (CSIR-NAL), Bengaluru",
-    value: "NCSIR-NAL",
+    value: "CSIR-NAL",
   },
   {
     label: "CSIR-National Botanical Research Institute (CSIR-NBRI), Lucknow",
@@ -134,7 +131,7 @@
   {
     label:
       "CSIR-National Environmental Engineering Research Institute (CSIR-NEERI), Nagpur",
-    value: "NEE&NEERI",
+    value: "CSIR-NEERI",
   },
   {
     label:
@@ -165,16 +162,16 @@
   },
   {
     label:
-      "CSIR-National Institute of Science Communication & Policy Research (CSIR-NISCPR), Delhi",
-    value: "CSIR-NISCPR",
+      "CSIR-National Institute of Science Communication & Policy Research (CSIR-NIScPR), Delhi",
+    value: "CSIR-NIScPR",
   },
   {
     label: "CSIR-Madras Complex (CSIR-CMC), Chennai",
-    value: "SERC",
+    value: "CSIR-CMC",
   },
   {
     label: "CSIR-Structural Engineering Research Centre (CSIR-SERC), Chennai",
-    value: "CSIR-CMC",
+    value: "CSIR-SERC",
   },
   {
     label: "CSIR-Council of Scientific & Industrial Research (CSIR-HQ), Delhi",

@@ -14,9 +14,10 @@ import PendingData from "Components/pages/pendingPage/pendingData";
 import EditSectionOne from "Components/pages/editForm/editSectionOne";
 import EditSectionTwo from "Components/pages/editForm/editSectionTwo";
 import EditSectionThree from "Components/pages/editForm/editSectionThree";
-import EditSectionFour from "Components/pages/editForm/EditSectionFour";    
+import EditSectionFour from "Components/pages/editForm/EditSectionFour";
 import OTPLoginVerify from "Components/auth/OtpLoginVerify";
 import ForgetPassword from "Components/auth/forgetPassword";
+import ViewTechnology from "Components/pages/view/viewTechnology";
 
 const AppRoutes = () => {
   return (
@@ -79,37 +80,37 @@ const AppRoutes = () => {
         }
       />
       <Route
-  path="editSectionOne"
-  element={
-    <PrivateRoute>
-      <EditSectionOne />
-    </PrivateRoute>
-  }
-/>
-<Route
-  path="editSectionTwo"
-  element={
-    <PrivateRoute>
-      <EditSectionTwo />
-    </PrivateRoute>
-  }
-/>
-<Route
-  path="editSectionThree"
-  element={
-    <PrivateRoute>
-      <EditSectionThree />
-    </PrivateRoute>
-  }
-/>
-<Route
-  path="editSectionFour"
-  element={
-    <PrivateRoute>
-      <EditSectionFour />
-    </PrivateRoute>
-  }
-/>
+        path="editSectionOne"
+        element={
+          <PrivateRoute>
+            <EditSectionOne />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="editSectionTwo"
+        element={
+          <PrivateRoute>
+            <EditSectionTwo />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="editSectionThree"
+        element={
+          <PrivateRoute>
+            <EditSectionThree />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="editSectionFour"
+        element={
+          <PrivateRoute>
+            <EditSectionFour />
+          </PrivateRoute>
+        }
+      />
       <Route
         path="EditSectionOne"
         element={
@@ -142,7 +143,16 @@ const AppRoutes = () => {
           </PrivateRoute>
         }
       />
-    </Routes> 
+      <Route
+        path="viewTechnology"
+        element={
+          <PrivateRoute>
+            <ViewTechnology />
+          </PrivateRoute>
+        }
+      />
+    </Routes>
+
   );
 };
 

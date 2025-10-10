@@ -151,7 +151,7 @@ const SectionThree = () => {
       <div className="flex flex-col md:flex-row">
         <div className="bg-gray-800"></div>
         <div className="flex-1 p-8 bg-blue-200 border">
-          <Section sectionLine="Section 3 : Details of License - Add/Modify Sub Form" />
+          <Section sectionLine="Section 3 : Details of Licensee (Commercialization)" />
 
           <Formik
             initialValues={{
@@ -187,11 +187,12 @@ const SectionThree = () => {
                 </div>
 
                 {/* License Name */}
+
                 <div className="form-group mb-2 flex flex-col">
                   <label className="font-bold">
-                    License Name
+                    Licensee Name
                     <span className="Hint block text-sm text-red-500">
-                      Max. 30 Characters
+                      Max. 300 Characters
                     </span>
                   </label>
                   <Field
@@ -210,6 +211,61 @@ const SectionThree = () => {
                   />
                 </div>
 
+                <div className="form-group mb-2 flex flex-col">
+                  <label className="font-bold text-sm">
+                    Address
+                  </label>
+                  <Field
+                    as="textarea"
+                    maxLength="30"
+                    name="address"
+                    type="text"
+                    className="w-half text-lg outline-0.1 rounded-md"
+                    value={licenseName}
+                  />
+                  <ErrorMessage
+                    name="address"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+
+                <div className="form-group mb-2 flex flex-col">
+                  <label className="font-bold">
+                    Email
+                  </label>
+                  <Field
+                    as="textarea"
+                    maxLength="30"
+                    name="email"
+                    type="text"
+                    className="w-half p-1 text-lg outline-0.1 rounded-md"
+                    value={licenseName}
+                  />
+                  <ErrorMessage
+                    name="email"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+                <div className="form-group mb-2 flex flex-col">
+                  <label className="font-bold">
+                    Contact No
+                  </label>
+                  <Field
+                    as="textarea"
+                    maxLength="10"
+                    name="contact"
+                    type="number"
+                    className="w-half p-1 text-lg outline-0.1 rounded-md"
+                    value={licenseName}
+                  />
+                  <ErrorMessage
+                    name="contact"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
                 {/* Date of Agreement Signing */}
                 <div className="form-group mb-2 flex flex-col">
                   <label className="font-bold mb-1">Date of Agreement Signing</label>
@@ -511,7 +567,7 @@ const SectionThree = () => {
                 {/* Grand Total */}
                 <div className="form-group mb-4">
                   <label className="font-bold" htmlFor="GrandTotal">
-                    Grand Total (in INR)
+                    Total Licensee (in INR)
                   </label>
                   <Field
                     maxLength="300"
@@ -521,6 +577,13 @@ const SectionThree = () => {
                     value={grandTotal}
                     readOnly
                   />
+                  <br></br>
+                  <button
+                    type="submit"
+                    className="bg-blue-600 text-white px-6 py-3 rounded mt-3 ml-9"
+                  >
+                    Add New Licensee
+                  </button>
                 </div>
                 {/* Buttons */}
                 <div className="flex justify-center items-center gap-4 mt-4">
@@ -545,8 +608,20 @@ const SectionThree = () => {
                     Next
                   </button>
                 </div>
-
-
+                <div className="form-group mb-4">
+                  <label className="font-bold" htmlFor="GrandTotal">
+                   Grand Total (in INR)
+                  </label>
+                  <Field
+                    maxLength="300"
+                    type="number"
+                    name="GrandTotal"
+                    className="w-half p-1 text-lg outline-0.1 rounded-md"
+                    value={grandTotal}
+                    readOnly
+                  />
+                  <br></br>
+                </div>
               </Form>
             )}
           </Formik>

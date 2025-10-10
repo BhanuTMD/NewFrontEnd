@@ -78,7 +78,7 @@ const SectionFour = () => {
       {/* <Header /> */}
       <NavBar />
       <div className="p-8 bg-blue-200 border">
-        <Section sectionLine="Section 4 : Commercialization / Deployment Details - Add / Modify Sub Form" />
+        <Section sectionLine="Section 4 :  Deployment Details " />
 
         <Formik
           initialValues={editMode && previewItem?.sectionFour?.[0] ? previewItem.sectionFour[0] : initialValues}
@@ -90,7 +90,7 @@ const SectionFour = () => {
             <FormField
               label="Technology / Knowhow Ref No:"
               name="technologyRefNo"
-              mandatory 
+              mandatory
               placeholder="Enter New Information"
               readOnly
             />
@@ -140,6 +140,12 @@ const SectionFour = () => {
               note="Max. 300 Characters"
               textarea
             />
+            <div> <button
+              type="submit"
+              className="bg-blue-600 text-white px-6 py-3 rounded mt-3 ml-9"
+            >
+              Add New Deployment Details
+            </button></div>
             <div className="form-group mb-4 flex justify-center">
               <button
                 type="button"
@@ -152,14 +158,19 @@ const SectionFour = () => {
                 type="submit"
                 className="px-4 py-2 bg-green-600 text-white rounded-md ml-4"
               >
-                Save & Preview
+                 Save
+              </button>
+                <button
+                type="submit"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md ml-4"
+              >
+                 Preview & Submit
               </button>
             </div>
           </Form>
         </Formik>
       </div>
       <FooterBar />
-
       {previewItem && (
         <PreviewPopUp
           item={previewItem}
@@ -171,7 +182,6 @@ const SectionFour = () => {
     </>
   );
 };
-
 const FormField = ({ label, name, note, mandatory, textarea, placeholder, readOnly }) => (
   <div className="form-group mb-4">
     <label className="font-bold flex justify-between" htmlFor={name}>

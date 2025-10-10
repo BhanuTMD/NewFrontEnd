@@ -81,7 +81,7 @@ const SectionTwo = () => {
       <NavBar />
       <div className="flex bg-blue-200 min-h-screen">
         <div className="flex-1 p-8">
-          <Section sectionLine="Section 2 : IPR Status - Add/Modify" />
+          <Section sectionLine="Section 2 : IPR Status " />
           <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
@@ -112,6 +112,15 @@ const SectionTwo = () => {
                     ))}
                   </Field>
                   <ErrorMessage name="iprType" component="div" className="text-red-500" />
+                </div>
+                <div>
+                  <label className="font-bold">IPU Reference No.</label>
+                  <Field
+                    name="refrenceNo"
+                    type="text"
+                    className="w-full p-2 rounded-md"
+                  />
+                  <ErrorMessage name="refrenceNo" component="div" className="text-red-500" />
                 </div>
 
                 {/* Registration No */}
@@ -164,7 +173,14 @@ const SectionTwo = () => {
                     placeholder="Select countries"
                   />
                   <ErrorMessage name="country" component="div" className="text-red-500" />
+
                 </div>
+                <div> <button
+                  type="submit"
+                  className="bg-blue-600 text-white px-6 py-3 rounded mt-3 ml-9"
+                >
+                  Add New IPR
+                </button></div>
 
                 {/* Buttons */}
                 <div className="flex justify-center gap-4">
