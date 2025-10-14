@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Validation from "Components/auth/LoginValidation";
 import axios from "axios";
+import Swal from "sweetalert2"; // ✅ Import SweetAlert2
 
 function Login() {
   const [values, setValues] = useState({ email: "", password: "" });
@@ -18,20 +19,42 @@ function Login() {
     setErrors(err);
 
     if (Object.keys(err).length === 0) {
+      // ✅ Show SweetAlert popup when request is sent
+      Swal.fire({
+        title: "Your request has been sent",
+        text: "Please wait while we process your login...",
+        icon: "info",
+        showConfirmButton: false,
+        timer: 10000,
+      });
+
       axios
         .post("http://172.16.2.246:8080/auth/login", values)
         .then((res) => {
-          const userName = res.data.userName; // <-- Change according to your API response
+          const userName = res.data.userName;
           const userEmail = values.email;
-          // ✅ Store in localStorage
+
           localStorage.setItem("userName", userName);
           localStorage.setItem("userEmail", userEmail);
-          // OTP successfully sent → go to OTP verify page
-          navigate("/otpLoginVerify", { state: { email: values.email } });
+
+          // ✅ Success popup
+          Swal.fire({
+            title: "OTP Sent!",
+            text: "Please check your email for the OTP.",
+            icon: "success",
+            confirmButtonColor: "#4F46E5",
+          }).then(() => {
+            navigate("/otpLoginVerify", { state: { email: values.email } });
+          });
         })
         .catch((err) => {
-          console.error("Login init error:", err);
-          alert("Invalid credentials or server error");
+          console.error("Login error:", err);
+          Swal.fire({
+            title: "Login Failed",
+            text: "Invalid credentials or server error.",
+            icon: "error",
+            confirmButtonColor: "#EF4444",
+          });
         });
     }
   };

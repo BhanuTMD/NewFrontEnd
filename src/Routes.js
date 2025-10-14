@@ -18,6 +18,7 @@ import EditSectionFour from "Components/pages/editForm/EditSectionFour";
 import OTPLoginVerify from "Components/auth/OtpLoginVerify";
 import ForgetPassword from "Components/auth/forgetPassword";
 import ViewTechnology from "Components/pages/view/viewTechnology";
+import TechnologyDetails from "Components/pages/view/TechnologyDetails";
 
 const AppRoutes = () => {
   return (
@@ -29,6 +30,8 @@ const AppRoutes = () => {
       <Route path="pendingData" element={<PendingData />} />
       <Route path="otpLoginVerify" element={<OTPLoginVerify />} />
       <Route path="forgetPassword" element={<ForgetPassword />} />
+        <Route path="/ViewTechnology" element={<ViewTechnology />} />
+  <Route path="/technology/:trnNo" element={<TechnologyDetails />} />
 
       {/* Protected Routes */}
       <Route
