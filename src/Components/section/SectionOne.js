@@ -10,7 +10,7 @@ import Swal from "sweetalert2";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { industrialSector } from "Components/data/industrialSector";
-import {potentialMinistries} from "Components/data/potentialMinistries";
+import { potentialMinistries } from "Components/data/potentialMinistries";
 import { theme } from "Components/data/theme";
 import { stakeHolders } from "Components/data/stakeHolders";
 import { lab } from "Components/data/lab";
@@ -26,7 +26,7 @@ const SectionOne = () => {
     nameTechnology: "",
     industrialSector: [],
     theme: [],
-    multiLabInstitute: "",
+    multiLabInstitute: "No",
     leadLaboratory: "",
     associateInstitute: [],
     technologyLevel: "",
@@ -69,8 +69,48 @@ const SectionOne = () => {
     }
   }, [passedTRN]);
 
-  const validationSchema = Yup.object({});
+  const validationSchema = Yup.object({
+    nameTechnology: Yup.string()
+      .required("Name of Technology is required")
+      .max(500, "Maximum 500 characters allowed"),
 
+    keywordTechnology: Yup.string()
+      .required("Keywords are required")
+      .max(200, "Maximum 200 characters allowed"),
+
+    leadLaboratory: Yup.mixed().required("Lead Laboratory is required"),
+
+
+    theme: Yup.array()
+      .min(1, "Please select at least one Theme")
+      .required("Please select at least one Theme"),
+
+    multiLabInstitute: Yup.string()
+      .required("Please select Yes or No for Multi Laboratories"),
+
+    // ✅ Conditional validation for "lab"
+    lab: Yup.array().when("multiLabInstitute", {
+      is: "Yes",
+      then: (schema) =>
+        schema.min(1, "Please select at least one Lab if 'Yes' is selected"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+
+    technologyLevel: Yup.string()
+      .required("Please select Technology Readiness Level"),
+
+    yearDevelopment: Yup.string()
+      .required("Year of Development is required")
+      .matches(/^[0-9]{4}$/, "Enter a valid year (e.g., 2025)"),
+
+    briefTech: Yup.string()
+      .required("Brief details are required")
+      .max(1000, "Maximum 1000 characters allowed"),
+
+    laboratoryDetail: Yup.string()
+      .required("Laboratory Contact Details are required")
+      .max(300, "Maximum 300 characters allowed"),
+  });
   const handleSubmit = (values, { setSubmitting }) => {
     Swal.fire({
       title: "Are you sure?",
@@ -137,7 +177,7 @@ const SectionOne = () => {
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
-            {({ setFieldValue, isSubmitting }) => (
+            {({ values, setFieldValue, isSubmitting }) => (
               <Form>
                 <div className="form-group mb-4">
                   <label className="font-bold flex justify-between" htmlFor="technologyRefNo">
@@ -152,7 +192,12 @@ const SectionOne = () => {
                     className="w-full p-2 text-lg outline-0.1 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
                   />
                 </div>
-                     <div className="form-group">
+                <div className="form-group">
+                  <ErrorMessage
+                    name="nameTechnology"
+                    component="div"
+                    className="text-red-500"
+                  />
                   <label className="font-bold" htmlFor="nameTechnology">
                     Name of Technology / Knowhow: &nbsp;
                     <span className="Hint block text-sm text-red-500 inline">
@@ -166,17 +211,17 @@ const SectionOne = () => {
                     rows="3"
                     className="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   />
+                </div>
+                <div className="form-group">
                   <ErrorMessage
-                    name="nameTechnology"
+                    name="keywordTechnology"
                     component="div"
                     className="text-red-500"
                   />
-                </div>
-                <div className="form-group">
                   <label className="font-bold" htmlFor="keywordTechnology">
                     Keywords for Technology / Knowhow &nbsp;
                     <span className="Hint block text-sm text-red-500 inline">
-                     ( 5 to 8 Words)
+                      ( 5 to 8 Words)
                     </span>
                   </label>
                   <Field
@@ -185,11 +230,7 @@ const SectionOne = () => {
                     defaultValue="CSIR/ANB/BIOT/01" // Default value here
                     className="w-full p-2 text-lg outline-0.1 rounded-md"
                   />
-                  <ErrorMessage
-                    name="keywordTechnology"
-                    component="div"
-                    className="text-red-500"
-                  />
+
                 </div>
                 <div className="form-group mb-4">
                   <label className="font-bold" htmlFor="industrialSector">
@@ -209,18 +250,28 @@ const SectionOne = () => {
                   />
                 </div>
                 <div className="form-group mb-4">
+                  {/* Error message label ke upar */}
+                  <ErrorMessage
+                    name="leadLaboratory"
+                    component="div"
+                    className="text-red-500 mb-1 text-sm"
+                  />
                   <label className="font-bold" htmlFor="leadLaboratory">
-                    Lead Laboratory / Institute
+                    Lead Laboratory / Institute <span className="text-red-500">*</span>
                   </label>
                   <Field
                     name="leadLaboratory"
                     options={lab}
                     component={CustomSelect}
                     placeholder="Select a Lab..."
-                  // isMulti={true}
-                  ></Field>
+                  />
                 </div>
                 <div className="form-group mb-4">
+                  <ErrorMessage
+                    name="theme"
+                    component="div"
+                    className="text-red-500"
+                  />
                   <label className="font-bold" htmlFor="theme">
                     Theme
                   </label>
@@ -231,12 +282,8 @@ const SectionOne = () => {
                     placeholder="Select a Theme..."
                     isMulti={true}
                   >
-                    <ErrorMessage
-                      name="theme"
-                      component="div"
-                      className="text-red-500"
-                    />
                   </Field>
+
                 </div>
                 <div className="form-group flex items-center mb-4">
                   <label className="font-bold" htmlFor="multiLabInstitute">
@@ -250,9 +297,8 @@ const SectionOne = () => {
                         name="multiLabInstitute"
                         value="Yes"
                         className="mr-2"
-                        onChange={() =>
-                          setFieldValue("multiLabInstitute", "Yes")
-                        }
+                        checked={values.multiLabInstitute === "Yes"} // ✅ bind checked
+                        onChange={() => setFieldValue("multiLabInstitute", "Yes")}
                       />
                       Yes
                     </label>
@@ -263,9 +309,8 @@ const SectionOne = () => {
                         name="multiLabInstitute"
                         value="No"
                         className="mr-2"
-                        onChange={() =>
-                          setFieldValue("multiLabInstitute", "No")
-                        }
+                        checked={values.multiLabInstitute === "No"} // ✅ bind checked
+                        onChange={() => setFieldValue("multiLabInstitute", "No")}
                       />
                       No
                     </label>
@@ -276,23 +321,31 @@ const SectionOne = () => {
                     className="text-red-500"
                   />
                 </div>
-
+                {values.multiLabInstitute === "Yes" && (
+                  <div className="form-group mb-4">
+                    <ErrorMessage
+                      name="lab"
+                      component="div"
+                      className="text-red-500 mb-1 text-sm"
+                    />
+                    <label className="font-bold" htmlFor="lab">
+                      If Yes, Please Specify Labs/Institutes <span className="text-red-500">*</span>
+                    </label>
+                    <Field
+                      name="lab"
+                      options={lab}
+                      component={CustomSelect}
+                      placeholder="Select List Of Multilabs From here..."
+                      isMulti={true}
+                    />
+                  </div>
+                )}
                 <div className="form-group mb-4">
-                  <label className="font-bold" htmlFor="lab">
-                    If Yes,Please Specify Labs/Institutes
-                  </label>
-
-                  <Field
-                    name="lab"
-                    options={lab}
-                    component={CustomSelect}
-                    placeholder="Select List Of Multilabs From here..."
-                    isMulti={true}
-                  //className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  ></Field>
-                </div>
-
-                <div className="form-group mb-4">
+                  <ErrorMessage
+                    name="technologyLevel"
+                    component="div"
+                    className="text-red-500"
+                  />
                   <label className="font-bold" htmlFor="technologyLevel">
                     Technology Readiness Level (TRL)
                   </label>
@@ -308,13 +361,7 @@ const SectionOne = () => {
                       </option>
                     ))}
                   </Field>
-                  <ErrorMessage
-                    name="technologyLevel"
-                    component="div"
-                    className="text-red-500"
-                  />
                 </div>
-
                 <div className="form-group mb-4">
                   <label className="font-bold" htmlFor="scaleDevelopment">
                     Scale of Development: &nbsp;
@@ -338,6 +385,11 @@ const SectionOne = () => {
                 </div>
 
                 <div className="form-group mb-4">
+                  <ErrorMessage
+                    name="yearDevelopment"
+                    component="div"
+                    className="text-red-500"
+                  />
                   <label className="font-bold" htmlFor="yearDevelopment">
                     Year of Development
                   </label>
@@ -346,14 +398,13 @@ const SectionOne = () => {
                     name="yearDevelopment"
                     className="w-full p-2 text-lg outline-0.1 rounded-md"
                   />
+                </div>
+                <div className="form-group mb-4">
                   <ErrorMessage
-                    name="yearDevelopment"
+                    name="briefTech"
                     component="div"
                     className="text-red-500"
                   />
-                </div>
-
-                <div className="form-group mb-4">
                   <label className="font-bold" htmlFor="briefTech">
                     Brief details of Technology / Knowhow: &nbsp;
                     <span className="Hint block text-sm text-red-500 inline">
@@ -368,11 +419,7 @@ const SectionOne = () => {
                     maxLength="1000"
                     className="w-full p-2 text-lg outline-0.1 rounded-md"
                   />
-                  <ErrorMessage
-                    name="briefTech"
-                    component="div"
-                    className="text-red-500"
-                  />
+
                 </div>
 
                 <div className="form-group mb-4">
@@ -415,9 +462,9 @@ const SectionOne = () => {
                     className="text-red-500"
                   />
                 </div>
-                        <div className="form-group mb-4">
+                <div className="form-group mb-4">
                   <label className="font-bold" htmlFor="ministertialStakeHolders">
-                     Potential Ministries
+                    Potential Ministries
                   </label>
                   <Field
                     name="potentialMinistries"
@@ -543,6 +590,11 @@ const SectionOne = () => {
                 </div>
 
                 <div className="form-group mb-4">
+                  <ErrorMessage
+                    name="laboratoryDetail"
+                    component="div"
+                    className="text-red-500 mb-1 text-sm"
+                  />
                   <label className="font-bold" htmlFor="laboratoryDetail">
                     Contact Details of Laboratory &nbsp;
                     <span className="Hint block text-sm text-red-500 inline">
@@ -557,13 +609,7 @@ const SectionOne = () => {
                     maxLength="300"
                     className="w-full p-2 text-lg outline-0.1 rounded-md"
                   />
-                  <ErrorMessage
-                    name="laboratoryDetail"
-                    component="div"
-                    className="text-red-500"
-                  />
                 </div>
-
                 <div className="form-group mb-4 flex justify-center ">
                   <button
                     type="submit"
@@ -571,7 +617,7 @@ const SectionOne = () => {
                   >
                     Save
                   </button>
-                   <button
+                  <button
                     type="button"
                     className="px-4 py-2 bg-blue-500 text-white rounded-md ml-4"
                     onClick={() => navigate("/sectionTwo", { state: { technologyRefNo: generatedRefNo } })}
