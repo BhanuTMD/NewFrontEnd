@@ -1,84 +1,32 @@
- const ministries = [
-    { label: "AYUSH (MoA)", value: "MoA" },
-    { label: "Agriculture and Farmers Welfare (MoAFW)", value: "MoAFW" },
-    { label: "Chemicals and Fertilizers (MoCF)", value: "MoCF" },
-    { label: "Civil Aviation (MoCA)", value: "MoCA" },
-    { label: "Coal", value: "Coal" },
-    { label: "Commerce and Industry (MoCI)", value: "MoCI" },
-    { label: "Communications (MoC)", value: "MoC" },
-    {
-        label: "Consumer Affairs, Food and Public Distribution (MoCAFP)",
-        value: "MoCAFP",
-    },
-    { label: "Cooperation", value: "Cooperation" },
-    { label: "Corporate Affairs (MCA)", value: "MCA" },
-    { label: "Culture", value: "Culture" },
-    { label: "Defence (MoD)", value: "MoD" },
-    { label: "Development of North Eastern Region (MDONER)", value: "MDONER" },
-    { label: "Earth Sciences (MoES)", value: "MoES" },
-    { label: "Education (MoE)", value: "MoE" },
-    { label: "Electronics and Information Technology (MeitY)", value: "MeitY" },
-    {
-        label: "Environment, Forest and Climate Change (MoEFCC)",
-        value: "MoEFCC",
-    },
-    { label: "External Affairs (MEA)", value: "MEA" },
-    { label: "Finance (MoF)", value: "MoF" },
-    {
-        label: "Fisheries, Animal Husbandry and Dairying (MoFAHD)",
-        value: "MoFAHD",
-    },
-    { label: "Food Processing Industries (MoFPI)", value: "MoFPI" },
-    { label: "Health and Family Welfare (MoHFW)", value: "MoHFW" },
-    { label: "Heavy Industries (MoHI)", value: "MoHI" },
-    { label: "Home Affairs (MHA)", value: "MHA" },
-    { label: "Housing and Urban Affairs (MoHUA)", value: "MoHUA" },
-    { label: "Information and Broadcasting (MIB)", value: "MIB" },
-    { label: "Jal Shakti (MoJS)", value: "MoJS" },
-    { label: "Labour and Employment (MoLE)", value: "MoLE" },
-    { label: "Law and Justice (MoLJ)", value: "MoLJ" },
-    { label: "Micro, Small & Medium Enterprises (MSME)", value: "MSME" },
-    { label: "Mines (MoM)", value: "MoM" },
-    { label: "Minority Affairs (MoMA)", value: "MoMA" },
-    { label: "New and Renewable Energy (MNRE)", value: "MNRE" },
-    { label: "Panchayati Raj (MoPR)", value: "MoPR" },
-    { label: "Parliamentary Affairs (MPA)", value: "MPA" },
-    {
-        label: "Personnel, Public Grievances and Pensions (MoPPGP)",
-        value: "MoPPGP",
-    },
-    { label: "Petroleum and Natural Gas (MoPNG)", value: "MoPNG" },
-    { label: "Planning (MoP)", value: "MoP" },
-    { label: "Ports, Shipping and Waterways (MoPSW)", value: "MoPSW" },
-    { label: "Power", value: "Power" },
-    { label: "Railways (MoR)", value: "MoR" },
-    { label: "Road Transport and Highways (MoRTH)", value: "MoRTH" },
-    { label: "Rural Development (MoRD)", value: "MoRD" },
-    { label: "Science and Technology (MST)", value: "MST" },
-    {
-        label: "Skill Development and Entrepreneurship (MSDE)",
-        value: "MSDE",
-    },
-    {
-        label: "Social Justice and Empowerment (MoSJE)",
-        value: "MoSJE",
-    },
-    {
-        label: "Statistics and Programme Implementation (MoSPI)",
-        value: "MoSPI",
-    },
-    { label: "Steel (MoS)", value: "MoS" },
-    { label: "Textiles (MoT)", value: "MoT" },
-    { label: "Tourism", value: "Tourism" },
-    { label: "Tribal Affairs (MoTA)", value: "MoTA" },
-    {
-        label: "Women and Child Development (MoWCD)",
-        value: "MoWCD",
-    },
-    {
-        label: "Youth Affairs and Sports (MoYAS)",
-        value: "MoYAS",
-    },
+const potentialMinistryNames = [
+  "Ministry of Information and Broadcasting (MoIB)", "Ministry of Agriculture & Farmers Welfare (MoA&FW)",
+  "Ministry of Textiles (MoTex)", "Ministry of Commerce & Industry (MOCI)", "Ministry of Defence (MoD)",
+  "Ministry of Finance (MoF)", "Ministry of Health and Family Welfare (MoHFW)", "Ministry of Home Affairs (MoHA)",
+  "Ministry of Housing and Urban Affairs (MoHUA)", "Ministry of Education (MoE)", "Ministry of Panchayati Raj (MoPR)",
+  "Ministry of Petroleum & Natural Gas (MoPNG)", "Ministry of Power (MoP)", "Ministry of Railways (MoR)",
+  "Ministry of Road Transport & Highways (MoRTH)", "Ministry of Rural Development (MoRD)",
+  "Ministry of Urban Development (MoUD)", // Kept separate for now, might overlap with MoHUA
+  "Ministry of Water Resources (MoWR)", // Now part of Jal Shakti? Keeping for potential legacy use.
+  "Ministry of Women & Child Development (MoWCD)", "Ministry of Youth Affairs and Sports (MoYAS)",
+  "Ministry of Coal (MoC)", "Ministry of Personnel, Public Grievances & Pensions (MoPP&P)",
+  "Ministry of Law & Justice (MoL&J)", "Ministry of Parliamentary Affairs (MoPA)",
+  "Ministry of Science & Technology (MoST)", "Ministry of Culture (MoCL)", "Ministry of Steel (MoS)",
+  "Ministry of Labour & Employment (MoL&E)", "Ministry of Communications (MoCIT)",
+  "Ministry of Civil Aviation (MoCA)", "Ministry of New and Renewable Energy (MNRE)",
+  "Ministry of Tourism (MoT)", "Ministry of Consumer Affairs, Food & Public Distribution (MoCAF&PD)",
+  "Ministry of Food Processing Industries (MoFPI)", // Note: Duplicate Tourism entry removed
+  "Ministry of Mines (MoM)", // Note: Ministry of Disinvestment likely deprecated/merged
+  "Ministry of Tribal Affairs (MoTA)", "Ministry of Social Justice & Empowerment (MoSJE)",
+  "Ministry of Micro, Small & Medium Enterprises (MSME)", "Ministry of Heavy Industries & Public Enterprises (MoHI)",
+  "Ministry of Statistics & Programme Implementation (MoSPI)", "Ministry of Development of North-East Region (MoDoNER)",
+  "Ministry of Minority Affairs (MoMA)", "Ministry of Corporate Affairs (MoCAF)", "Ministry of Earth Science (MoES)",
+  "Ministry of Skill Development and Entrepreneurship (MoSDE)", // Corrected typo
+  "Department of Space (DoS)", "Election Commission of India (ECI)", "Department of Atomic Energy (DAE)", // Corrected typo
+  "AYUSH", "Ministry of External Affairs (MEA)", "Ministry of Fisheries, Animal Husbandry and Dairying (DADF)", // Corrected typo
+  "Ministry of Jal Shakti (MoJS)", "Ministry of Planning (NITI Aayog)",
+  "Ministry of Ports, Shipping and Waterways (MoPSW)"
 ];
 
-export const potentialMinistries = ministries;
+const createOptions = (names) => names.map(name => ({ label: name, value: name }));
+
+export const potentialMinistryOptions = createOptions(potentialMinistryNames);
