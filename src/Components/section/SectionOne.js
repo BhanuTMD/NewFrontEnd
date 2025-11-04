@@ -6,8 +6,11 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 import CustomSelect from "../utils/CustomSelect"; // Assuming CustomSelect is fixed
 import * as Yup from "yup";
 import Swal from "sweetalert2";
+import DatePicker from "react-datepicker";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+import "react-datepicker/dist/react-datepicker.css";
+
 
 // --- UPDATED IMPORTS ---
 import { industrialSectorOptions } from "Components/data/industrialSector"; // Assuming file is named industrialSector.js
@@ -166,12 +169,12 @@ const SectionOne = () => {
     scaleDevelopment: Yup.string().max(250, "Max 250 chars").nullable(),
     competitivePosition: Yup.string().max(1500, "Max 1500 chars").nullable(),
     technoEconomics: Yup.string().max(1500, "Max 1500 chars").nullable(),
-    marketPotential: Yup.string().max(1000, "Max 1000 chars").nullable(),
+    // marketPotential: Yup.string().max(1000, "Max 1000 chars").nullable(),
     environmentalStatutory: Yup.string().max(300, "Max 300 chars").nullable(),
-    potentialApplicationAreas: Yup.array().of(Yup.object().shape({ // Validate array of objects
-      value: Yup.string().required(),
-      label: Yup.string().required(),
-    })).nullable(),
+    // potentialApplicationAreas: Yup.array().of(Yup.object().shape({ // Validate array of objects
+    //   value: Yup.string().required(),
+    //   label: Yup.string().required(),
+    // })).nullable(),
     potentialMinistries: Yup.array().of(Yup.object().shape({ // Validate array of objects
       value: Yup.string().required(),
       label: Yup.string().required(),
@@ -370,14 +373,14 @@ const SectionOne = () => {
 
                   {/* --- Name of Technology (Spans 2 Cols) --- */}
                   <div className="form-group md:col-span-2">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="nameTechnology">Name of Technology <span className="text-red-500">*</span><span className="block text-sm font-normal text-gray-500">Max. 500 Chars</span></label>
+                    <label className="font-bold block mb-1 text-gray-700" htmlFor="nameTechnology">Name of Technology <span className="text-red-500">*</span><span className="block text-sm font-normal text-gray-500">Max. 100 Chars</span></label>
                     <Field name="nameTechnology" as="textarea" rows="3" className={`w-full p-2 text-lg rounded-md border ${errors.nameTechnology && touched.nameTechnology ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
                     <ErrorMessage name="nameTechnology" component="div" className="text-red-500 text-sm mt-1" />
                   </div>
 
                   {/* --- Keywords (Spans 2 Cols) --- */}
                   <div className="form-group md:col-span-2">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="keywordTechnology">Keywords <span className="text-red-500">*</span><span className="block text-sm font-normal text-gray-500">(Comma-separated, 5-8 words, Max 200 Chars)</span></label>
+                    <label className="font-bold block mb-1 text-gray-700" htmlFor="keywordTechnology">Keywords <span className="text-red-500">*</span><span className="block text-sm font-normal text-gray-500">(Comma-separated, 5-8 words, Max 100 Chars)</span></label>
                     <Field type="text" name="keywordTechnology" maxLength="200" className={`w-full p-2 text-lg rounded-md border ${errors.keywordTechnology && touched.keywordTechnology ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
                     <ErrorMessage name="keywordTechnology" component="div" className="text-red-500 text-sm mt-1" />
                   </div>
@@ -412,7 +415,6 @@ const SectionOne = () => {
                     </div>
                     <ErrorMessage name="multiLabInstitute" component="div" className="text-red-500 text-sm mt-1" />
                   </div>
-
                   {/* --- Conditional Lab Selection (Spans 2) --- */}
                   {values.multiLabInstitute === "Yes" && (
                     <div className="form-group md:col-span-2 pl-4 border-l-4 border-indigo-200">
@@ -421,62 +423,90 @@ const SectionOne = () => {
                       <ErrorMessage name="lab" component="div" className="text-red-500 text-sm mt-1" />
                     </div>
                   )}
-
                   {/* --- TRL --- */}
                   <div className="form-group">
                     <label className="font-bold block mb-1 text-gray-700" htmlFor="technologyLevel">TRL <span className="text-red-500">*</span></label>
                     <Field as="select" name="technologyLevel" className={`w-full p-2 text-lg rounded-md border ${errors.technologyLevel && touched.technologyLevel ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none bg-white`}>
-                      <option value="" label="Select TRL (1-9)" />
-                      {[...Array(9).keys()].map(i => (<option key={i + 1} value={String(i + 1)}>{i + 1}</option>))} {/* Ensure value is string */}
+                      <option value="" label="Select TRL (0-9)" />
+                      {[...Array(9).keys()].map(i => (<option key={i} value={String(i)}>{i}</option>))} {/* Ensure value is string */}
                     </Field>
                     <ErrorMessage name="technologyLevel" component="div" className="text-red-500 text-sm mt-1" />
                   </div>
 
                   {/* --- Year of Development --- */}
                   <div className="form-group">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="yearDevelopment">Year of Development <span className="text-red-500">*</span><span className="block text-sm font-normal text-gray-500">YYYY</span></label>
-                    <Field type="text" name="yearDevelopment" maxLength="4" className={`w-full p-2 text-lg rounded-md border ${errors.yearDevelopment && touched.yearDevelopment ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
-                    <ErrorMessage name="yearDevelopment" component="div" className="text-red-500 text-sm mt-1" />
-                  </div>
+                    <label
+                      className="font-bold block mb-1 text-gray-700"
+                      htmlFor="yearDevelopment"
+                    >
+                      Year of Development <span className="text-red-500">*</span>
+                      <span className="block text-sm font-normal text-gray-500">YYYY</span>
+                    </label>
 
+                    <Field name="yearDevelopment">
+                      {({ field, form }) => (
+                        <DatePicker
+                          selected={
+                            field.value ? new Date(field.value, 0, 1) : null
+                          }
+                          onChange={(date) => {
+                            const year = date?.getFullYear();
+                            form.setFieldValue(field.name, year);
+                          }}
+                          showYearPicker      // 👈 Only year selection
+                          dateFormat="yyyy"
+                          placeholderText="Select Year..."
+                          className={`w-full p-2 text-lg rounded-md border ${form.errors.yearDevelopment && form.touched.yearDevelopment
+                              ? "border-red-500"
+                              : "border-gray-300"
+                            } focus:border-indigo-500 outline-none`}
+                        />
+                      )}
+                    </Field>
+                    <ErrorMessage
+                      name="yearDevelopment"
+                      component="div"
+                      className="text-red-500 text-sm mt-1"
+                    />
+                  </div>
                   {/* --- Scale of Development (Spans 2) --- */}
                   <div className="form-group md:col-span-2">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="scaleDevelopment">Scale of Development <span className="block text-sm font-normal text-gray-500">Max. 250 Chars</span></label>
-                    <Field name="scaleDevelopment" as="textarea" rows="2" maxLength="250" className={`w-full p-2 text-lg rounded-md border ${errors.scaleDevelopment && touched.scaleDevelopment ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
+                    <label className="font-bold block mb-1 text-gray-700" htmlFor="scaleDevelopment">Scale of Development <span className="block text-sm font-normal text-gray-500">Max. 100 Chars</span></label>
+                    <Field name="scaleDevelopment" as="textarea" rows="2" maxLength="100" className={`w-full p-2 text-lg rounded-md border ${errors.scaleDevelopment && touched.scaleDevelopment ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
                     <ErrorMessage name="scaleDevelopment" component="div" className="text-red-500 text-sm mt-1" />
                   </div>
 
                   {/* --- Brief Details (Spans 2) --- */}
                   <div className="form-group md:col-span-2">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="briefTech">Brief Details <span className="text-red-500">*</span><span className="block text-sm font-normal text-gray-500">Max. 1000 Chars</span></label>
-                    <Field name="briefTech" as="textarea" rows="4" maxLength="1000" className={`w-full p-2 text-lg rounded-md border ${errors.briefTech && touched.briefTech ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
+                    <label className="font-bold block mb-1 text-gray-700" htmlFor="briefTech"> Details of Technology <span className="text-red-500">*</span><span className="block text-sm font-normal text-gray-500">Max. 250 Chars</span></label>
+                    <Field name="briefTech" as="textarea" rows="4" maxLength="250" className={`w-full p-2 text-lg rounded-md border ${errors.briefTech && touched.briefTech ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
                     <ErrorMessage name="briefTech" component="div" className="text-red-500 text-sm mt-1" />
                   </div>
 
                   {/* --- Competitive Positioning (Spans 2) --- */}
                   <div className="form-group md:col-span-2">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="competitivePosition">Competitive Positioning <span className="block text-sm font-normal text-gray-500">Max. 1500 Chars</span></label>
-                    <Field name="competitivePosition" as="textarea" rows="4" maxLength="1500" className={`w-full p-2 text-lg rounded-md border ${errors.competitivePosition && touched.competitivePosition ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
+                    <label className="font-bold block mb-1 text-gray-700" htmlFor="competitivePosition">Competitive Positioning (Global bench mark in the domain ) <span className="block text-sm font-normal text-gray-500">Max.250 Chars</span></label>
+                    <Field name="competitivePosition" as="textarea" rows="4" maxLength="250" className={`w-full p-2 text-lg rounded-md border ${errors.competitivePosition && touched.competitivePosition ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
                     <ErrorMessage name="competitivePosition" component="div" className="text-red-500 text-sm mt-1" />
                   </div>
 
                   {/* --- Techno-economics (Spans 2) --- */}
                   <div className="form-group md:col-span-2">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="technoEconomics">Techno-economics <span className="block text-sm font-normal text-gray-500">Max. 1500 Chars</span></label>
-                    <Field name="technoEconomics" as="textarea" rows="4" maxLength="1500" className={`w-full p-2 text-lg rounded-md border ${errors.technoEconomics && touched.technoEconomics ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
+                    <label className="font-bold block mb-1 text-gray-700" htmlFor="technoEconomics">Techno-economics <span className="block text-sm font-normal text-gray-500">Max. 100 Chars</span></label>
+                    <Field name="technoEconomics" as="textarea" rows="4" maxLength="100" className={`w-full p-2 text-lg rounded-md border ${errors.technoEconomics && touched.technoEconomics ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
                     <ErrorMessage name="technoEconomics" component="div" className="text-red-500 text-sm mt-1" />
                   </div>
 
                   {/* --- Potential Application Areas --- */}
-                  <div className="form-group">
+                  {/* <div className="form-group">
                     <label className="font-bold block mb-1 text-gray-700" htmlFor="potentialApplicationAreas">Potential Application Area(s)</label>
                     <Field name="potentialApplicationAreas" options={potentialApplicationAreaOptions} component={CustomSelect} placeholder="Select Area(s)..." isMulti={true} />
                     <ErrorMessage name="potentialApplicationAreas" component="div" className="text-red-500 text-sm mt-1" />
-                  </div>
+                  </div> */}
 
                   {/* --- Potential Ministries --- */}
                   <div className="form-group">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="potentialMinistries">Potential Ministries</label>
+                    <label className="font-bold block mb-1 text-gray-700" htmlFor="potentialMinistries">Potential Ministries(who may be benefited)</label>
                     <Field name="potentialMinistries" options={potentialMinistryOptions} component={CustomSelect} placeholder="Select Ministries..." isMulti={true} />
                     <ErrorMessage name="potentialMinistries" component="div" className="text-red-500 text-sm mt-1" />
                   </div>
@@ -489,11 +519,11 @@ const SectionOne = () => {
                   </div>
 
                   {/* --- Market Potential (Spans 2) --- */}
-                  <div className="form-group md:col-span-2">
+                  {/* <div className="form-group md:col-span-2">
                     <label className="font-bold block mb-1 text-gray-700" htmlFor="marketPotential">Market Potential <span className="block text-sm font-normal text-gray-500">Max. 1000 Chars</span></label>
                     <Field name="marketPotential" as="textarea" rows="4" maxLength="1000" className={`w-full p-2 text-lg rounded-md border ${errors.marketPotential && touched.marketPotential ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
                     <ErrorMessage name="marketPotential" component="div" className="text-red-500 text-sm mt-1" />
-                  </div>
+                  </div> */}
 
                   {/* --- File Upload Section (Spans 2) --- */}
                   <div className="form-group p-4 border border-dashed border-gray-400 rounded-md bg-gray-50 md:col-span-2">

@@ -1172,3 +1172,657 @@
 // };
 
 // export default SectionOne;
+
+
+
+// sectointhree updated code
+
+
+import axios from "axios";
+// import Header from "Components/common/header";
+import Section from "Components/common/section";
+import NavBar from "Components/common/navBar";
+import FooterBar from "Components/common/footer";
+import { Formik, Field, Form, ErrorMessage } from "formik";
+import CustomSelect from "../utils/CustomSelect";
+import * as Yup from "yup";
+import Swal from "sweetalert2";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { industrialSector } from "Components/data/industrialSector";
+import { potentialMinistries } from "Components/data/potentialMinistries";
+import { theme } from "Components/data/theme";
+import { stakeHolders } from "Components/data/stakeHolders";
+import { lab } from "Components/data/lab";
+
+const SectionOne = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const passedTRN = location.state?.technologyRefNo || "";
+  const [generatedRefNo, setGeneratedRefNo] = useState(passedTRN);
+  const [initialValues, setInitialValues] = useState({
+    technologyRefNo: "",
+    keywordTechnology: "",
+    nameTechnology: "",
+    industrialSector: [],
+    theme: [],
+    multiLabInstitute: "No",
+    leadLaboratory: "",
+    associateInstitute: [],
+    technologyLevel: "",
+    scaleDevelopment: "",
+    yearDevelopment: "",
+    briefTech: "",
+    competitivePosition: "",
+    technoEconomics: "",
+    stakeHolders: [],
+    potentialMinistries: [],
+    environmentalStatutory: "",
+    marketPotential: "",
+    file: null,
+    laboratoryDetail: "",
+    lab: []
+  });
+
+  useEffect(() => {
+    if (passedTRN) {
+      const saved = localStorage.getItem("sectionOneData");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.technologyRefNo === passedTRN) {
+          setInitialValues(prev => ({ ...prev, ...parsed, file: null }));
+          setGeneratedRefNo(passedTRN);
+          return;
+        }
+      }
+
+      const token = localStorage.getItem("token");
+      axios
+        .get(`http://172.16.2.246:8080/apf/tdmp/sectionOne/${passedTRN}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => {
+          setInitialValues(prev => ({ ...prev, ...res.data, file: res.data.file || null }));
+          setGeneratedRefNo(passedTRN);
+        })
+        .catch((err) => console.error("Error fetching section data", err));
+    }
+  }, [passedTRN]);
+
+  const validationSchema = Yup.object({
+    nameTechnology: Yup.string()
+      .required("Name of Technology is required")
+      .max(500, "Maximum 500 characters allowed"),
+
+    keywordTechnology: Yup.string()
+      .required("Keywords are required")
+      .max(200, "Maximum 200 characters allowed"),
+
+    leadLaboratory: Yup.mixed().required("Lead Laboratory is required"),
+
+
+    theme: Yup.array()
+      .min(1, "Please select at least one Theme")
+      .required("Please select at least one Theme"),
+
+    multiLabInstitute: Yup.string()
+      .required("Please select Yes or No for Multi Laboratories"),
+
+    // ✅ Conditional validation for "lab"
+    lab: Yup.array().when("multiLabInstitute", {
+      is: "Yes",
+      then: (schema) =>
+        schema.min(1, "Please select at least one Lab if 'Yes' is selected"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+
+    technologyLevel: Yup.string()
+      .required("Please select Technology Readiness Level"),
+
+    yearDevelopment: Yup.string()
+      .required("Year of Development is required")
+      .matches(/^[0-9]{4}$/, "Enter a valid year (e.g., 2025)"),
+
+    briefTech: Yup.string()
+      .required("Brief details are required")
+      .max(1000, "Maximum 1000 characters allowed"),
+
+    laboratoryDetail: Yup.string()
+      .required("Laboratory Contact Details are required")
+      .max(300, "Maximum 300 characters allowed"),
+  });
+  const handleSubmit = (values, { setSubmitting }) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to submit this form now?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Submit it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const url = "http://172.16.2.246:8080/apf/tdmp/saveSectionOne";
+        const formData = new FormData();
+
+        for (let key in values) {
+          if (Array.isArray(values[key])) {
+            values[key].forEach((item) => formData.append(key, item));
+          } else if (key === "file" && values.file) {
+            formData.append("file", values.file);
+          } else {
+            formData.append(key, values[key]);
+          }
+        }
+
+        const token = localStorage.getItem("token");
+
+        axios
+          .post(url, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          .then((res) => {
+            const responseData = res.data;
+            const techRef = responseData.technologyRefNo;
+            setGeneratedRefNo(techRef);
+            localStorage.setItem("sectionOneData", JSON.stringify(responseData));
+            Swal.fire("Success!", "Form submitted successfully!", "success");
+            navigate("/sectionTwo", { state: { technologyRefNo: techRef } });
+          })
+          .catch((err) => {
+            console.error("Submission error", err);
+            Swal.fire("Error!", "Failed to submit. Try again.", "error");
+          })
+          .finally(() => setSubmitting(false));
+      } else {
+        setSubmitting(false);
+      }
+    });
+  };
+
+  return (
+    <>
+      <NavBar />
+      <div className="flex">
+        <div className="bg-gray-800"></div>
+        <div className="flex-1 p-8 bg-blue-200 border">
+          <Section sectionLine="Section 1 : Key Details of the Technology / Knowhow " />
+          <Formik
+            enableReinitialize
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            {({ values, setFieldValue, isSubmitting }) => (
+              <Form>
+                <div className="form-group mb-4">
+                  <label className="font-bold flex justify-between" htmlFor="technologyRefNo">
+                    Technology /Knowhow Ref No:
+                    <span className="Hint block text-xs text-red-500 inline text-end">Mandatory Field</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="technologyRefNo"
+                    value={generatedRefNo ? generatedRefNo : "Will be generated after submission"}
+                    readOnly
+                    className="w-full p-2 text-lg outline-0.1 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
+                  />
+                </div>
+                <div className="form-group">
+                  <ErrorMessage
+                    name="nameTechnology"
+                    component="div"
+                    className="text-red-500"
+                  />
+                  <label className="font-bold" htmlFor="nameTechnology">
+                    Name of Technology / Knowhow: &nbsp;
+                    <span className="Hint block text-sm text-red-500 inline">
+                      Max. 500 Characters
+                    </span>
+                  </label>
+                  <Field
+                    type="text"
+                    name="nameTechnology"
+                    as="textarea"
+                    rows="3"
+                    className="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  />
+                </div>
+                <div className="form-group">
+                  <ErrorMessage
+                    name="keywordTechnology"
+                    component="div"
+                    className="text-red-500"
+                  />
+                  <label className="font-bold" htmlFor="keywordTechnology">
+                    Keywords for Technology / Knowhow &nbsp;
+                    <span className="Hint block text-sm text-red-500 inline">
+                      ( 5 to 8 Words)
+                    </span>
+                  </label>
+                  <Field
+                    type="text"
+                    name="keywordTechnology"
+                    defaultValue="CSIR/ANB/BIOT/01" // Default value here
+                    className="w-full p-2 text-lg outline-0.1 rounded-md"
+                  />
+
+                </div>
+                <div className="form-group mb-4">
+                  <label className="font-bold" htmlFor="industrialSector">
+                    Industrial Sector
+                  </label>
+                  <Field
+                    name="industrialSector"
+                    options={industrialSector}
+                    component={CustomSelect}
+                    placeholder="Select Industrial Sector..."
+                    isMulti={true}
+                  />
+                  <ErrorMessage
+                    name="industrialSector"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+                <div className="form-group mb-4">
+                  {/* Error message label ke upar */}
+                  <ErrorMessage
+                    name="leadLaboratory"
+                    component="div"
+                    className="text-red-500 mb-1 text-sm"
+                  />
+                  <label className="font-bold" htmlFor="leadLaboratory">
+                    Lead Laboratory / Institute <span className="text-red-500">*</span>
+                  </label>
+                  <Field
+                    name="leadLaboratory"
+                    options={lab}
+                    component={CustomSelect}
+                    placeholder="Select a Lab..."
+                  />
+                </div>
+                <div className="form-group mb-4">
+                  <ErrorMessage
+                    name="theme"
+                    component="div"
+                    className="text-red-500"
+                  />
+                  <label className="font-bold" htmlFor="theme">
+                    Theme
+                  </label>
+                  <Field
+                    name="theme"
+                    options={theme}
+                    component={CustomSelect}
+                    placeholder="Select a Theme..."
+                    isMulti={true}
+                  >
+                  </Field>
+
+                </div>
+                <div className="form-group flex items-center mb-4">
+                  <label className="font-bold" htmlFor="multiLabInstitute">
+                    Multi Laboratories / Institutes Involved
+                  </label>
+                  <div className="ml-4 flex space-x-4">
+                    <label htmlFor="multiLabYes" className="flex items-center">
+                      <input
+                        type="radio"
+                        id="multiLabYes"
+                        name="multiLabInstitute"
+                        value="Yes"
+                        className="mr-2"
+                        checked={values.multiLabInstitute === "Yes"} // ✅ bind checked
+                        onChange={() => setFieldValue("multiLabInstitute", "Yes")}
+                      />
+                      Yes
+                    </label>
+                    <label htmlFor="multiLabNo" className="flex items-center">
+                      <input
+                        type="radio"
+                        id="multiLabNo"
+                        name="multiLabInstitute"
+                        value="No"
+                        className="mr-2"
+                        checked={values.multiLabInstitute === "No"} // ✅ bind checked
+                        onChange={() => setFieldValue("multiLabInstitute", "No")}
+                      />
+                      No
+                    </label>
+                  </div>
+                  <ErrorMessage
+                    name="multiLabInstitute"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+                {values.multiLabInstitute === "Yes" && (
+                  <div className="form-group mb-4">
+                    <ErrorMessage
+                      name="lab"
+                      component="div"
+                      className="text-red-500 mb-1 text-sm"
+                    />
+                    <label className="font-bold" htmlFor="lab">
+                      If Yes, Please Specify Labs/Institutes <span className="text-red-500">*</span>
+                    </label>
+                    <Field
+                      name="lab"
+                      options={lab}
+                      component={CustomSelect}
+                      placeholder="Select List Of Multilabs From here..."
+                      isMulti={true}
+                    />
+                  </div>
+                )}
+                <div className="form-group mb-4">
+                  <ErrorMessage
+                    name="technologyLevel"
+                    component="div"
+                    className="text-red-500"
+                  />
+                  <label className="font-bold" htmlFor="technologyLevel">
+                    Technology Readiness Level (TRL)
+                  </label>
+                  <Field
+                    as="select"
+                    name="technologyLevel"
+                    className="w-full p-2 text-lg outline-0.1 rounded-md"
+                  >
+                    <option value="" label="Select TRL" />
+                    {[...Array(9).keys()].map((i) => (
+                      <option key={i + 1} value={i + 1}>
+                        {i + 1}
+                      </option>
+                    ))}
+                  </Field>
+                </div>
+                <div className="form-group mb-4">
+                  <label className="font-bold" htmlFor="scaleDevelopment">
+                    Scale of Development: &nbsp;
+                    <span className="Hint block text-sm text-red-500 inline">
+                      Max. 250 Characters
+                    </span>
+                  </label>
+                  <Field
+                    type="text"
+                    name="scaleDevelopment"
+                    as="textarea"
+                    rows="3"
+                    maxLength="250"
+                    className="w-full p-2 text-lg outline-0.1 rounded-md"
+                  />
+                  <ErrorMessage
+                    name="scaleDevelopment"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+
+                <div className="form-group mb-4">
+                  <ErrorMessage
+                    name="yearDevelopment"
+                    component="div"
+                    className="text-red-500"
+                  />
+                  <label className="font-bold" htmlFor="yearDevelopment">
+                    Year of Development
+                  </label>
+                  <Field
+                    type="text"
+                    name="yearDevelopment"
+                    className="w-full p-2 text-lg outline-0.1 rounded-md"
+                  />
+                </div>
+                <div className="form-group mb-4">
+                  <ErrorMessage
+                    name="briefTech"
+                    component="div"
+                    className="text-red-500"
+                  />
+                  <label className="font-bold" htmlFor="briefTech">
+                    Brief details of Technology / Knowhow: &nbsp;
+                    <span className="Hint block text-sm text-red-500 inline">
+                      Max. 1000 Characters
+                    </span>
+                  </label>
+                  <Field
+                    type="text"
+                    name="briefTech"
+                    as="textarea"
+                    rows="3"
+                    maxLength="1000"
+                    className="w-full p-2 text-lg outline-0.1 rounded-md"
+                  />
+
+                </div>
+
+                <div className="form-group mb-4">
+                  <label className="font-bold" htmlFor="competitivePosition">
+                    Competitive Positioning in the domain (how is it better than
+                    competing technology)/Technology Benchmarking &nbsp;
+                    <span className="Hint block text-sm text-red-500 inline">
+                      Max. 1500 Characters
+                    </span>
+                  </label>
+                  <Field
+                    type="text"
+                    name="competitivePosition"
+                    as="textarea"
+                    rows="3"
+                    maxLength="1500"
+                    className="w-full p-2 text-lg outline-0.1 rounded-md"
+                  />
+                  <ErrorMessage
+                    name="competitivePosition"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+                <div className="form-group mb-4">
+                  <label className="font-bold" htmlFor="stakeHolders">
+                    Potential Applicant
+                  </label>
+                  <Field
+                    name="stakeHolders"
+                    options={stakeHolders}
+                    component={CustomSelect}
+                    placeholder="Select Ministry List from here..."
+                    isMulti={true}
+                  //className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  ></Field>
+                  <ErrorMessage
+                    name="stakeHolders"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+                <div className="form-group mb-4">
+                  <label className="font-bold" htmlFor="ministertialStakeHolders">
+                    Potential Ministries
+                  </label>
+                  <Field
+                    name="potentialMinistries"
+                    options={potentialMinistries}
+                    component={CustomSelect}
+                    placeholder="Select Ministry List from here..."
+                    isMulti={true}
+                  //className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  ></Field>
+                  <ErrorMessage
+                    name="potentialMinistries"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+                <div className="form-group mb-4">
+                  <label className="font-bold" htmlFor="technoEconomics">
+                    Techno-economics (including development & deployment
+                    cost,operational cost, payback period etc.) &nbsp;
+                    <span className="Hint block text-sm text-red-500 inline">
+                      Max. 1500 Characters
+                    </span>
+                  </label>
+                  <Field
+                    type="text"
+                    name="technoEconomics"
+                    as="textarea"
+                    rows="3"
+                    maxLength="1500"
+                    className="w-full p-2 text-lg outline-0.1 rounded-md"
+                  />
+                  <ErrorMessage
+                    name="technoEconomics"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+
+                <div className="form-group mb-4">
+                  <label className="font-bold" htmlFor="marketPotential">
+                    Market Potential &nbsp;
+                    <span className="Hint block text-sm text-red-500 inline">
+                      Max. 1000 Characters
+                    </span>
+                  </label>
+                  <Field
+                    type="text"
+                    name="marketPotential"
+                    as="textarea"
+                    rows="3"
+                    maxLength="1000"
+                    className="w-full p-2 text-lg outline-0.1 rounded-md"
+                  />
+                  <ErrorMessage
+                    name="marketPotential"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+
+                <div className="form-group mb-4">
+                  <label className="font-bold" htmlFor="environmentalStatutory">
+                    Environmental considerations / Statutory regulatory
+                    compliance details &nbsp;
+                    <span className="Hint block text-sm text-red-500 inline">
+                      Max. 1000 Characters
+                    </span>
+                  </label>
+                  <Field
+                    type="text"
+                    name="environmentalStatutory"
+                    as="textarea"
+                    rows="3"
+                    maxLength="300"
+                    className="w-full p-2 text-lg outline-0.1 rounded-md"
+                  />
+                  <ErrorMessage
+                    name="environmentalStatutory"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+                <div className="form-group mb-4">
+                  <label className="font-bold" htmlFor="file">
+                    Upload High-Resolution file (Maximum 10 MB)
+                  </label>
+                  <input
+                    type="file"
+                    name="file"
+                    accept=".jpg,.jpeg,.png,.pdf"
+                    className="w-full p-2 text-lg outline-0.1 rounded-md"
+                    onChange={(e) => {
+                      const file = e.currentTarget.files[0];
+                      const maxSize = 10 * 1024 * 1024; // 10 MB
+
+                      if (file) {
+                        const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
+                        if (!allowedTypes.includes(file.type)) {
+                          alert("Only JPG, PNG, and PDF files are allowed.");
+                          e.target.value = null; // Reset the input
+                          return;
+                        }
+
+                        if (file.size > maxSize) {
+                          alert("File size should be less than or equal to 10MB.");
+                          e.target.value = null; // Reset the input
+                          return;
+                        }
+
+                        // Set file if valid
+                        setFieldValue("file", file);
+                      }
+                    }}
+                  />
+
+                  {initialValues.file && (
+                    <img
+                      src={`data:image/jpeg;base64,${initialValues.file}`}
+                      alt="Preview"
+                      className="mt-2 max-h-40"
+                    />
+                  )}
+                </div>
+
+                <div className="form-group mb-4">
+                  <ErrorMessage
+                    name="laboratoryDetail"
+                    component="div"
+                    className="text-red-500 mb-1 text-sm"
+                  />
+                  <label className="font-bold" htmlFor="laboratoryDetail">
+                    Contact Details of Laboratory &nbsp;
+                    <span className="Hint block text-sm text-red-500 inline">
+                      Max. 300 Characters
+                    </span>
+                  </label>
+                  <Field
+                    type="text"
+                    name="laboratoryDetail"
+                    as="textarea"
+                    rows="3"
+                    maxLength="300"
+                    className="w-full p-2 text-lg outline-0.1 rounded-md"
+                  />
+                </div>
+                <div className="form-group mb-4 flex justify-center ">
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-green-600 text-white rounded-md "
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md ml-4"
+                    onClick={() => navigate("/sectionTwo", { state: { technologyRefNo: generatedRefNo } })}
+
+                  >
+                    Next
+                  </button>
+                </div>
+                {/* <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Submitting..." : "Submit & Next"}
+                  </button>
+                </div> */}
+                {/* <MyForm/> */}
+              </Form>
+            )}
+          </Formik>
+        </div>
+      </div>
+      <FooterBar />
+    </>
+  );
+};
+
+export default SectionOne;
