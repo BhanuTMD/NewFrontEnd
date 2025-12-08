@@ -16,6 +16,7 @@ import { potentialMinistryOptions } from "Components/data/potentialMinistries";
 import { themeOptions } from "Components/data/theme";
 import { labOptions } from "Components/data/lab";
 import { potentialApplicationAreaOptions } from "Components/data/potentialApplicationAreas";
+import { labDetails } from "Components/data/labDetails";
 
 import FileViewerModal from "Components/pages/view/FileViewerModal";
 
@@ -53,7 +54,7 @@ const SectionOne = () => {
     environmentalStatutory: "",
     marketPotential: "",
     file: null,
-    laboratoryDetail: "",
+    laboratoryDetail: null, // dropdown: object/null
   });
 
   // --- Prefill / Edit data ---
@@ -61,6 +62,7 @@ const SectionOne = () => {
     if (passedTRN) {
       setLoading(true);
       const token = localStorage.getItem("token");
+
       axios
         .get(`http://172.16.2.246:8080/api/section-one/${passedTRN}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -71,8 +73,9 @@ const SectionOne = () => {
           const processToArray = (input) => {
             if (!input) return [];
             if (Array.isArray(input)) return input;
-            if (typeof input === "string")
+            if (typeof input === "string") {
               return input.split("|").filter(Boolean);
+            }
             return [];
           };
 
@@ -93,6 +96,10 @@ const SectionOne = () => {
             leadLaboratory:
               labOptions.find(
                 (opt) => opt.value === fetchedData.leadLaboratory
+              ) || null,
+            laboratoryDetail:
+              labDetails.find(
+                (opt) => opt.value === fetchedData.laboratoryDetail
               ) || null,
             industrialSector: industrialSectorOptions.filter((opt) =>
               cleanedIndustrialSectors.includes(opt.value)
@@ -157,7 +164,7 @@ const SectionOne = () => {
         environmentalStatutory: "",
         marketPotential: "",
         file: null,
-        laboratoryDetail: "",
+        laboratoryDetail: null, // important
       });
       setGeneratedRefNo("");
       setExistingFileUrl("");
@@ -208,9 +215,13 @@ const SectionOne = () => {
     briefTech: Yup.string()
       .required("Brief details are required")
       .max(1000, "Max 1000 chars"),
-    laboratoryDetail: Yup.string()
-      .required("Lab details are required")
-      .max(300, "Max 300 chars"),
+    laboratoryDetail: Yup.object()
+      .shape({
+        value: Yup.string().required(),
+        label: Yup.string().required(),
+      })
+      .nullable()
+      .required("Lab details are required"),
     scaleDevelopment: Yup.string().max(250, "Max 250 chars").nullable(),
     competitivePosition: Yup.string()
       .max(1500, "Max 1500 chars")
@@ -290,7 +301,7 @@ const SectionOne = () => {
 
         if (key === "file" && value instanceof File) {
           formData.append("file", value);
-        } else if (key === "leadLaboratory") {
+        } else if (key === "leadLaboratory" || key === "laboratoryDetail") {
           if (value && typeof value === "object" && value.value) {
             formData.append(key, value.value);
           } else if (typeof value === "string") {
@@ -338,7 +349,7 @@ const SectionOne = () => {
       let requestPromise;
       if (isUpdate) {
         const updateUrl = `http://172.16.2.246:8080/api/section-one/update/${passedTRN}`;
-          requestPromise = axios.put(updateUrl, formData, { headers });
+        requestPromise = axios.put(updateUrl, formData, { headers });
       } else {
         const createUrl = "http://172.16.2.246:8080/api/section-one/create";
         requestPromise = axios.post(createUrl, formData, { headers });
@@ -357,8 +368,6 @@ const SectionOne = () => {
 
           if (action === "next") {
             navigate("/sectionTwo", { state: { technologyRefNo: techRef } });
-          } else {
-            // updateOnly -> stay on this section
           }
         })
         .catch((err) => {
@@ -375,7 +384,7 @@ const SectionOne = () => {
 
   if (loading && passedTRN) {
     return (
-      <p className="text-center mt-6 text-gray-600">
+      <p className="mt-6 text-center text-gray-600">
         Loading existing data...
       </p>
     );
@@ -390,8 +399,8 @@ const SectionOne = () => {
       {/* PAGE LAYOUT: Left 75%, Right 25% empty */}
       <div className="flex min-h-screen bg-blue-100">
         {/* Left content (75%) */}
-        <div className="w-full md:w-3/4 border-r">
-          <div className="max-w-5xl ml-60 mr-auto p-6 md:p-8">
+        <div className="w-full border-r md:w-3/4">
+          <div className="ml-60 mr-auto max-w-5xl p-6 md:p-8">
             <Section sectionLine="Section 1 : Key Details of the Technology / Knowhow " />
 
             <Formik
@@ -403,11 +412,11 @@ const SectionOne = () => {
               }
             >
               {({ values, setFieldValue, isSubmitting, errors, touched }) => (
-                <Form className="bg-white p-6 md:p-8 rounded-xl shadow-md border border-gray-100 space-y-6">
+                <Form className="space-y-6 rounded-xl border border-gray-100 bg-white p-6 shadow-md md:p-8">
                   {/* Header: Ref No */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <div className="md:col-span-2">
-                      <label className="font-semibold text-gray-700 block mb-1">
+                      <label className="mb-1 block font-semibold text-gray-700">
                         Technology Ref No
                       </label>
                       <input
@@ -416,21 +425,20 @@ const SectionOne = () => {
                           generatedRefNo || "Will be generated after submission"
                         }
                         readOnly
-                        className="w-full p-2.5 text-base rounded-md bg-gray-100 text-gray-600 border border-gray-300"
+                        className="w-full rounded-md border border-gray-300 bg-gray-100 p-2.5 text-base text-gray-600"
                       />
                     </div>
                   </div>
 
                   {/* Main Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Name of Technology (full width) */}
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    {/* Name of Technology */}
                     <div className="md:col-span-2">
                       <label
-                        className="font-semibold text-gray-700 block mb-1"
                         htmlFor="nameTechnology"
+                        className="mb-1 block font-semibold text-gray-700"
                       >
-                        Name of Technology{" "}
-                        <span className="text-red-500">*</span>
+                        Name of Technology <span className="text-red-500">*</span>
                         <span className="block text-xs font-normal text-gray-500">
                           Max. 500 characters
                         </span>
@@ -439,24 +447,24 @@ const SectionOne = () => {
                         name="nameTechnology"
                         as="textarea"
                         rows="3"
-                        className={`w-full p-2.5 text-base rounded-md border ${
+                        className={`w-full rounded-md border p-2.5 text-base outline-none focus:border-blue-500 ${
                           errors.nameTechnology && touched.nameTechnology
                             ? "border-red-500"
                             : "border-gray-300"
-                        } focus:border-blue-500 outline-none`}
+                        }`}
                       />
                       <ErrorMessage
                         name="nameTechnology"
                         component="div"
-                        className="text-red-500 text-xs mt-1"
+                        className="mt-1 text-xs text-red-500"
                       />
                     </div>
 
                     {/* Keywords */}
                     <div className="md:col-span-2">
                       <label
-                        className="font-semibold text-gray-700 block mb-1"
                         htmlFor="keywordTechnology"
+                        className="mb-1 block font-semibold text-gray-700"
                       >
                         Keywords <span className="text-red-500">*</span>
                         <span className="block text-xs font-normal text-gray-500">
@@ -467,24 +475,24 @@ const SectionOne = () => {
                         type="text"
                         name="keywordTechnology"
                         maxLength="200"
-                        className={`w-full p-2.5 text-base rounded-md border ${
+                        className={`w-full rounded-md border p-2.5 text-base outline-none focus:border-blue-500 ${
                           errors.keywordTechnology && touched.keywordTechnology
                             ? "border-red-500"
                             : "border-gray-300"
-                        } focus:border-blue-500 outline-none`}
+                        }`}
                       />
                       <ErrorMessage
                         name="keywordTechnology"
                         component="div"
-                        className="text-red-500 text-xs mt-1"
+                        className="mt-1 text-xs text-red-500"
                       />
                     </div>
 
                     {/* Industrial Sector */}
                     <div>
                       <label
-                        className="font-semibold text-gray-700 block mb-1"
                         htmlFor="industrialSector"
+                        className="mb-1 block font-semibold text-gray-700"
                       >
                         Industrial Sector(s)
                       </label>
@@ -493,20 +501,20 @@ const SectionOne = () => {
                         options={industrialSectorOptions}
                         component={CustomSelect}
                         placeholder="Select sector(s)..."
-                        isMulti={true}
+                        isMulti
                       />
                       <ErrorMessage
                         name="industrialSector"
                         component="div"
-                        className="text-red-500 text-xs mt-1"
+                        className="mt-1 text-xs text-red-500"
                       />
                     </div>
 
                     {/* Theme */}
                     <div>
                       <label
-                        className="font-semibold text-gray-700 block mb-1"
                         htmlFor="theme"
+                        className="mb-1 block font-semibold text-gray-700"
                       >
                         Theme(s) <span className="text-red-500">*</span>
                       </label>
@@ -515,25 +523,23 @@ const SectionOne = () => {
                         options={themeOptions}
                         component={CustomSelect}
                         placeholder="Select theme(s)..."
-                        isMulti={true}
-                        className={`${
-                          errors.theme && touched.theme
-                            ? "react-select-error"
-                            : ""
-                        }`}
+                        isMulti
+                        className={
+                          errors.theme && touched.theme ? "react-select-error" : ""
+                        }
                       />
                       <ErrorMessage
                         name="theme"
                         component="div"
-                        className="text-red-500 text-xs mt-1"
+                        className="mt-1 text-xs text-red-500"
                       />
                     </div>
 
                     {/* Lead Laboratory */}
                     <div>
                       <label
-                        className="font-semibold text-gray-700 block mb-1"
                         htmlFor="leadLaboratory"
+                        className="mb-1 block font-semibold text-gray-700"
                       >
                         Lead Laboratory / Institute{" "}
                         <span className="text-red-500">*</span>
@@ -543,26 +549,26 @@ const SectionOne = () => {
                         options={labOptions}
                         component={CustomSelect}
                         placeholder="Select lead lab..."
-                        className={`${
+                        className={
                           errors.leadLaboratory && touched.leadLaboratory
                             ? "react-select-error"
                             : ""
-                        }`}
+                        }
                       />
                       <ErrorMessage
                         name="leadLaboratory"
                         component="div"
-                        className="text-red-500 text-xs mt-1"
+                        className="mt-1 text-xs text-red-500"
                       />
                     </div>
 
                     {/* Multi Lab Radio */}
-                    <div className="border rounded-md bg-gray-50 p-3">
-                      <label className="font-semibold text-gray-700 block mb-1">
+                    <div className="rounded-md border bg-gray-50 p-3">
+                      <label className="mb-1 block font-semibold text-gray-700">
                         Multi Laboratories Involved?{" "}
                         <span className="text-red-500">*</span>
                       </label>
-                      <div className="flex gap-4 mt-1">
+                      <div className="mt-1 flex gap-4">
                         <label className="flex items-center text-sm">
                           <Field
                             type="radio"
@@ -585,26 +591,26 @@ const SectionOne = () => {
                       <ErrorMessage
                         name="multiLabInstitute"
                         component="div"
-                        className="text-red-500 text-xs mt-1"
+                        className="mt-1 text-xs text-red-500"
                       />
                     </div>
 
                     {/* TRL */}
                     <div>
                       <label
-                        className="font-semibold text-gray-700 block mb-1"
                         htmlFor="technologyLevel"
+                        className="mb-1 block font-semibold text-gray-700"
                       >
                         TRL <span className="text-red-500">*</span>
                       </label>
                       <Field
                         as="select"
                         name="technologyLevel"
-                        className={`w-full p-2.5 text-base rounded-md border ${
+                        className={`w-full rounded-md border bg-white p-2.5 text-base outline-none focus:border-blue-500 ${
                           errors.technologyLevel && touched.technologyLevel
                             ? "border-red-500"
                             : "border-gray-300"
-                        } focus:border-blue-500 outline-none bg-white`}
+                        }`}
                       >
                         <option value="" label="Select TRL (0–9)" />
                         {[...Array(10).keys()].map((i) => (
@@ -616,7 +622,7 @@ const SectionOne = () => {
                       <ErrorMessage
                         name="technologyLevel"
                         component="div"
-                        className="text-red-500 text-xs mt-1"
+                        className="mt-1 text-xs text-red-500"
                       />
                     </div>
 
@@ -624,8 +630,8 @@ const SectionOne = () => {
                     {values.multiLabInstitute === "Yes" && (
                       <div className="md:col-span-2">
                         <label
-                          className="font-semibold text-gray-700 block mb-1"
                           htmlFor="lab"
+                          className="mb-1 block font-semibold text-gray-700"
                         >
                           Specify Associated Labs{" "}
                           <span className="text-red-500">*</span>
@@ -635,17 +641,15 @@ const SectionOne = () => {
                           options={labOptions}
                           component={CustomSelect}
                           placeholder="Select associated lab(s)..."
-                          isMulti={true}
-                          className={`${
-                            errors.lab && touched.lab
-                              ? "react-select-error"
-                              : ""
-                          }`}
+                          isMulti
+                          className={
+                            errors.lab && touched.lab ? "react-select-error" : ""
+                          }
                         />
                         <ErrorMessage
                           name="lab"
                           component="div"
-                          className="text-red-500 text-xs mt-1"
+                          className="mt-1 text-xs text-red-500"
                         />
                       </div>
                     )}
@@ -653,8 +657,8 @@ const SectionOne = () => {
                     {/* Year of Development */}
                     <div>
                       <label
-                        className="font-semibold text-gray-700 block mb-1"
                         htmlFor="yearDevelopment"
+                        className="mb-1 block font-semibold text-gray-700"
                       >
                         Year of Development{" "}
                         <span className="text-red-500">*</span>
@@ -675,27 +679,27 @@ const SectionOne = () => {
                             showYearPicker
                             dateFormat="yyyy"
                             placeholderText="Select year..."
-                            className={`w-full p-2.5 text-base rounded-md border ${
+                            className={`w-full rounded-md border p-2.5 text-base outline-none focus:border-blue-500 ${
                               form.errors.yearDevelopment &&
                               form.touched.yearDevelopment
                                 ? "border-red-500"
                                 : "border-gray-300"
-                            } focus:border-blue-500 outline-none`}
+                            }`}
                           />
                         )}
                       </Field>
                       <ErrorMessage
                         name="yearDevelopment"
                         component="div"
-                        className="text-red-500 text-xs mt-1"
+                        className="mt-1 text-xs text-red-500"
                       />
                     </div>
 
                     {/* Scale of Development */}
                     <div>
                       <label
-                        className="font-semibold text-gray-700 block mb-1"
                         htmlFor="scaleDevelopment"
+                        className="mb-1 block font-semibold text-gray-700"
                       >
                         Scale of Development
                         <span className="block text-xs font-normal text-gray-500">
@@ -707,24 +711,24 @@ const SectionOne = () => {
                         as="textarea"
                         rows="2"
                         maxLength="250"
-                        className={`w-full p-2.5 text-base rounded-md border ${
+                        className={`w-full rounded-md border p-2.5 text-base outline-none focus:border-blue-500 ${
                           errors.scaleDevelopment && touched.scaleDevelopment
                             ? "border-red-500"
                             : "border-gray-300"
-                        } focus:border-blue-500 outline-none`}
+                        }`}
                       />
                       <ErrorMessage
                         name="scaleDevelopment"
                         component="div"
-                        className="text-red-500 text-xs mt-1"
+                        className="mt-1 text-xs text-red-500"
                       />
                     </div>
 
-                    {/* Brief Details (full width) */}
+                    {/* Brief Details */}
                     <div className="md:col-span-2">
                       <label
-                        className="font-semibold text-gray-700 block mb-1"
                         htmlFor="briefTech"
+                        className="mb-1 block font-semibold text-gray-700"
                       >
                         Details of Technology{" "}
                         <span className="text-red-500">*</span>
@@ -737,24 +741,24 @@ const SectionOne = () => {
                         as="textarea"
                         rows="4"
                         maxLength="1000"
-                        className={`w-full p-2.5 text-base rounded-md border ${
+                        className={`w-full rounded-md border p-2.5 text-base outline-none focus:border-blue-500 ${
                           errors.briefTech && touched.briefTech
                             ? "border-red-500"
                             : "border-gray-300"
-                        } focus:border-blue-500 outline-none`}
+                        }`}
                       />
                       <ErrorMessage
                         name="briefTech"
                         component="div"
-                        className="text-red-500 text-xs mt-1"
+                        className="mt-1 text-xs text-red-500"
                       />
                     </div>
 
-                    {/* Competitive Positioning (full width) */}
+                    {/* Competitive Positioning */}
                     <div className="md:col-span-2">
                       <label
-                        className="font-semibold text-gray-700 block mb-1"
                         htmlFor="competitivePosition"
+                        className="mb-1 block font-semibold text-gray-700"
                       >
                         Competitive Positioning (Global benchmark in the domain)
                         <span className="block text-xs font-normal text-gray-500">
@@ -766,25 +770,25 @@ const SectionOne = () => {
                         as="textarea"
                         rows="4"
                         maxLength="1500"
-                        className={`w-full p-2.5 text-base rounded-md border ${
+                        className={`w-full rounded-md border p-2.5 text-base outline-none focus:border-blue-500 ${
                           errors.competitivePosition &&
                           touched.competitivePosition
                             ? "border-red-500"
                             : "border-gray-300"
-                        } focus:border-blue-500 outline-none`}
+                        }`}
                       />
                       <ErrorMessage
                         name="competitivePosition"
                         component="div"
-                        className="text-red-500 text-xs mt-1"
+                        className="mt-1 text-xs text-red-500"
                       />
                     </div>
 
-                    {/* Techno-economics (full width) */}
+                    {/* Techno-economics */}
                     <div className="md:col-span-2">
                       <label
-                        className="font-semibold text-gray-700 block mb-1"
                         htmlFor="technoEconomics"
+                        className="mb-1 block font-semibold text-gray-700"
                       >
                         Techno-economics
                         <span className="block text-xs font-normal text-gray-500">
@@ -796,24 +800,24 @@ const SectionOne = () => {
                         as="textarea"
                         rows="4"
                         maxLength="1500"
-                        className={`w-full p-2.5 text-base rounded-md border ${
+                        className={`w-full rounded-md border p-2.5 text-base outline-none focus:border-blue-500 ${
                           errors.technoEconomics && touched.technoEconomics
                             ? "border-red-500"
                             : "border-gray-300"
-                        } focus:border-blue-500 outline-none`}
+                        }`}
                       />
                       <ErrorMessage
                         name="technoEconomics"
                         component="div"
-                        className="text-red-500 text-xs mt-1"
+                        className="mt-1 text-xs text-red-500"
                       />
                     </div>
 
                     {/* Potential Ministries */}
                     <div>
                       <label
-                        className="font-semibold text-gray-700 block mb-1"
                         htmlFor="potentialMinistries"
+                        className="mb-1 block font-semibold text-gray-700"
                       >
                         Potential Ministries (who may be benefited)
                       </label>
@@ -822,20 +826,20 @@ const SectionOne = () => {
                         options={potentialMinistryOptions}
                         component={CustomSelect}
                         placeholder="Select ministries..."
-                        isMulti={true}
+                        isMulti
                       />
                       <ErrorMessage
                         name="potentialMinistries"
                         component="div"
-                        className="text-red-500 text-xs mt-1"
+                        className="mt-1 text-xs text-red-500"
                       />
                     </div>
 
                     {/* Environmental / Statutory */}
                     <div>
                       <label
-                        className="font-semibold text-gray-700 block mb-1"
                         htmlFor="environmentalStatutory"
+                        className="mb-1 block font-semibold text-gray-700"
                       >
                         Environmental / Statutory Compliance
                         <span className="block text-xs font-normal text-gray-500">
@@ -847,45 +851,46 @@ const SectionOne = () => {
                         as="textarea"
                         rows="3"
                         maxLength="300"
-                        className={`w-full p-2.5 text-base rounded-md border ${
+                        className={`w-full rounded-md border p-2.5 text-base outline-none focus:border-blue-500 ${
                           errors.environmentalStatutory &&
                           touched.environmentalStatutory
                             ? "border-red-500"
                             : "border-gray-300"
-                        } focus:border-blue-500 outline-none`}
+                        }`}
                       />
                       <ErrorMessage
                         name="environmentalStatutory"
                         component="div"
-                        className="text-red-500 text-xs mt-1"
+                        className="mt-1 text-xs text-red-500"
                       />
                     </div>
 
-                    {/* File Upload (full width) */}
+                    {/* File Upload */}
                     <div className="md:col-span-2">
-                      <div className="p-4 border border-dashed border-gray-300 rounded-md bg-gray-50">
+                      <div className="rounded-md border border-dashed border-gray-300 bg-gray-50 p-4">
                         <label
-                          className="font-semibold text-gray-700 block mb-1"
                           htmlFor="file"
+                          className="mb-1 block font-semibold text-gray-700"
                         >
                           Upload File (Optional)
                           <span className="block text-xs font-normal text-gray-500">
                             Image/PDF (Max 10MB)
                           </span>
                         </label>
+
                         {passedTRN && existingFileUrl && !isFileRemoved && (
-                          <div className="mb-3 flex flex-wrap gap-3 items-center">
+                          <div className="mb-3 flex flex-wrap items-center gap-3">
                             <button
                               type="button"
                               onClick={handleViewFile}
-                              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-medium"
+                              className="rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700"
                             >
                               View Current
                             </button>
                             <button
                               type="button"
                               onClick={() => handleRemoveFile(setFieldValue)}
-                              className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-medium"
+                              className="rounded bg-red-500 px-3 py-1 text-xs font-medium text-white hover:bg-red-600"
                             >
                               Remove Current
                             </button>
@@ -894,17 +899,19 @@ const SectionOne = () => {
                             </span>
                           </div>
                         )}
+
                         {isFileRemoved && (
-                          <p className="text-xs text-orange-600 mb-2">
+                          <p className="mb-2 text-xs text-orange-600">
                             Existing file marked for removal.
                           </p>
                         )}
+
                         <input
                           id="file"
                           type="file"
                           name="file"
                           accept=".jpg,.jpeg,.png,.pdf"
-                          className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                          className="block w-full text-sm text-gray-600 file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
                           onChange={(event) => {
                             const file = event.currentTarget.files[0];
                             if (file && file.size > 10 * 1024 * 1024) {
@@ -924,48 +931,44 @@ const SectionOne = () => {
                         <ErrorMessage
                           name="file"
                           component="div"
-                          className="text-red-500 text-xs mt-1"
+                          className="mt-1 text-xs text-red-500"
                         />
                       </div>
                     </div>
 
-                    {/* Laboratory Details (full width) */}
+                    {/* Laboratory Details */}
                     <div className="md:col-span-2">
                       <label
-                        className="font-semibold text-gray-700 block mb-1"
                         htmlFor="laboratoryDetail"
+                        className="mb-1 block font-semibold text-gray-700"
                       >
-                        Laboratory Details{" "}
-                        <span className="text-red-500">*</span>
-                        <span className="block text-xs font-normal text-gray-500">
-                          Max. 300 characters
-                        </span>
+                        Laboratory Details <span className="text-red-500">*</span>
                       </label>
                       <Field
                         name="laboratoryDetail"
-                        as="textarea"
-                        rows="3"
-                        maxLength="300"
-                        className={`w-full p-2.5 text-base rounded-md border ${
+                        component={CustomSelect}
+                        options={labDetails}
+                        placeholder="Select laboratory detail..."
+                        className={
                           errors.laboratoryDetail && touched.laboratoryDetail
-                            ? "border-red-500"
-                            : "border-gray-300"
-                        } focus:border-blue-500 outline-none`}
+                            ? "react-select-error"
+                            : ""
+                        }
                       />
                       <ErrorMessage
                         name="laboratoryDetail"
                         component="div"
-                        className="text-red-500 text-xs mt-1"
+                        className="mt-1 text-xs text-red-500"
                       />
                     </div>
                   </div>
 
                   {/* Buttons */}
-                  <div className="flex flex-wrap justify-end gap-3 pt-4 border-t border-gray-100">
+                  <div className="flex flex-wrap justify-end gap-3 border-t border-gray-100 pt-4">
                     <button
                       type="button"
                       onClick={() => navigate("/ViewTechnology")}
-                      className="px-5 py-2 rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 text-sm font-semibold"
+                      className="rounded-md bg-gray-200 px-5 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-300"
                       disabled={isSubmitting}
                     >
                       Cancel
@@ -975,7 +978,7 @@ const SectionOne = () => {
                       <>
                         <button
                           type="submit"
-                          className="px-5 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700 text-sm font-semibold"
+                          className="rounded-md bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700"
                           disabled={isSubmitting}
                         >
                           {isSubmitting ? "Updating..." : "Update Section"}
@@ -983,7 +986,7 @@ const SectionOne = () => {
 
                         <button
                           type="button"
-                          className="px-5 py-2 rounded-md text-white bg-green-600 hover:bg-green-700 text-sm font-semibold"
+                          className="rounded-md bg-green-600 px-5 py-2 text-sm font-semibold text-white hover:bg-green-700"
                           onClick={() =>
                             navigate("/sectionTwo", {
                               state: {
@@ -998,7 +1001,7 @@ const SectionOne = () => {
                     ) : (
                       <button
                         type="submit"
-                        className="px-5 py-2 rounded-md text-white bg-green-600 hover:bg-green-700 text-sm font-semibold"
+                        className="rounded-md bg-green-600 px-5 py-2 text-sm font-semibold text-white hover:bg-green-700"
                         disabled={isSubmitting}
                       >
                         {isSubmitting

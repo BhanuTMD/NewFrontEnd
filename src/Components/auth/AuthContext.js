@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import PropTypes from "prop-types";
+// import PropTypes from "prop-types";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
