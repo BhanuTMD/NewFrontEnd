@@ -3,63 +3,60 @@ import Section from "Components/common/section";
 import NavBar from "Components/common/navBar";
 import FooterBar from "Components/common/footer";
 import { Formik, Field, Form, ErrorMessage } from "formik";
-import CustomSelect from "../utils/CustomSelect"; // Assuming CustomSelect is fixed
+import CustomSelect from "../utils/CustomSelect";
 import * as Yup from "yup";
 import Swal from "sweetalert2";
 import DatePicker from "react-datepicker";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 
+import { industrialSectorOptions } from "Components/data/industrialSector";
+import { potentialMinistryOptions } from "Components/data/potentialMinistries";
+import { themeOptions } from "Components/data/theme";
+import { labOptions } from "Components/data/lab";
+import { potentialApplicationAreaOptions } from "Components/data/potentialApplicationAreas";
 
-// --- UPDATED IMPORTS ---
-import { industrialSectorOptions } from "Components/data/industrialSector"; // Assuming file is named industrialSector.js
-import { potentialMinistryOptions } from "Components/data/potentialMinistries"; // Assuming file is named potentialMinistries.js
-import { themeOptions } from "Components/data/theme"; // Assuming file is named theme.js
-import { labOptions } from "Components/data/lab"; // Assuming file is named lab.js
-import { potentialApplicationAreaOptions } from "Components/data/potentialApplicationAreas"; // Assuming file is named potentialApplicationAreas.js
-// --- END UPDATED IMPORTS ---
-
-import FileViewerModal from "Components/pages/view/FileViewerModal"; // Ensure path is correct
+import FileViewerModal from "Components/pages/view/FileViewerModal";
 
 const SectionOne = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const passedTRN = location.state?.technologyRefNo || "";
+  const { technologyRefNo: paramTRN } = useParams();
+  const passedTRN = paramTRN || location.state?.technologyRefNo || "";
 
   const [generatedRefNo, setGeneratedRefNo] = useState(passedTRN);
   const [loading, setLoading] = useState(!!passedTRN);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [fileToView, setFileToView] = useState('');
-  const [existingFileUrl, setExistingFileUrl] = useState('');
+  const [fileToView, setFileToView] = useState("");
+  const [existingFileUrl, setExistingFileUrl] = useState("");
   const [isFileRemoved, setIsFileRemoved] = useState(false);
 
   const [initialValues, setInitialValues] = useState({
     id: null,
     technologyRefNo: "",
-    keywordTechnology: "", // Comma-separated string
+    keywordTechnology: "",
     nameTechnology: "",
-    industrialSector: [], // Array of {value, label}
-    theme: [],          // Array of {value, label}
+    industrialSector: [],
+    theme: [],
     multiLabInstitute: "No",
-    leadLaboratory: null, // Single {value, label} or null
-    lab: [],              // Array of {value, label}
+    leadLaboratory: null,
+    lab: [],
     technologyLevel: "",
     scaleDevelopment: "",
     yearDevelopment: "",
     briefTech: "",
     competitivePosition: "",
     technoEconomics: "",
-    potentialApplicationAreas: [], // Array of {value, label}
-    potentialMinistries: [],       // Array of {value, label}
+    potentialApplicationAreas: [],
+    potentialMinistries: [],
     environmentalStatutory: "",
     marketPotential: "",
-    file: null, // For new file uploads
+    file: null,
     laboratoryDetail: "",
   });
 
-  // Fetch data if editing
-  // --- THIS useEffect BLOCK IS FIXED ---
+  // --- Prefill / Edit data ---
   useEffect(() => {
     if (passedTRN) {
       setLoading(true);
@@ -71,521 +68,955 @@ const SectionOne = () => {
         .then((res) => {
           const fetchedData = res.data;
 
-          // --- FIX START ---
-          // Helper function to split a pipe-separated string (e.g., "Value1|Value2") into an array
-          const splitPipeStringToArray = (pipeString) => {
-            if (!pipeString || typeof pipeString !== 'string') {
-              return []; // Return empty array if input is null, undefined, or not a string
-            }
-            return pipeString.split('|').filter(Boolean); // Split by pipe and remove any empty strings
+          const processToArray = (input) => {
+            if (!input) return [];
+            if (Array.isArray(input)) return input;
+            if (typeof input === "string")
+              return input.split("|").filter(Boolean);
+            return [];
           };
 
-          // Apply the new helper to all pipe-separated string fields
-          const cleanedIndustrialSectors = splitPipeStringToArray(fetchedData.industrialSector);
-          const cleanedThemes = splitPipeStringToArray(fetchedData.theme);
-          const cleanedLabs = splitPipeStringToArray(fetchedData.lab);
-          const cleanedAppAreas = splitPipeStringToArray(fetchedData.potentialApplicationAreas);
-          const cleanedMinistries = splitPipeStringToArray(fetchedData.potentialMinistries);
-          // --- FIX END ---
+          const cleanedIndustrialSectors = processToArray(
+            fetchedData.industrialSector
+          );
+          const cleanedThemes = processToArray(fetchedData.theme);
+          const cleanedLabs = processToArray(fetchedData.lab);
+          const cleanedAppAreas = processToArray(
+            fetchedData.potentialApplicationAreas
+          );
+          const cleanedMinistries = processToArray(
+            fetchedData.potentialMinistries
+          );
 
-
-          // Format fetched data for Formik state
           const formattedValues = {
             ...fetchedData,
-            // Convert simple strings/arrays from backend to {value, label} objects/arrays for react-select
-            leadLaboratory: labOptions.find(opt => opt.value === fetchedData.leadLaboratory) || null,
-
-            // --- USE CLEANED VALUES FOR FILTERING (This part remains the same) ---
-            industrialSector: industrialSectorOptions.filter(opt => cleanedIndustrialSectors.includes(opt.value)),
-            theme: themeOptions.filter(opt => cleanedThemes.includes(opt.value)),
-            lab: labOptions.filter(opt => cleanedLabs.includes(opt.value)),
-            potentialApplicationAreas: potentialApplicationAreaOptions.filter(opt => cleanedAppAreas.includes(opt.value)),
-            potentialMinistries: potentialMinistryOptions.filter(opt => cleanedMinistries.includes(opt.value)),
-            // --- END OF FIX ---
-
-            multiLabInstitute: fetchedData.multiLabInstitute === "Yes" || fetchedData.multiLabInstitute === true ? "Yes" : "No",
-            // Keep fetched keywords as string, DTO handles conversion
+            leadLaboratory:
+              labOptions.find(
+                (opt) => opt.value === fetchedData.leadLaboratory
+              ) || null,
+            industrialSector: industrialSectorOptions.filter((opt) =>
+              cleanedIndustrialSectors.includes(opt.value)
+            ),
+            theme: themeOptions.filter((opt) =>
+              cleanedThemes.includes(opt.value)
+            ),
+            lab: labOptions.filter((opt) => cleanedLabs.includes(opt.value)),
+            potentialApplicationAreas:
+              potentialApplicationAreaOptions.filter((opt) =>
+                cleanedAppAreas.includes(opt.value)
+              ),
+            potentialMinistries: potentialMinistryOptions.filter((opt) =>
+              cleanedMinistries.includes(opt.value)
+            ),
+            multiLabInstitute:
+              fetchedData.multiLabInstitute === "Yes" ||
+              fetchedData.multiLabInstitute === true
+                ? "Yes"
+                : "No",
             keywordTechnology: fetchedData.keywordTechnology || "",
-            // Convert year/TRL back to string for input fields if needed
-            yearDevelopment: fetchedData.yearDevelopment ? String(fetchedData.yearDevelopment) : "",
-            technologyLevel: fetchedData.technologyLevel ? String(fetchedData.technologyLevel) : "",
-            file: null, // File input should remain null on load
+            yearDevelopment: fetchedData.yearDevelopment
+              ? String(fetchedData.yearDevelopment)
+              : "",
+            technologyLevel: fetchedData.technologyLevel
+              ? String(fetchedData.technologyLevel)
+              : "",
+            file: null,
           };
 
           setInitialValues(formattedValues);
           setGeneratedRefNo(passedTRN);
-          setExistingFileUrl(fetchedData.fileUrl || '');
+          setExistingFileUrl(fetchedData.fileUrl || "");
           setIsFileRemoved(false);
         })
         .catch((err) => {
           console.error("Error fetching section one data", err);
           Swal.fire("Error", "Could not fetch existing data.", "error");
-          navigate('/ViewTechnology'); // Navigate back on error
+          navigate("/ViewTechnology");
         })
         .finally(() => setLoading(false));
     } else {
-      // Reset to default empty state when not editing
+      // --- New create ---
       setInitialValues({
-        id: null, technologyRefNo: "", keywordTechnology: "", nameTechnology: "",
-        industrialSector: [], theme: [], multiLabInstitute: "No", leadLaboratory: null,
-        lab: [], technologyLevel: "", scaleDevelopment: "", yearDevelopment: "",
-        briefTech: "", competitivePosition: "", technoEconomics: "", potentialApplicationAreas: [],
-        potentialMinistries: [], environmentalStatutory: "", marketPotential: "",
-        file: null, laboratoryDetail: "",
+        id: null,
+        technologyRefNo: "",
+        keywordTechnology: "",
+        nameTechnology: "",
+        industrialSector: [],
+        theme: [],
+        multiLabInstitute: "No",
+        leadLaboratory: null,
+        lab: [],
+        technologyLevel: "",
+        scaleDevelopment: "",
+        yearDevelopment: "",
+        briefTech: "",
+        competitivePosition: "",
+        technoEconomics: "",
+        potentialApplicationAreas: [],
+        potentialMinistries: [],
+        environmentalStatutory: "",
+        marketPotential: "",
+        file: null,
+        laboratoryDetail: "",
       });
-      setGeneratedRefNo('');
-      setExistingFileUrl('');
+      setGeneratedRefNo("");
+      setExistingFileUrl("");
       setIsFileRemoved(false);
       setLoading(false);
     }
   }, [passedTRN, navigate]);
-  // --- END OF FIXED useEffect BLOCK ---
 
-  // Validation schema expects objects for react-select fields
+  // --- Yup Validation ---
   const validationSchema = Yup.object({
     nameTechnology: Yup.string().required("Required").max(500, "Max 500 chars"),
-    keywordTechnology: Yup.string().required("Required").max(200, "Max 200 chars"),
-    leadLaboratory: Yup.object().shape({ // Validate the structure if leadLaboratory is an object
-      value: Yup.string().required(),
-      label: Yup.string().required(),
-    }).nullable().required("Lead Laboratory is required"), // Expects object
-    theme: Yup.array().of(Yup.object().shape({ // Validate array of objects
-      value: Yup.string().required(),
-      label: Yup.string().required(),
-    })).min(1, "Select at least one theme").required("Theme is required"),
+    keywordTechnology: Yup.string()
+      .required("Required")
+      .max(200, "Max 200 chars"),
+    leadLaboratory: Yup.object()
+      .shape({
+        value: Yup.string().required(),
+        label: Yup.string().required(),
+      })
+      .nullable()
+      .required("Lead Laboratory is required"),
+    theme: Yup.array()
+      .of(
+        Yup.object().shape({
+          value: Yup.string().required(),
+          label: Yup.string().required(),
+        })
+      )
+      .min(1, "Select at least one theme")
+      .required("Theme is required"),
     multiLabInstitute: Yup.string().required("Please select Yes or No"),
-    lab: Yup.array().of(Yup.object().shape({ // Validate array of objects
-      value: Yup.string().required(),
-      label: Yup.string().required(),
-    })).when("multiLabInstitute", {
-      is: "Yes",
-      then: (schema) => schema.min(1, "Select associated labs if 'Yes'"),
-      otherwise: (schema) => schema.notRequired(),
-    }),
-    technologyLevel: Yup.string().required("TRL is required"), // Keep as string for select
-    yearDevelopment: Yup.string().required("Year is required").matches(/^[0-9]{4}$/, "Enter a valid 4-digit year"), // Keep as string for input
-    briefTech: Yup.string().required("Brief details are required").max(1000, "Max 1000 chars"),
-    laboratoryDetail: Yup.string().required("Lab details are required").max(300, "Max 300 chars"),
+    lab: Yup.array()
+      .of(
+        Yup.object().shape({
+          value: Yup.string().required(),
+          label: Yup.string().required(),
+        })
+      )
+      .when("multiLabInstitute", {
+        is: "Yes",
+        then: (schema) => schema.min(1, "Select associated labs if 'Yes'"),
+        otherwise: (schema) => schema.notRequired(),
+      }),
+    technologyLevel: Yup.string().required("TRL is required"),
+    yearDevelopment: Yup.string()
+      .required("Year is required")
+      .matches(/^[0-9]{4}$/, "Enter a valid 4-digit year"),
+    briefTech: Yup.string()
+      .required("Brief details are required")
+      .max(1000, "Max 1000 chars"),
+    laboratoryDetail: Yup.string()
+      .required("Lab details are required")
+      .max(300, "Max 300 chars"),
     scaleDevelopment: Yup.string().max(250, "Max 250 chars").nullable(),
-    competitivePosition: Yup.string().max(1500, "Max 1500 chars").nullable(),
+    competitivePosition: Yup.string()
+      .max(1500, "Max 1500 chars")
+      .nullable(),
     technoEconomics: Yup.string().max(1500, "Max 1500 chars").nullable(),
-    // marketPotential: Yup.string().max(1000, "Max 1000 chars").nullable(),
-    environmentalStatutory: Yup.string().max(300, "Max 300 chars").nullable(),
-    // potentialApplicationAreas: Yup.array().of(Yup.object().shape({ // Validate array of objects
-    //   value: Yup.string().required(),
-    //   label: Yup.string().required(),
-    // })).nullable(),
-    potentialMinistries: Yup.array().of(Yup.object().shape({ // Validate array of objects
-      value: Yup.string().required(),
-      label: Yup.string().required(),
-    })).nullable(),
-    industrialSector: Yup.array().of(Yup.object().shape({ // Validate array of objects
-      value: Yup.string().required(),
-      label: Yup.string().required(),
-    })).nullable(),
-    // File validation can be tricky with Yup, often done separately in onChange
+    environmentalStatutory: Yup.string()
+      .max(300, "Max 300 chars")
+      .nullable(),
+    potentialMinistries: Yup.array()
+      .of(
+        Yup.object().shape({
+          value: Yup.string().required(),
+          label: Yup.string().required(),
+        })
+      )
+      .nullable(),
+    industrialSector: Yup.array()
+      .of(
+        Yup.object().shape({
+          value: Yup.string().required(),
+          label: Yup.string().required(),
+        })
+      )
+      .nullable(),
   });
 
   // --- File Handlers ---
   const handleViewFile = () => {
     if (existingFileUrl) {
-      // Use the correct view URL structure from your backend
-      const viewUrl = existingFileUrl.replace('/download/', '/view/'); // Adjust if needed
-      console.log("Attempting to view file at URL:", viewUrl); // Log the URL
+      const viewUrl = existingFileUrl.replace("/download/", "/view/");
       setFileToView(viewUrl);
       setIsModalOpen(true);
     } else {
-      console.warn("handleViewFile called but existingFileUrl is empty.");
-      Swal.fire("Info", "No file available to view.", "info"); // Use Swal instead of alert
+      Swal.fire("Info", "No file available to view.", "info");
     }
   };
 
   const handleRemoveFile = (setFieldValue) => {
-    Swal.fire({ title: "Remove Existing File?", text: "This will mark the file for removal upon saving. Upload a new file if needed.", icon: "warning", showCancelButton: true, confirmButtonColor: "#d33", confirmButtonText: "Yes, remove it" })
-      .then((result) => {
-        if (result.isConfirmed) {
-          setExistingFileUrl('');      // Clear the displayed URL
-          setIsFileRemoved(true); // Set flag for backend
-          setFieldValue('file', null); // Clear any newly selected file in Formik state
-          console.log("Existing file marked for removal.");
-        }
-      });
-  };
-  // ---
-
-  // Submit Handler extracts '.value' before sending
-  const handleSubmit = (values, { setSubmitting }) => {
-    console.log("Form values on submit:", JSON.stringify(values, null, 2)); // Log all values
-
-    Swal.fire({ title: "Confirm Submission?", text: passedTRN ? "Update this technology?" : "Submit this new technology?", icon: "question", showCancelButton: true, confirmButtonColor: "#3085d6", cancelButtonColor: "#d33", confirmButtonText: "Yes, Submit!" })
-      .then((result) => {
-        if (result.isConfirmed) {
-          const formData = new FormData();
-
-          console.log("--- Preparing FormData ---"); // Log FormData creation start
-
-          // Prepare FormData, extracting .value from objects/arrays
-          Object.keys(values).forEach(key => {
-            const value = values[key];
-
-            // Log current key and value being processed
-            console.log(`Processing key: ${key}, value:`, value);
-
-            if (key === 'file' && value instanceof File) {
-              formData.append('file', value);
-              console.log(`Appended file: ${value.name}`);
-            } else if (key === 'leadLaboratory') {
-              // Handle both object (from react-select) and potentially string (if loaded differently)
-              if (value && typeof value === 'object' && value.value) {
-                formData.append(key, value.value);
-              } else if (typeof value === 'string') {
-                formData.append(key, value);
-
-              } else if (typeof value === 'string' && value) { // Fallback if it's already a string
-                formData.append(key, value);
-                console.log(`Appended ${key} (as string): ${value}`);
-              } else {
-                console.log(`Skipped ${key} (null or invalid object)`);
-              }
-            } else if (['industrialSector', 'theme', 'lab', 'potentialApplicationAreas', 'potentialMinistries'].includes(key)) {
-              if (Array.isArray(value) && value.length > 0) {
-                // append as pipe-separated string for backend
-                const list = value.map(v => (v?.value ?? '')).filter(Boolean).join('|');
-                formData.append(key, list);
-                console.log(`Appended ${key}: ${list}`);
-              } else {
-                console.log(`Skipped ${key} (empty or invalid array)`);
-              }
-            }
-
-
-            // Append simple values (string, number, boolean), exclude null/undefined and file object
-            else if (value !== null && value !== undefined && typeof value !== 'object' && key !== 'file') {
-              formData.append(key, value);
-              console.log(`Appended ${key}: ${value}`);
-            }
-            // Handle specific simple object cases if necessary (e.g., date objects, though usually sent as strings)
-            // else if (value instanceof Date) {
-            //  formData.append(key, value.toISOString()); // Example: send date as ISO string
-            //  console.log(`Appended ${key} (Date as ISO): ${value.toISOString()}`);
-            // }
-            else {
-              // Log skipped keys for clarity
-              if (key !== 'file' && !(Array.isArray(value) && ['industrialSector', 'theme', 'lab', 'potentialApplicationAreas', 'potentialMinistries'].includes(key))) { // Avoid double logging arrays
-                console.log(`SkiBroke key ${key} (type: ${typeof value}, value: ${JSON.stringify(value)})`);
-              }
-            }
-          });
-
-          // Append ID only if it exists (for updates)
-          if (values.id) {
-            formData.append('id', values.id);
-            console.log(`Appended id: ${values.id}`);
-          }
-          // Append flag to remove file if set
-          if (isFileRemoved) {
-            formData.append('isFileRemoved', 'true');
-            console.log('Marked file for removal');
-          }
-
-
-          console.log("--- FormData Prepared ---");
-          // You can also iterate FormData entries for final verification (more complex)
-          // for (let [key, val] of formData.entries()) {
-          //   console.log(`FormData Entry: ${key} = `, val);
-          // }
-
-
-          const token = localStorage.getItem("token");
-          const headers = {
-            // Let browser set Content-Type for FormData
-            // "Content-Type": "multipart/form-data", // REMOVE THIS LINE
-            Authorization: `Bearer ${token}`
-          };
-
-          let requestPromise;
-          const isUpdate = !!passedTRN;
-
-          if (isUpdate) { // UPDATE
-            const updateUrl = `http://172.16.2.246:8080/api/section-one/update/${passedTRN}`;
-            console.log("Sending PUT request to:", updateUrl);
-            requestPromise = axios.put(updateUrl, formData, { headers });
-          } else { // CREATE
-            const createUrl = "http://172.16.2.246:8080/api/section-one/create";
-            console.log("Sending POST request to:", createUrl);
-            requestPromise = axios.post(createUrl, formData, { headers });
-          }
-
-          requestPromise
-            .then((res) => {
-              const techRef = res.data.technologyRefNo;
-              setGeneratedRefNo(techRef); // Update state if needed
-              Swal.fire("Success!", `Technology ${isUpdate ? 'updated' : 'saved'}! TRN: ${techRef}`, "success");
-              console.log("API call successful, navigating to Section Two.");
-              navigate("/sectionTwo", { state: { technologyRefNo: techRef } });
-            })
-            .catch((err) => {
-              console.error("API Submission error:", err.response?.data || err.message, err); // Log more details
-              Swal.fire("Error!", err.response?.data?.message || `Failed to ${isUpdate ? 'update' : 'submit'}. Please check console for details.`, "error");
-            })
-            .finally(() => {
-              console.log("API call finished.");
-              setSubmitting(false);
-            });
-        } else {
-          // User cancelled Swal confirmation
-          console.log("User cancelled submission.");
-          setSubmitting(false);
-        }
-      });
+    Swal.fire({
+      title: "Remove Existing File?",
+      text: "This will mark the file for removal upon saving. Upload a new file if needed.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "Yes, remove it",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setExistingFileUrl("");
+        setIsFileRemoved(true);
+        setFieldValue("file", null);
+      }
+    });
   };
 
+  // --- Submit handler ---
+  const handleSubmit = (values, { setSubmitting }, action) => {
+    const isUpdate = !!passedTRN;
+
+    Swal.fire({
+      title: "Confirm Submission?",
+      text: isUpdate ? "Update this technology?" : "Submit this new technology?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Submit!",
+    }).then((result) => {
+      if (!result.isConfirmed) {
+        setSubmitting(false);
+        return;
+      }
+
+      const formData = new FormData();
+
+      Object.keys(values).forEach((key) => {
+        const value = values[key];
+
+        if (key === "file" && value instanceof File) {
+          formData.append("file", value);
+        } else if (key === "leadLaboratory") {
+          if (value && typeof value === "object" && value.value) {
+            formData.append(key, value.value);
+          } else if (typeof value === "string") {
+            formData.append(key, value);
+          }
+        } else if (
+          [
+            "industrialSector",
+            "theme",
+            "lab",
+            "potentialApplicationAreas",
+            "potentialMinistries",
+          ].includes(key)
+        ) {
+          if (Array.isArray(value) && value.length > 0) {
+            const list = value
+              .map((v) => v?.value ?? "")
+              .filter(Boolean)
+              .join("|");
+            formData.append(key, list);
+          }
+        } else if (
+          value !== null &&
+          value !== undefined &&
+          typeof value !== "object" &&
+          key !== "file"
+        ) {
+          formData.append(key, value);
+        }
+      });
+
+      if (values.id) {
+        formData.append("id", values.id);
+      }
+
+      if (isFileRemoved) {
+        formData.append("isFileRemoved", "true");
+      }
+
+      const token = localStorage.getItem("token");
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      let requestPromise;
+      if (isUpdate) {
+        const updateUrl = `http://172.16.2.246:8080/api/section-one/update/${passedTRN}`;
+          requestPromise = axios.put(updateUrl, formData, { headers });
+      } else {
+        const createUrl = "http://172.16.2.246:8080/api/section-one/create";
+        requestPromise = axios.post(createUrl, formData, { headers });
+      }
+
+      requestPromise
+        .then((res) => {
+          const techRef = res.data.technologyRefNo;
+          setGeneratedRefNo(techRef);
+
+          Swal.fire(
+            "Success!",
+            `Technology ${isUpdate ? "updated" : "saved"}! TRN: ${techRef}`,
+            "success"
+          );
+
+          if (action === "next") {
+            navigate("/sectionTwo", { state: { technologyRefNo: techRef } });
+          } else {
+            // updateOnly -> stay on this section
+          }
+        })
+        .catch((err) => {
+          Swal.fire(
+            "Error!",
+            err.response?.data?.message ||
+              `Failed to ${isUpdate ? "update" : "submit"}.`,
+            "error"
+          );
+        })
+        .finally(() => setSubmitting(false));
+    });
+  };
 
   if (loading && passedTRN) {
-    return <p className="text-center mt-6 text-gray-600">Loading existing data...</p>;
+    return (
+      <p className="text-center mt-6 text-gray-600">
+        Loading existing data...
+      </p>
+    );
   }
 
+  const defaultAction = passedTRN ? "updateOnly" : "next";
 
   return (
     <>
       <NavBar />
-      <div className="flex">
-        <div className="bg-gray-800"></div> {/* Sidebar Placeholder */}
-        <div className="flex-1 p-8 bg-blue-100 border">
-          <Section sectionLine="Section 1 : Key Details of the Technology / Knowhow " />
-          <Formik
-            enableReinitialize // Essential
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-            onSubmit={handleSubmit}
-          >
-            {({ values, setFieldValue, isSubmitting, errors, touched }) => (
-              <Form className="bg-white p-6 rounded-lg shadow-md">
 
-                {/* --- Technology Ref No (Full Width) --- */}
-                <div className="form-group mb-6">
-                  <label className="font-bold block mb-1 text-gray-700">Technology Ref No:</label>
-                  <input type="text" value={generatedRefNo || "Will be generated after submission"} readOnly className="w-full p-2 text-lg rounded-md bg-gray-100 text-gray-600 cursor-not-allowed border border-gray-300" />
-                </div>
+      {/* PAGE LAYOUT: Left 75%, Right 25% empty */}
+      <div className="flex min-h-screen bg-blue-100">
+        {/* Left content (75%) */}
+        <div className="w-full md:w-3/4 border-r">
+          <div className="max-w-5xl ml-60 mr-auto p-6 md:p-8">
+            <Section sectionLine="Section 1 : Key Details of the Technology / Knowhow " />
 
-                {/* --- START: 2-COLUMN GRID --- */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-
-                  {/* --- Name of Technology (Spans 2 Cols) --- */}
-                  <div className="form-group md:col-span-2">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="nameTechnology">Name of Technology <span className="text-red-500">*</span><span className="block text-sm font-normal text-gray-500">Max. 100 Chars</span></label>
-                    <Field name="nameTechnology" as="textarea" rows="3" className={`w-full p-2 text-lg rounded-md border ${errors.nameTechnology && touched.nameTechnology ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
-                    <ErrorMessage name="nameTechnology" component="div" className="text-red-500 text-sm mt-1" />
-                  </div>
-
-                  {/* --- Keywords (Spans 2 Cols) --- */}
-                  <div className="form-group md:col-span-2">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="keywordTechnology">Keywords <span className="text-red-500">*</span><span className="block text-sm font-normal text-gray-500">(Comma-separated, 5-8 words, Max 100 Chars)</span></label>
-                    <Field type="text" name="keywordTechnology" maxLength="200" className={`w-full p-2 text-lg rounded-md border ${errors.keywordTechnology && touched.keywordTechnology ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
-                    <ErrorMessage name="keywordTechnology" component="div" className="text-red-500 text-sm mt-1" />
-                  </div>
-
-                  {/* --- Industrial Sector --- */}
-                  <div className="form-group">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="industrialSector">Industrial Sector(s)</label>
-                    <Field name="industrialSector" options={industrialSectorOptions} component={CustomSelect} placeholder="Select Sector(s)..." isMulti={true} />
-                    <ErrorMessage name="industrialSector" component="div" className="text-red-500 text-sm mt-1" />
-                  </div>
-
-                  {/* --- Theme --- */}
-                  <div className="form-group">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="theme">Theme(s) <span className="text-red-500">*</span></label>
-                    <Field name="theme" options={themeOptions} component={CustomSelect} placeholder="Select Theme(s)..." isMulti={true} className={`${errors.theme && touched.theme ? 'react-select-error' : ''}`} />
-                    <ErrorMessage name="theme" component="div" className="text-red-500 text-sm mt-1" />
-                  </div>
-
-                  {/* --- Lead Laboratory --- */}
-                  <div className="form-group">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="leadLaboratory">Lead Laboratory / Institute <span className="text-red-500">*</span></label>
-                    <Field name="leadLaboratory" options={labOptions} component={CustomSelect} placeholder="Select Lead Lab..." className={`${errors.leadLaboratory && touched.leadLaboratory ? 'react-select-error' : ''}`} />
-                    <ErrorMessage name="leadLaboratory" component="div" className="text-red-500 text-sm mt-1" />
-                  </div>
-
-                  {/* --- Multi Laboratories Radio --- */}
-                  <div className="form-group border p-3 rounded-md bg-gray-50 h-full flex flex-col justify-center">
-                    <label className="font-bold text-gray-700">Multi Laboratories Involved? <span className="text-red-500">*</span></label>
-                    <div className="flex space-x-4 mt-2">
-                      <label className="flex items-center cursor-pointer"><Field type="radio" name="multiLabInstitute" value="Yes" className="mr-2 h-4 w-4" /> Yes</label>
-                      <label className="flex items-center cursor-pointer"><Field type="radio" name="multiLabInstitute" value="No" className="mr-2 h-4 w-4" /> No</label>
+            <Formik
+              enableReinitialize
+              initialValues={initialValues}
+              validationSchema={validationSchema}
+              onSubmit={(values, formikHelpers) =>
+                handleSubmit(values, formikHelpers, defaultAction)
+              }
+            >
+              {({ values, setFieldValue, isSubmitting, errors, touched }) => (
+                <Form className="bg-white p-6 md:p-8 rounded-xl shadow-md border border-gray-100 space-y-6">
+                  {/* Header: Ref No */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="md:col-span-2">
+                      <label className="font-semibold text-gray-700 block mb-1">
+                        Technology Ref No
+                      </label>
+                      <input
+                        type="text"
+                        value={
+                          generatedRefNo || "Will be generated after submission"
+                        }
+                        readOnly
+                        className="w-full p-2.5 text-base rounded-md bg-gray-100 text-gray-600 border border-gray-300"
+                      />
                     </div>
-                    <ErrorMessage name="multiLabInstitute" component="div" className="text-red-500 text-sm mt-1" />
                   </div>
-                  {/* --- Conditional Lab Selection (Spans 2) --- */}
-                  {values.multiLabInstitute === "Yes" && (
-                    <div className="form-group md:col-span-2 pl-4 border-l-4 border-indigo-200">
-                      <label className="font-bold block mb-1 text-gray-700" htmlFor="lab">Specify Associated Labs <span className="text-red-500">*</span></label>
-                      <Field name="lab" options={labOptions} component={CustomSelect} placeholder="Select Associated Lab(s)..." isMulti={true} className={`${errors.lab && touched.lab ? 'react-select-error' : ''}`} />
-                      <ErrorMessage name="lab" component="div" className="text-red-500 text-sm mt-1" />
+
+                  {/* Main Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Name of Technology (full width) */}
+                    <div className="md:col-span-2">
+                      <label
+                        className="font-semibold text-gray-700 block mb-1"
+                        htmlFor="nameTechnology"
+                      >
+                        Name of Technology{" "}
+                        <span className="text-red-500">*</span>
+                        <span className="block text-xs font-normal text-gray-500">
+                          Max. 500 characters
+                        </span>
+                      </label>
+                      <Field
+                        name="nameTechnology"
+                        as="textarea"
+                        rows="3"
+                        className={`w-full p-2.5 text-base rounded-md border ${
+                          errors.nameTechnology && touched.nameTechnology
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } focus:border-blue-500 outline-none`}
+                      />
+                      <ErrorMessage
+                        name="nameTechnology"
+                        component="div"
+                        className="text-red-500 text-xs mt-1"
+                      />
                     </div>
-                  )}
-                  {/* --- TRL --- */}
-                  <div className="form-group">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="technologyLevel">TRL <span className="text-red-500">*</span></label>
-                    <Field as="select" name="technologyLevel" className={`w-full p-2 text-lg rounded-md border ${errors.technologyLevel && touched.technologyLevel ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none bg-white`}>
-                      <option value="" label="Select TRL (0-9)" />
-                      {[...Array(9).keys()].map(i => (<option key={i} value={String(i)}>{i}</option>))} {/* Ensure value is string */}
-                    </Field>
-                    <ErrorMessage name="technologyLevel" component="div" className="text-red-500 text-sm mt-1" />
-                  </div>
 
-                  {/* --- Year of Development --- */}
-                  <div className="form-group">
-                    <label
-                      className="font-bold block mb-1 text-gray-700"
-                      htmlFor="yearDevelopment"
-                    >
-                      Year of Development <span className="text-red-500">*</span>
-                      <span className="block text-sm font-normal text-gray-500">YYYY</span>
-                    </label>
+                    {/* Keywords */}
+                    <div className="md:col-span-2">
+                      <label
+                        className="font-semibold text-gray-700 block mb-1"
+                        htmlFor="keywordTechnology"
+                      >
+                        Keywords <span className="text-red-500">*</span>
+                        <span className="block text-xs font-normal text-gray-500">
+                          Comma-separated, 5–8 words, Max 200 characters
+                        </span>
+                      </label>
+                      <Field
+                        type="text"
+                        name="keywordTechnology"
+                        maxLength="200"
+                        className={`w-full p-2.5 text-base rounded-md border ${
+                          errors.keywordTechnology && touched.keywordTechnology
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } focus:border-blue-500 outline-none`}
+                      />
+                      <ErrorMessage
+                        name="keywordTechnology"
+                        component="div"
+                        className="text-red-500 text-xs mt-1"
+                      />
+                    </div>
 
-                    <Field name="yearDevelopment">
-                      {({ field, form }) => (
-                        <DatePicker
-                          selected={
-                            field.value ? new Date(field.value, 0, 1) : null
-                          }
-                          onChange={(date) => {
-                            const year = date?.getFullYear();
-                            form.setFieldValue(field.name, year);
-                          }}
-                          showYearPicker      // 👈 Only year selection
-                          dateFormat="yyyy"
-                          placeholderText="Select Year..."
-                          className={`w-full p-2 text-lg rounded-md border ${form.errors.yearDevelopment && form.touched.yearDevelopment
-                              ? "border-red-500"
-                              : "border-gray-300"
-                            } focus:border-indigo-500 outline-none`}
+                    {/* Industrial Sector */}
+                    <div>
+                      <label
+                        className="font-semibold text-gray-700 block mb-1"
+                        htmlFor="industrialSector"
+                      >
+                        Industrial Sector(s)
+                      </label>
+                      <Field
+                        name="industrialSector"
+                        options={industrialSectorOptions}
+                        component={CustomSelect}
+                        placeholder="Select sector(s)..."
+                        isMulti={true}
+                      />
+                      <ErrorMessage
+                        name="industrialSector"
+                        component="div"
+                        className="text-red-500 text-xs mt-1"
+                      />
+                    </div>
+
+                    {/* Theme */}
+                    <div>
+                      <label
+                        className="font-semibold text-gray-700 block mb-1"
+                        htmlFor="theme"
+                      >
+                        Theme(s) <span className="text-red-500">*</span>
+                      </label>
+                      <Field
+                        name="theme"
+                        options={themeOptions}
+                        component={CustomSelect}
+                        placeholder="Select theme(s)..."
+                        isMulti={true}
+                        className={`${
+                          errors.theme && touched.theme
+                            ? "react-select-error"
+                            : ""
+                        }`}
+                      />
+                      <ErrorMessage
+                        name="theme"
+                        component="div"
+                        className="text-red-500 text-xs mt-1"
+                      />
+                    </div>
+
+                    {/* Lead Laboratory */}
+                    <div>
+                      <label
+                        className="font-semibold text-gray-700 block mb-1"
+                        htmlFor="leadLaboratory"
+                      >
+                        Lead Laboratory / Institute{" "}
+                        <span className="text-red-500">*</span>
+                      </label>
+                      <Field
+                        name="leadLaboratory"
+                        options={labOptions}
+                        component={CustomSelect}
+                        placeholder="Select lead lab..."
+                        className={`${
+                          errors.leadLaboratory && touched.leadLaboratory
+                            ? "react-select-error"
+                            : ""
+                        }`}
+                      />
+                      <ErrorMessage
+                        name="leadLaboratory"
+                        component="div"
+                        className="text-red-500 text-xs mt-1"
+                      />
+                    </div>
+
+                    {/* Multi Lab Radio */}
+                    <div className="border rounded-md bg-gray-50 p-3">
+                      <label className="font-semibold text-gray-700 block mb-1">
+                        Multi Laboratories Involved?{" "}
+                        <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex gap-4 mt-1">
+                        <label className="flex items-center text-sm">
+                          <Field
+                            type="radio"
+                            name="multiLabInstitute"
+                            value="Yes"
+                            className="mr-2"
+                          />
+                          Yes
+                        </label>
+                        <label className="flex items-center text-sm">
+                          <Field
+                            type="radio"
+                            name="multiLabInstitute"
+                            value="No"
+                            className="mr-2"
+                          />
+                          No
+                        </label>
+                      </div>
+                      <ErrorMessage
+                        name="multiLabInstitute"
+                        component="div"
+                        className="text-red-500 text-xs mt-1"
+                      />
+                    </div>
+
+                    {/* TRL */}
+                    <div>
+                      <label
+                        className="font-semibold text-gray-700 block mb-1"
+                        htmlFor="technologyLevel"
+                      >
+                        TRL <span className="text-red-500">*</span>
+                      </label>
+                      <Field
+                        as="select"
+                        name="technologyLevel"
+                        className={`w-full p-2.5 text-base rounded-md border ${
+                          errors.technologyLevel && touched.technologyLevel
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } focus:border-blue-500 outline-none bg-white`}
+                      >
+                        <option value="" label="Select TRL (0–9)" />
+                        {[...Array(10).keys()].map((i) => (
+                          <option key={i} value={String(i)}>
+                            {i}
+                          </option>
+                        ))}
+                      </Field>
+                      <ErrorMessage
+                        name="technologyLevel"
+                        component="div"
+                        className="text-red-500 text-xs mt-1"
+                      />
+                    </div>
+
+                    {/* Associated Labs if Yes */}
+                    {values.multiLabInstitute === "Yes" && (
+                      <div className="md:col-span-2">
+                        <label
+                          className="font-semibold text-gray-700 block mb-1"
+                          htmlFor="lab"
+                        >
+                          Specify Associated Labs{" "}
+                          <span className="text-red-500">*</span>
+                        </label>
+                        <Field
+                          name="lab"
+                          options={labOptions}
+                          component={CustomSelect}
+                          placeholder="Select associated lab(s)..."
+                          isMulti={true}
+                          className={`${
+                            errors.lab && touched.lab
+                              ? "react-select-error"
+                              : ""
+                          }`}
                         />
-                      )}
-                    </Field>
-                    <ErrorMessage
-                      name="yearDevelopment"
-                      component="div"
-                      className="text-red-500 text-sm mt-1"
-                    />
-                  </div>
-                  {/* --- Scale of Development (Spans 2) --- */}
-                  <div className="form-group md:col-span-2">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="scaleDevelopment">Scale of Development <span className="block text-sm font-normal text-gray-500">Max. 100 Chars</span></label>
-                    <Field name="scaleDevelopment" as="textarea" rows="2" maxLength="100" className={`w-full p-2 text-lg rounded-md border ${errors.scaleDevelopment && touched.scaleDevelopment ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
-                    <ErrorMessage name="scaleDevelopment" component="div" className="text-red-500 text-sm mt-1" />
-                  </div>
-
-                  {/* --- Brief Details (Spans 2) --- */}
-                  <div className="form-group md:col-span-2">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="briefTech"> Details of Technology <span className="text-red-500">*</span><span className="block text-sm font-normal text-gray-500">Max. 250 Chars</span></label>
-                    <Field name="briefTech" as="textarea" rows="4" maxLength="250" className={`w-full p-2 text-lg rounded-md border ${errors.briefTech && touched.briefTech ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
-                    <ErrorMessage name="briefTech" component="div" className="text-red-500 text-sm mt-1" />
-                  </div>
-
-                  {/* --- Competitive Positioning (Spans 2) --- */}
-                  <div className="form-group md:col-span-2">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="competitivePosition">Competitive Positioning (Global bench mark in the domain ) <span className="block text-sm font-normal text-gray-500">Max.250 Chars</span></label>
-                    <Field name="competitivePosition" as="textarea" rows="4" maxLength="250" className={`w-full p-2 text-lg rounded-md border ${errors.competitivePosition && touched.competitivePosition ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
-                    <ErrorMessage name="competitivePosition" component="div" className="text-red-500 text-sm mt-1" />
-                  </div>
-
-                  {/* --- Techno-economics (Spans 2) --- */}
-                  <div className="form-group md:col-span-2">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="technoEconomics">Techno-economics <span className="block text-sm font-normal text-gray-500">Max. 100 Chars</span></label>
-                    <Field name="technoEconomics" as="textarea" rows="4" maxLength="100" className={`w-full p-2 text-lg rounded-md border ${errors.technoEconomics && touched.technoEconomics ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
-                    <ErrorMessage name="technoEconomics" component="div" className="text-red-500 text-sm mt-1" />
-                  </div>
-
-                  {/* --- Potential Application Areas --- */}
-                  {/* <div className="form-group">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="potentialApplicationAreas">Potential Application Area(s)</label>
-                    <Field name="potentialApplicationAreas" options={potentialApplicationAreaOptions} component={CustomSelect} placeholder="Select Area(s)..." isMulti={true} />
-                    <ErrorMessage name="potentialApplicationAreas" component="div" className="text-red-500 text-sm mt-1" />
-                  </div> */}
-
-                  {/* --- Potential Ministries --- */}
-                  <div className="form-group">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="potentialMinistries">Potential Ministries(who may be benefited)</label>
-                    <Field name="potentialMinistries" options={potentialMinistryOptions} component={CustomSelect} placeholder="Select Ministries..." isMulti={true} />
-                    <ErrorMessage name="potentialMinistries" component="div" className="text-red-500 text-sm mt-1" />
-                  </div>
-
-                  {/* --- Environmental / Statutory (Spans 2) --- */}
-                  <div className="form-group md:col-span-2">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="environmentalStatutory">Environmental / Statutory Compliance <span className="block text-sm font-normal text-gray-500">Max. 300 Chars</span></label>
-                    <Field name="environmentalStatutory" as="textarea" rows="3" maxLength="300" className={`w-full p-2 text-lg rounded-md border ${errors.environmentalStatutory && touched.environmentalStatutory ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
-                    <ErrorMessage name="environmentalStatutory" component="div" className="text-red-500 text-sm mt-1" />
-                  </div>
-
-                  {/* --- Market Potential (Spans 2) --- */}
-                  {/* <div className="form-group md:col-span-2">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="marketPotential">Market Potential <span className="block text-sm font-normal text-gray-500">Max. 1000 Chars</span></label>
-                    <Field name="marketPotential" as="textarea" rows="4" maxLength="1000" className={`w-full p-2 text-lg rounded-md border ${errors.marketPotential && touched.marketPotential ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
-                    <ErrorMessage name="marketPotential" component="div" className="text-red-500 text-sm mt-1" />
-                  </div> */}
-
-                  {/* --- File Upload Section (Spans 2) --- */}
-                  <div className="form-group p-4 border border-dashed border-gray-400 rounded-md bg-gray-50 md:col-span-2">
-                    <label className="font-bold block mb-2 text-gray-700" htmlFor="file">Upload File (Optional)<span className="block text-sm font-normal text-gray-500">Image/PDF (Max 10MB)</span></label>
-                    {passedTRN && existingFileUrl && !isFileRemoved && (
-                      <div className="mb-3 flex gap-3 items-center">
-                        <button type="button" onClick={handleViewFile} className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">View Current</button>
-                        <button type="button" onClick={() => handleRemoveFile(setFieldValue)} className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">Remove Current</button>
-                        <span className="text-xs text-gray-600">(Will be replaced if you upload new)</span>
+                        <ErrorMessage
+                          name="lab"
+                          component="div"
+                          className="text-red-500 text-xs mt-1"
+                        />
                       </div>
                     )}
-                    {isFileRemoved && (<p className="text-sm text-orange-600 mb-2">Existing file marked for removal.</p>)}
-                    <input id="file" type="file" name="file" accept=".jpg,.jpeg,.png,.pdf" className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                      onChange={(event) => {
-                        const file = event.currentTarget.files[0];
-                        if (file && file.size > 10 * 1024 * 1024) { // 10MB check
-                          Swal.fire("File Too Large", "Maximum file size is 10MB.", "error");
-                          setFieldValue("file", null);
-                          event.currentTarget.value = null; // Clear the input
-                        } else {
-                          setFieldValue("file", file);
-                          setIsFileRemoved(false); // If they upload a new file, don't send the 'remove' flag
-                        }
-                      }}
-                    />
-                    <ErrorMessage name="file" component="div" className="text-red-500 text-sm mt-1" />
+
+                    {/* Year of Development */}
+                    <div>
+                      <label
+                        className="font-semibold text-gray-700 block mb-1"
+                        htmlFor="yearDevelopment"
+                      >
+                        Year of Development{" "}
+                        <span className="text-red-500">*</span>
+                        <span className="block text-xs font-normal text-gray-500">
+                          YYYY
+                        </span>
+                      </label>
+                      <Field name="yearDevelopment">
+                        {({ field, form }) => (
+                          <DatePicker
+                            selected={
+                              field.value ? new Date(field.value, 0, 1) : null
+                            }
+                            onChange={(date) => {
+                              const year = date?.getFullYear();
+                              form.setFieldValue(field.name, year);
+                            }}
+                            showYearPicker
+                            dateFormat="yyyy"
+                            placeholderText="Select year..."
+                            className={`w-full p-2.5 text-base rounded-md border ${
+                              form.errors.yearDevelopment &&
+                              form.touched.yearDevelopment
+                                ? "border-red-500"
+                                : "border-gray-300"
+                            } focus:border-blue-500 outline-none`}
+                          />
+                        )}
+                      </Field>
+                      <ErrorMessage
+                        name="yearDevelopment"
+                        component="div"
+                        className="text-red-500 text-xs mt-1"
+                      />
+                    </div>
+
+                    {/* Scale of Development */}
+                    <div>
+                      <label
+                        className="font-semibold text-gray-700 block mb-1"
+                        htmlFor="scaleDevelopment"
+                      >
+                        Scale of Development
+                        <span className="block text-xs font-normal text-gray-500">
+                          Max. 250 characters
+                        </span>
+                      </label>
+                      <Field
+                        name="scaleDevelopment"
+                        as="textarea"
+                        rows="2"
+                        maxLength="250"
+                        className={`w-full p-2.5 text-base rounded-md border ${
+                          errors.scaleDevelopment && touched.scaleDevelopment
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } focus:border-blue-500 outline-none`}
+                      />
+                      <ErrorMessage
+                        name="scaleDevelopment"
+                        component="div"
+                        className="text-red-500 text-xs mt-1"
+                      />
+                    </div>
+
+                    {/* Brief Details (full width) */}
+                    <div className="md:col-span-2">
+                      <label
+                        className="font-semibold text-gray-700 block mb-1"
+                        htmlFor="briefTech"
+                      >
+                        Details of Technology{" "}
+                        <span className="text-red-500">*</span>
+                        <span className="block text-xs font-normal text-gray-500">
+                          Max. 1000 characters
+                        </span>
+                      </label>
+                      <Field
+                        name="briefTech"
+                        as="textarea"
+                        rows="4"
+                        maxLength="1000"
+                        className={`w-full p-2.5 text-base rounded-md border ${
+                          errors.briefTech && touched.briefTech
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } focus:border-blue-500 outline-none`}
+                      />
+                      <ErrorMessage
+                        name="briefTech"
+                        component="div"
+                        className="text-red-500 text-xs mt-1"
+                      />
+                    </div>
+
+                    {/* Competitive Positioning (full width) */}
+                    <div className="md:col-span-2">
+                      <label
+                        className="font-semibold text-gray-700 block mb-1"
+                        htmlFor="competitivePosition"
+                      >
+                        Competitive Positioning (Global benchmark in the domain)
+                        <span className="block text-xs font-normal text-gray-500">
+                          Max. 1500 characters
+                        </span>
+                      </label>
+                      <Field
+                        name="competitivePosition"
+                        as="textarea"
+                        rows="4"
+                        maxLength="1500"
+                        className={`w-full p-2.5 text-base rounded-md border ${
+                          errors.competitivePosition &&
+                          touched.competitivePosition
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } focus:border-blue-500 outline-none`}
+                      />
+                      <ErrorMessage
+                        name="competitivePosition"
+                        component="div"
+                        className="text-red-500 text-xs mt-1"
+                      />
+                    </div>
+
+                    {/* Techno-economics (full width) */}
+                    <div className="md:col-span-2">
+                      <label
+                        className="font-semibold text-gray-700 block mb-1"
+                        htmlFor="technoEconomics"
+                      >
+                        Techno-economics
+                        <span className="block text-xs font-normal text-gray-500">
+                          Max. 1500 characters
+                        </span>
+                      </label>
+                      <Field
+                        name="technoEconomics"
+                        as="textarea"
+                        rows="4"
+                        maxLength="1500"
+                        className={`w-full p-2.5 text-base rounded-md border ${
+                          errors.technoEconomics && touched.technoEconomics
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } focus:border-blue-500 outline-none`}
+                      />
+                      <ErrorMessage
+                        name="technoEconomics"
+                        component="div"
+                        className="text-red-500 text-xs mt-1"
+                      />
+                    </div>
+
+                    {/* Potential Ministries */}
+                    <div>
+                      <label
+                        className="font-semibold text-gray-700 block mb-1"
+                        htmlFor="potentialMinistries"
+                      >
+                        Potential Ministries (who may be benefited)
+                      </label>
+                      <Field
+                        name="potentialMinistries"
+                        options={potentialMinistryOptions}
+                        component={CustomSelect}
+                        placeholder="Select ministries..."
+                        isMulti={true}
+                      />
+                      <ErrorMessage
+                        name="potentialMinistries"
+                        component="div"
+                        className="text-red-500 text-xs mt-1"
+                      />
+                    </div>
+
+                    {/* Environmental / Statutory */}
+                    <div>
+                      <label
+                        className="font-semibold text-gray-700 block mb-1"
+                        htmlFor="environmentalStatutory"
+                      >
+                        Environmental / Statutory Compliance
+                        <span className="block text-xs font-normal text-gray-500">
+                          Max. 300 characters
+                        </span>
+                      </label>
+                      <Field
+                        name="environmentalStatutory"
+                        as="textarea"
+                        rows="3"
+                        maxLength="300"
+                        className={`w-full p-2.5 text-base rounded-md border ${
+                          errors.environmentalStatutory &&
+                          touched.environmentalStatutory
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } focus:border-blue-500 outline-none`}
+                      />
+                      <ErrorMessage
+                        name="environmentalStatutory"
+                        component="div"
+                        className="text-red-500 text-xs mt-1"
+                      />
+                    </div>
+
+                    {/* File Upload (full width) */}
+                    <div className="md:col-span-2">
+                      <div className="p-4 border border-dashed border-gray-300 rounded-md bg-gray-50">
+                        <label
+                          className="font-semibold text-gray-700 block mb-1"
+                          htmlFor="file"
+                        >
+                          Upload File (Optional)
+                          <span className="block text-xs font-normal text-gray-500">
+                            Image/PDF (Max 10MB)
+                          </span>
+                        </label>
+                        {passedTRN && existingFileUrl && !isFileRemoved && (
+                          <div className="mb-3 flex flex-wrap gap-3 items-center">
+                            <button
+                              type="button"
+                              onClick={handleViewFile}
+                              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-medium"
+                            >
+                              View Current
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveFile(setFieldValue)}
+                              className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-medium"
+                            >
+                              Remove Current
+                            </button>
+                            <span className="text-xs text-gray-600">
+                              (Will be replaced if you upload new)
+                            </span>
+                          </div>
+                        )}
+                        {isFileRemoved && (
+                          <p className="text-xs text-orange-600 mb-2">
+                            Existing file marked for removal.
+                          </p>
+                        )}
+                        <input
+                          id="file"
+                          type="file"
+                          name="file"
+                          accept=".jpg,.jpeg,.png,.pdf"
+                          className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                          onChange={(event) => {
+                            const file = event.currentTarget.files[0];
+                            if (file && file.size > 10 * 1024 * 1024) {
+                              Swal.fire(
+                                "File Too Large",
+                                "Maximum file size is 10MB.",
+                                "error"
+                              );
+                              setFieldValue("file", null);
+                              event.currentTarget.value = null;
+                            } else {
+                              setFieldValue("file", file);
+                              setIsFileRemoved(false);
+                            }
+                          }}
+                        />
+                        <ErrorMessage
+                          name="file"
+                          component="div"
+                          className="text-red-500 text-xs mt-1"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Laboratory Details (full width) */}
+                    <div className="md:col-span-2">
+                      <label
+                        className="font-semibold text-gray-700 block mb-1"
+                        htmlFor="laboratoryDetail"
+                      >
+                        Laboratory Details{" "}
+                        <span className="text-red-500">*</span>
+                        <span className="block text-xs font-normal text-gray-500">
+                          Max. 300 characters
+                        </span>
+                      </label>
+                      <Field
+                        name="laboratoryDetail"
+                        as="textarea"
+                        rows="3"
+                        maxLength="300"
+                        className={`w-full p-2.5 text-base rounded-md border ${
+                          errors.laboratoryDetail && touched.laboratoryDetail
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } focus:border-blue-500 outline-none`}
+                      />
+                      <ErrorMessage
+                        name="laboratoryDetail"
+                        component="div"
+                        className="text-red-500 text-xs mt-1"
+                      />
+                    </div>
                   </div>
 
+                  {/* Buttons */}
+                  <div className="flex flex-wrap justify-end gap-3 pt-4 border-t border-gray-100">
+                    <button
+                      type="button"
+                      onClick={() => navigate("/ViewTechnology")}
+                      className="px-5 py-2 rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 text-sm font-semibold"
+                      disabled={isSubmitting}
+                    >
+                      Cancel
+                    </button>
 
-                  {/* --- Laboratory Details (Spans 2) --- */}
-                  <div className="form-group md:col-span-2">
-                    <label className="font-bold block mb-1 text-gray-700" htmlFor="laboratoryDetail">Laboratory Details <span className="text-red-500">*</span><span className="block text-sm font-normal text-gray-500">Max. 300 Chars</span></label>
-                    <Field name="laboratoryDetail" as="textarea" rows="3" maxLength="300" className={`w-full p-2 text-lg rounded-md border ${errors.laboratoryDetail && touched.laboratoryDetail ? 'border-red-500' : 'border-gray-300'} focus:border-indigo-500 outline-none`} />
-                    <ErrorMessage name="laboratoryDetail" component="div" className="text-red-500 text-sm mt-1" />
+                    {passedTRN ? (
+                      <>
+                        <button
+                          type="submit"
+                          className="px-5 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700 text-sm font-semibold"
+                          disabled={isSubmitting}
+                        >
+                          {isSubmitting ? "Updating..." : "Update Section"}
+                        </button>
+
+                        <button
+                          type="button"
+                          className="px-5 py-2 rounded-md text-white bg-green-600 hover:bg-green-700 text-sm font-semibold"
+                          onClick={() =>
+                            navigate("/sectionTwo", {
+                              state: {
+                                technologyRefNo: generatedRefNo || passedTRN,
+                              },
+                            })
+                          }
+                        >
+                          Section Two Next →
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        type="submit"
+                        className="px-5 py-2 rounded-md text-white bg-green-600 hover:bg-green-700 text-sm font-semibold"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting
+                          ? "Saving & Going Next..."
+                          : "Section Two Next →"}
+                      </button>
+                    )}
                   </div>
-
-                </div>
-                {/* --- END: 2-COLUMN GRID --- */}
-
-                {/* --- Form Buttons --- */}
-                <div className="flex justify-end space-x-4 mt-8">
-                  <button type="button" onClick={() => navigate('/ViewTechnology')} className="px-6 py-2 rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 font-semibold" disabled={isSubmitting}>Cancel</button>
-                  <button type="submit" className="px-6 py-2 rounded-md text-white bg-green-600 hover:bg-green-700 font-semibold" disabled={isSubmitting}>
-                    {isSubmitting ? (passedTRN ? "Updating..." : "Saving...") : (passedTRN ? "Save & Next" : "Save & Next")}
-                  </button>
-                </div>
-
-                {/* --- Debugging: Show Formik state ---
-                <pre className="mt-4 p-4 bg-gray-100 rounded-md text-xs overflow-auto">
-                  <strong>Formik Values:</strong><br />
-                  {JSON.stringify(values, null, 2)}
-                  <br /><br />
-                  <strong>Formik Errors:</strong><br />
-                  {JSON.stringify(errors, null, 2)}
-                </pre>
-                */}
-
-              </Form>
-            )}
-          </Formik>
+                </Form>
+              )}
+            </Formik>
+          </div>
         </div>
+
+        {/* Right empty space (25%) */}
+        <div className="hidden md:block md:w-1/4" />
       </div>
+
       <FooterBar />
 
       <FileViewerModal

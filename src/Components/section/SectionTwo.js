@@ -601,7 +601,8 @@ const SectionTwo = () => {
           <div className="flex justify-center items-center gap-6 mt-10 border-t pt-6">
             <button
               type="button"
-              onClick={() => navigate("/sectionOne", { state: { technologyRefNo } })}
+              // onClick={() => navigate("/sectionOne", { state: { technologyRefNo } })}
+              onClick={() => navigate(`/sectionOne/${technologyRefNo}`)}
               className="bg-gray-600 text-white px-6 py-3 rounded hover:bg-gray-700 font-semibold"
             >
               ← Previous (Section 1)

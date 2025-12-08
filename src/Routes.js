@@ -1,5 +1,6 @@
+// AppRoutes.jsx
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "Components/auth/Login";
 import Signup from "Components/auth/Signup";
 import SectionOne from "Components/section/SectionOne";
@@ -19,23 +20,77 @@ import OTPLoginVerify from "Components/auth/OtpLoginVerify";
 import ForgetPassword from "Components/auth/forgetPassword";
 import ViewTechnology from "Components/pages/view/viewTechnology";
 import TechnologyDetails from "Components/pages/view/TechnologyDetails";
+import { useAuth } from "Components/auth/AuthContext";
 
 const AppRoutes = () => {
+  const { isOtpVerified, isAuthenticated } = useAuth();
+
   return (
     <Routes>
+      {/* Public / unprotected */}
       <Route path="/" element={<WelcomePage />} />
-      <Route path="welcomePage" element={<WelcomePage />} />
-      <Route path="signup" element={<Signup />} />
-      <Route path="Login" element={<Login />} />
-      <Route path="pendingData" element={<PendingData />} />
-      <Route path="otpLoginVerify" element={<OTPLoginVerify />} />
-      <Route path="forgetPassword" element={<ForgetPassword />} />
-        <Route path="/ViewTechnology" element={<ViewTechnology />} />
-  <Route path="/technology/:trnNo" element={<TechnologyDetails />} />
+      <Route path="/welcomePage" element={<WelcomePage />} />
 
-      {/* Protected Routes */}
+      {/* If user is already authenticated, redirect away from login/signup */}
       <Route
-        path="SectionOne"
+        path="/login"
+        element={isAuthenticated ? <Navigate to="/viewTechnology" replace /> : <Login />}
+      />
+      <Route
+        path="/signup"
+        element={isAuthenticated ? <Navigate to="/viewTechnology" replace /> : <Signup />}
+      />
+
+      {/* Keep pending/OTP/forget publicly accessible but redirect OTP if already verified */}
+      <Route path="/pendingData" element={<PendingData />} />
+      <Route
+        path="/otpLoginVerify"
+        element={isOtpVerified ? <Navigate to="/welcomePage" replace /> : <OTPLoginVerify />}
+      />
+      <Route path="/forgetPassword" element={<ForgetPassword />} />
+
+      {/* Dashboard alias */}
+      <Route
+        path="/dashboard"
+        element={isAuthenticated ? <WelcomePage /> : <Navigate to="/login" replace />}
+      />
+
+      {/* ViewTechnology protected */}
+      <Route
+        path="/viewTechnology"
+        element={
+          <PrivateRoute>
+            <ViewTechnology />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Keep old-cased route for backwards compatibility but redirect to canonical one */}
+      <Route path="/ViewTechnology" element={<Navigate to="/viewTechnology" replace />} />
+
+      {/* Technology details (protected if needed) */}
+      <Route
+        path="/technology/:trnNo"
+        element={
+          <PrivateRoute>
+            <TechnologyDetails />
+          </PrivateRoute>
+        }
+      />
+
+      {/* SectionOne by ref (this might be used for edit/prefill - protect if needed) */}
+      <Route
+        path="/sectionOne/:technologyRefNo"
+        element={
+          <PrivateRoute>
+            <SectionOne />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Protected pages grouped */}
+      <Route
+        path="/SectionOne"
         element={
           <PrivateRoute>
             <SectionOne />
@@ -43,7 +98,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="SectionTwo"
+        path="/SectionTwo"
         element={
           <PrivateRoute>
             <SectionTwo />
@@ -51,7 +106,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="SectionThree"
+        path="/SectionThree"
         element={
           <PrivateRoute>
             <SectionThree />
@@ -59,7 +114,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="SectionFour"
+        path="/SectionFour"
         element={
           <PrivateRoute>
             <SectionFour />
@@ -67,7 +122,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="techSearch"
+        path="/techSearch"
         element={
           <PrivateRoute>
             <TechSearch />
@@ -75,87 +130,51 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="PreviewPopUp"
+        path="/PreviewPopUp"
         element={
           <PrivateRoute>
             <PreviewPopUp />
           </PrivateRoute>
         }
       />
-      <Route
-        path="editSectionOne"
-        element={
-          <PrivateRoute>
-            <EditSectionOne />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="editSectionTwo"
-        element={
-          <PrivateRoute>
-            <EditSectionTwo />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="editSectionThree"
-        element={
-          <PrivateRoute>
-            <EditSectionThree />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="editSectionFour"
-        element={
-          <PrivateRoute>
-            <EditSectionFour />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="EditSectionOne"
-        element={
-          <PrivateRoute>
-            <EditSectionOne />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="EditSectionTwo"
-        element={
-          <PrivateRoute>
-            <EditSectionTwo />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="EditSectionThree"
-        element={
-          <PrivateRoute>
-            <EditSectionThree />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="EditSectionFour"
-        element={
-          <PrivateRoute>
-            <EditSectionFour />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="viewTechnology"
-        element={
-          <PrivateRoute>
-            <ViewTechnology />
-          </PrivateRoute>
-        }
-      />
-    </Routes>
 
+      {/* Edit routes */}
+      <Route
+        path="/editSectionOne"
+        element={
+          <PrivateRoute>
+            <EditSectionOne />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/editSectionTwo"
+        element={
+          <PrivateRoute>
+            <EditSectionTwo />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/editSectionThree"
+        element={
+          <PrivateRoute>
+            <EditSectionThree />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/editSectionFour"
+        element={
+          <PrivateRoute>
+            <EditSectionFour />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 };
 
