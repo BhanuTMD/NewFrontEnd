@@ -2,8 +2,25 @@ import React from "react";
 
 const Section = ({ sectionLine }) => {
   return (
-    <div className="flex justify-between ">
-      <h2 className="text-2xl w-full m-1 font-bold mb-4 text-center bg-[#81abff] border-solid border-2 me-0 border-black rounded-[0.5rem] p-1">
+    <div className="w-full flex justify-center my-4">
+      <h2
+        className="
+          w-full 
+          max-w-4xl 
+          text-center 
+          text-xl sm:text-2xl 
+          font-extrabold 
+          tracking-wide 
+          text-white 
+          bg-gradient-to-r from-indigo-500 via-sky-500 to-cyan-400
+          shadow-md 
+          rounded-xl 
+          py-3 
+          px-4 
+          border border-white/30 
+          backdrop-blur-sm
+        "
+      >
         {sectionLine}
       </h2>
     </div>

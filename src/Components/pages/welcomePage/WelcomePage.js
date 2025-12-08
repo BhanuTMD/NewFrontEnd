@@ -1,120 +1,184 @@
+import React from "react";
+import NavBar from "Components/common/navBar";
+import "./WelcomePage.css"; // agar isme extra styles hai to rehne do, warna hata bhi sakta hai
+
+const WelcomePage = () => {
+  return (
+    <div className="flex min-h-screen w-screen flex-col bg-gradient-to-b from-sky-50 via-white to-indigo-50">
+      {/* Top Nav */}
+      <NavBar />
+
+      {/* Main Content */}
+      <main className="flex flex-1 flex-col items-center px-4 pb-10 pt-10 sm:px-6 lg:px-8">
+        {/* Hero Card */}
+        <section className="flex w-full max-w-5xl flex-col items-center rounded-3xl bg-white/80 p-6 shadow-lg ring-1 ring-black/5 backdrop-blur-sm sm:p-10">
+          {/* Logo */}
+          <div className="mb-4 flex items-center justify-center">
+            <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-blue-50 shadow-inner sm:h-24 sm:w-24">
+              <img
+                src="/logo.jpg"
+                alt="CSIR Logo"
+                className="h-18 w-18 rounded-full object-contain sm:h-22 sm:w-22"
+              />
+            </div>
+          </div>
+          {/* Hindi / English Text */}
+          <div className="mb-6 text-center text-2xl  tracking-tight text-slate-800 sm:text-xl">
+            <p className="font-semibold ">
+              वैज्ञानिक तथा औद्योगिक अनुसंधान परिषद्
+            </p>
+            <p className="text-blue-600 font-semibold">Council of Scientific &amp; Industrial Research</p>
+            <p className="text-blue-600 font-semibold">Ministry of Science &amp; Technology, Govt. of India</p>
+          </div>
+          {/* Heading */}
+          <h1 className="mb-3 text-center text-2xl font-extrabold tracking-tight text-slate-700 sm:text-2xl lg:text-1xl">
+            Technology Database Management Portal
+          </h1>
+          <p className="mb-6 text-center text-xs font-semibold   uppercase tracking-[0.22em] text-blue-600 sm:text-sm">
+         Developed by Technology Management Directorate (TMD), CSIR-HQ
+          </p>
+  
+          {/* Small divider */}
+          <div className="mb-4 h-px w-20 rounded-full bg-gradient-to-r from-transparent via-indigo-400 to-transparent" />
+
+          {/* Short tagline */}
+          <p className="max-w-2xl text-center text-xs text-slate-600 sm:text-s">
+            “A digital gateway that transforms CSIR’s innovations into accessible knowledge, enabling industry, government, and citizens to explore, 
+            evaluate, and engage with our diverse technology portfolio.”
+          </p>
+        </section>
+
+        {/* Info / Description */}
+        <section className="mt-8 w-full max-w-5xl rounded-3xl bg-gradient-to-r from-indigo-50 via-sky-50 to-blue-50 p-5 sm:p-7 lg:p-8 shadow-sm ring-1 ring-indigo-100/70">
+          <h2 className="mb-3 text-base font-bold text-slate-800 sm:text-lg">
+            About the Technology Management Directorate (TMD)
+          </h2>
+
+          <p className="mb-3 text-sm font-medium text-slate-700 sm:text-base">
+            Technology Management Directorate (TMD) facilitates CSIR&apos;s
+            engagement with ministries, industry, and citizens by offering
+            innovative solutions and services.
+          </p>
+
+          <ul className="mt-2 space-y-2 text-sm text-slate-800 sm:text-base">
+            <li className="flex items-start gap-2">
+              <span className="mt-[6px] h-2 w-2 flex-shrink-0 rounded-full bg-indigo-500" />
+              <span>Robust portal for managing CSIR lab technologies</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-[6px] h-2 w-2 flex-shrink-0 rounded-full bg-indigo-500" />
+              <span>Enables collaboration and fast access to validated data</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-[6px] h-2 w-2 flex-shrink-0 rounded-full bg-indigo-500" />
+              <span>Supports commercialization, licensing, and policy decisions</span>
+            </li>
+          </ul>
+        </section>
+      </main>
+
+      {/* Footer */}
+      <footer className="w-full bg-indigo-700/95 py-2 text-center text-xs text-indigo-50 sm:text-sm">
+        Created &amp; Maintained by CSIR - Technology Management Directorate,
+        New Delhi
+      </footer>
+    </div>
+  );
+};
+
+export default WelcomePage;
+
+
+
+//  another version`
 // import React from "react";
-// import "./WelcomePage.css";
 // import NavBar from "Components/common/navBar";
+// import "./WelcomePage.css"; // agar isme extra styles hai to rehne do, warna hata bhi sakta hai
 
 // const WelcomePage = () => {
 //   return (
-//     <div className="h-screen w-screen overflow-hidden flex flex-col bg-white">
+//     <div className="flex min-h-screen w-screen flex-col bg-gradient-to-b from-sky-50 via-white to-indigo-50">
+//       {/* Top Nav */}
 //       <NavBar />
-//      <div className="w-full px-2 sm:px-6 pt-2">
-//   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-6 w-full">
 
-//     {/* 👉 Logo + Paragraph as a group */}
-//     <div className="flex items-start gap-2 sm:gap-3">
-//       {/* Logo */}
-//       <div className="flex-shrink-0">
-//         <img src="/logo.jpg" alt="CSIR-Logo" className="w-20 sm:w-24 h-auto" />
-//       </div>
+//       {/* Main Content */}
+//       <main className="flex flex-1 flex-col items-center px-4 pb-10 pt-10 sm:px-6 lg:px-8">
+//         {/* Hero Card */}
+//         <section className="flex w-full max-w-5xl flex-col items-center rounded-3xl bg-white/80 p-6 shadow-lg ring-1 ring-black/5 backdrop-blur-sm sm:p-10">
+//           {/* Logo */}
+//           <div className="mb-4 flex items-center justify-center">
+//             <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-blue-50 shadow-inner sm:h-24 sm:w-24">
+//               <img
+//                 src="/logo.jpg"
+//                 alt="CSIR Logo"
+//                 className="h-16 w-16 rounded-full object-contain sm:h-20 sm:w-20"
+//               />
+//             </div>
+//           </div>
 
-//       {/* Paragraph */}
-//       <div className="text-[11px] sm:text-sm font-medium text-gray-700 leading-snug text-left">
-//         <p>
-//           वैज्ञानिक तथा औद्योगिक अनुसंधान परिषद् <br />
-//           Council of Scientific & Industrial Research <br />
-//           (विज्ञान एवं प्रौद्योगिकी मंत्रालय, भारत सरकार) <br />
-//           Ministry of Science & Technology, Govt. of India
-//         </p>
-//       </div>
-//     </div>
-
-//     {/* Heading */}
-//     <div className="text-sm sm:text-lg font-bold text-blue-700 text-left sm:text-right sm:max-w-xs">
-//       Technology Database Management Portal (TDMP)
-//     </div>
-//   </div>
-// </div>
-
-
-//       {/* Description Section */}
-//       <div className="flex-grow flex flex-col items-center justify-start mt-6 w-full px-4 sm:px-12 overflow-auto">
-//         <div className="w-full text-left text-sm sm:text-base font-medium text-gray-700 leading-relaxed">
-//           <p className="mb-3">
-//             Technology Management Directorate (TMD) facilitates CSIR connect with Line Ministries,
-//             State Governments and other organizations on one hand, and with industry on the other
-//             for providing high-quality technology-based products/solutions/services as well as
-//             competitive advantage to citizens of the country.
+//           {/* Heading */}
+//           <h1 className="mb-3 text-center text-2xl font-extrabold tracking-tight text-slate-800 sm:text-3xl lg:text-4xl">
+//             Technology Database Management Portal
+//           </h1>
+//           <p className="mb-6 text-center text-xs font-semibold uppercase tracking-[0.22em] text-blue-600 sm:text-sm">
+//             TDMP · Council of Scientific & Industrial Research
 //           </p>
-//           <p className="mb-3">The Directorate is responsible for:</p>
-//           <ul className="list-disc list-inside space-y-2 text-gray-900">
-//             <li>TDMP is a robust and dynamic data feeding portal designed specifically for Technologies/Know-how developed by CSIR labs.</li>
-//             <li>It enables the CSIR-Technology Management Directorate (TMD) to easily manage and access up-to-date information across all CSIR labs.</li>
-//             <li>TDMP fosters collaboration between labs and supports quick, informed decision-making.</li>
-//             <li>It also plays a key role in promoting the commercialization and licensing of CSIR technologies, connecting innovations with industry needs.</li>
+
+//           {/* Hindi / English Text */}
+//           <div className="mb-6 text-center text-sm leading-relaxed text-slate-700 sm:text-base">
+//             <p className="font-semibold">
+//               वैज्ञानिक तथा औद्योगिक अनुसंधान परिषद्
+//             </p>
+//             <p>Council of Scientific &amp; Industrial Research</p>
+//             <p>Ministry of Science &amp; Technology, Govt. of India</p>
+//           </div>
+
+//           {/* Small divider */}
+//           <div className="mb-4 h-px w-20 rounded-full bg-gradient-to-r from-transparent via-indigo-400 to-transparent" />
+
+//           {/* Short tagline */}
+//           <p className="max-w-2xl text-center text-xs text-slate-600 sm:text-sm">
+//             A unified digital platform to capture, manage, and showcase CSIR lab
+//             technologies for policy makers, industry partners, and citizens.
+//           </p>
+//         </section>
+
+//         {/* Info / Description */}
+//         <section className="mt-8 w-full max-w-5xl rounded-3xl bg-gradient-to-r from-indigo-50 via-sky-50 to-blue-50 p-5 sm:p-7 lg:p-8 shadow-sm ring-1 ring-indigo-100/70">
+//           <h2 className="mb-3 text-base font-bold text-slate-800 sm:text-lg">
+//             About the Technology Management Directorate (TMD)
+//           </h2>
+
+//           <p className="mb-3 text-sm font-medium text-slate-700 sm:text-base">
+//             Technology Management Directorate (TMD) facilitates CSIR&apos;s
+//             engagement with ministries, industry, and citizens by offering
+//             innovative solutions and services.
+//           </p>
+
+//           <ul className="mt-2 space-y-2 text-sm text-slate-800 sm:text-base">
+//             <li className="flex items-start gap-2">
+//               <span className="mt-[6px] h-2 w-2 flex-shrink-0 rounded-full bg-indigo-500" />
+//               <span>Robust portal for managing CSIR lab technologies</span>
+//             </li>
+//             <li className="flex items-start gap-2">
+//               <span className="mt-[6px] h-2 w-2 flex-shrink-0 rounded-full bg-indigo-500" />
+//               <span>Enables collaboration and fast access to validated data</span>
+//             </li>
+//             <li className="flex items-start gap-2">
+//               <span className="mt-[6px] h-2 w-2 flex-shrink-0 rounded-full bg-indigo-500" />
+//               <span>Supports commercialization, licensing, and policy decisions</span>
+//             </li>
 //           </ul>
-//         </div>
-//       </div>
+//         </section>
+//       </main>
 
 //       {/* Footer */}
-//       <div className="bg-indigo-500 text-white font-semibold py-2 text-center w-full">
-//         <p className="inline-block marquee-animation whitespace-nowrap overflow-hidden">
-//           Created & Maintained by Technology Management Directorate, CSIR, Headquarter, New Delhi
-//         </p>
-//       </div>
+//       <footer className="w-full bg-indigo-700/95 py-2 text-center text-xs text-indigo-50 sm:text-sm">
+//         Created &amp; Maintained by CSIR - Technology Management Directorate,
+//         New Delhi
+//       </footer>
 //     </div>
 //   );
 // };
 
 // export default WelcomePage;
-
-
-
-import React from "react";
-import "./WelcomePage.css";
-import NavBar from "Components/common/navBar";
-
-const WelcomePage = () => {
-  return (
-    <div className="min-h-screen w-screen bg-white flex flex-col">
-      <NavBar />
-
-      {/* Hero Section */}
-      <div className="flex-grow flex flex-col items-center justify-start pt-12 sm:pt-20 px-4 sm:px-8 text-center bg-gradient-to-b from-blue-50 to-white">
-        {/* Bigger Logo */}
-        <img src="/logo.jpg" alt="CSIR Logo" className="w-28 sm:w-36 mb-4" />
-
-        {/* Bigger Heading */}
-        <h1 className="text-2xl sm:text-3xl font-bold text-blue-800 mb-3">
-          Technology Database Management Portal (TDMP)
-        </h1>
-
-        {/* Bigger Paragraph */}
-        <p className="text-gray-700 text-base sm:text-lg max-w-3xl leading-relaxed">
-          वैज्ञानिक तथा औद्योगिक अनुसंधान परिषद् <br />
-          Council of Scientific & Industrial Research <br />
-          Ministry of Science & Technology, Govt. of India
-        </p>
-      </div>
-
-      {/* Description */}
-      <div className="bg-blue-100/30 px-6 py-6 sm:py-10 sm:px-12 text-left">
-        <p className="text-sm sm:text-base mb-3 text-gray-700 font-semibold">
-          Technology Management Directorate (TMD) facilitates CSIR connect with ministries,
-          industry, and citizens by offering innovative solutions and services.
-        </p>
-        <ul className="list-disc list-inside space-y-2 text-gray-800 text-sm sm:text-base">
-          <li>Robust portal for managing CSIR lab technologies</li>
-          <li>Enables collaboration and fast access to data</li>
-          <li>Helps with commercialization and licensing</li>
-        </ul>
-      </div>
-
-      {/* Footer */}
-      <div className="bg-indigo-600 text-white text-center py-2 text-sm">
-        Created & Maintained by CSIR - Technology Management Directorate, New Delhi
-      </div>
-    </div>
-  );
-    };
-
-export default WelcomePage;
-
