@@ -34,11 +34,11 @@ const AppRoutes = () => {
       {/* If user is already authenticated, redirect away from login/signup */}
       <Route
         path="/login"
-        element={isAuthenticated ? <Navigate to="/viewTechnology" replace /> : <Login />}
+        element={isAuthenticated ? <Navigate to="/WelcomPage" replace /> : <Login />}
       />
       <Route
         path="/signup"
-        element={isAuthenticated ? <Navigate to="/viewTechnology" replace /> : <Signup />}
+        element={isAuthenticated ? <Navigate to="/login" replace /> : <Signup />}
       />
 
       {/* Keep pending/OTP/forget publicly accessible but redirect OTP if already verified */}
