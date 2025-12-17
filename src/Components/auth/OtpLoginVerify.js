@@ -81,10 +81,10 @@ const OTPLoginVerify = () => {
         showConfirmButton: false,
       });
 
-      navigate("/viewTechnology", { replace: true });
+      navigate("/welcomePage", { replace: true });
     } catch (err) {
       console.error(err);
-      if (err.response && err.response.status === 400) {
+      if (err.response?.status === 400) {
         setErrorMsg("Invalid or expired OTP. Please try again.");
         Swal.fire("Error", "Invalid or expired OTP.", "error");
       } else {

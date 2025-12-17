@@ -70,27 +70,30 @@ function NavBar() {
               >
                 <span className="relative h-9 w-9 rounded-2xl bg-gradient-to-tr from-white via-sky-100 to-amber-100 text-indigo-700 flex items-center justify-center text-lg font-extrabold shadow-md">
                   <span className="absolute inset-0 rounded-2xl border border-white/70/0" />
-                  T
+                  <img src="./logo.jpg" alt="CSIR Logo" className="h-15 w-15 rounded-2xl object-contain" />
                 </span>
                 <span className="hidden sm:flex flex-col leading-tight">
-                  <span className="flex items-center gap-1 text-[10px] uppercase tracking-[0.2em] text-white/80">
+                  <span className="flex items-center gap-1 text-[10px] uppercase tracking-[0.2em] text-white/100">
                     <Sparkles className="h-3 w-3" />
-                    Technology Portal
+                    Technology Database <br/> Management Portal
                   </span>
-                  <span className="text-sm font-bold text-white">
-                    CSIR Tech Catalog
-                  </span>
+                  {/* <span className="text-sm font-bold text-white ml-7">
+                    CSIR(TMD)
+                  </span> */}
                 </span>
               </Link>
 
               {/* Desktop Menu */}
               <div className="hidden items-center gap-2 sm:flex">
+                
                 <Link
                   to="/welcomePage"
-                  className="rounded-full px-3 py-1.5 text-xs sm:text-sm font-semibold text-white/90 hover:bg-white/15 hover:text-white transition-colors"
+                  className="rounded-full px-3 py-1.5 text-xs sm:text-sm font-semibold text-white/100 hover:bg-white/15 hover:text-white transition-colors"
                 >
                   Home
                 </Link>
+               
+
 
                 {isAuthenticated && (
                   <>
@@ -161,7 +164,7 @@ function NavBar() {
                             className="block px-4 py-2.5 hover:bg-indigo-50 text-sm"
                             onClick={() => setIsDropdownOpen(false)}
                           >
-                            Review Submissions
+                            My Submissions
                           </Link>
                         </div>
                       )}
@@ -198,7 +201,7 @@ function NavBar() {
                     to="/Login"
                     className="rounded-full bg-white px-4 py-1.5 text-xs sm:text-sm font-semibold text-indigo-700 shadow-sm hover:bg-slate-100 transition-colors"
                   >
-                    Sign In
+                    Log In
                   </Link>
                   <Link
                     to="/Signup"
@@ -322,7 +325,7 @@ function NavBar() {
                     className="block rounded-xl bg-white px-3 py-2 text-center font-semibold text-indigo-700 hover:bg-slate-100"
                     onClick={toggleMobileMenu}
                   >
-                    Sign In
+                    Log In
                   </Link>
                   <Link
                     to="/Signup"

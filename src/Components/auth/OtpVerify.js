@@ -101,26 +101,26 @@
 //   );
 // };
 
-// export default OTPVerify;
-import { useAuth } from "./AuthContext"; // Adjust path
-import { useNavigate } from "react-router-dom";
+// // export default OTPVerify;
+// import { useAuth } from "./AuthContext"; // Adjust path
+// import { useNavigate } from "react-router-dom";
 
-const OTPVerificationPage = () => {
-  const { verifyOtp } = useAuth();
-  const navigate = useNavigate();
-  const handleVerify = () => {
-    // Example OTP logic: replace with real validation
-    const success = true; // Set to true or false based on your OTP validation logic
-    if (success) {
-      verifyOtp(); // Mark as verified
-      navigate("/dashboard"); // Go to next page
-    }
-  };
-  return (
-    <div>
-      {/* Your OTP form */}
-    </div>
-  );
-};
+// const OTPVerificationPage = () => {
+//   const { verifyOtp } = useAuth();
+//   const navigate = useNavigate();
+//   const handleVerify = () => {
+//     // Example OTP logic: replace with real validation
+//     const success = true; // Set to true or false based on your OTP validation logic
+//     if (success) {
+//       verifyOtp(); // Mark as verified
+//       navigate("/dashboard"); // Go to next page
+//     }
+//   };
+//   return (
+//     <div>
+//       {/* Your OTP form */}
+//     </div>
+//   );
+// };
 
-export default OTPVerificationPage;
+// export default OTPVerificationPage;

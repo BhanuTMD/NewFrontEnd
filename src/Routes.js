@@ -52,7 +52,7 @@ const AppRoutes = () => {
       {/* Dashboard alias */}
       <Route
         path="/dashboard"
-        element={isAuthenticated ? <WelcomePage /> : <Navigate to="/login" replace />}
+        element={isAuthenticated ? <WelcomePage /> : <Navigate to="/WelcomePage" replace />}
       />
 
       {/* ViewTechnology protected */}

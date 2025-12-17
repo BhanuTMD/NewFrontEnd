@@ -11,46 +11,83 @@ const WelcomePage = () => {
       {/* Main Content */}
       <main className="flex flex-1 flex-col items-center px-4 pb-10 pt-10 sm:px-6 lg:px-8">
         {/* Hero Card */}
-        <section className="flex w-full max-w-5xl flex-col items-center rounded-3xl bg-white/80 p-6 shadow-lg ring-1 ring-black/5 backdrop-blur-sm sm:p-10">
+        <section className="flex w-full max-w-5xl flex-col items-center rounded-3xl bg-white/80 p-6 ring-1 ring-black/5 backdrop-blur-sm sm:p-10">
           {/* Logo */}
-          <div className="mb-4 flex items-center justify-center">
-            <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-blue-50 shadow-inner sm:h-24 sm:w-24">
-              <img
-                src="/logo.jpg"
-                alt="CSIR Logo"
-                className="h-18 w-18 rounded-full object-contain sm:h-22 sm:w-22"
-              />
-            </div>
+          {/* <div className="mb-4 flex items-center justify-center"> */}
+          <div className="self-center mb-1 flex h-40 w-40 items-center justify-center sm:h-36 sm:w-36">
+            <img
+              src="/logo.jpg"
+              alt="CSIR Logo"
+              className="h-32 w-32 rounded-full object-contain sm:h-30 sm:w-30"
+            />
           </div>
+
+          {/* </div> */}
           {/* Hindi / English Text */}
-          <div className="mb-6 text-center text-2xl  tracking-tight text-slate-800 sm:text-xl">
-            <p className="font-semibold ">
+          <div className="mb-6 text-center text-2xl tracking-tight sm:text-xl space-y-1">
+
+            <p className="font-extrabold text-transparent bg-clip-text 
+          bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 
+           drop-shadow-[0_3px_6px_rgba(0,0,0,0.35)]">
               वैज्ञानिक तथा औद्योगिक अनुसंधान परिषद्
             </p>
-            <p className="text-blue-600 font-semibold">Council of Scientific &amp; Industrial Research</p>
-            <p className="text-blue-600 font-semibold">Ministry of Science &amp; Technology, Govt. of India</p>
+
+            <p className="font-bold text-transparent bg-clip-text 
+           bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 
+           drop-shadow-[0_2px_5px_rgba(0,0,0,0.3)]">
+              Council of Scientific &amp; Industrial Research
+            </p>
+
+            <p className="text-sm font-semibold tracking-widest text-gray-500 uppercase">
+              Ministry of Science &amp; Technology, Govt. of India
+            </p>
+
           </div>
+
+
           {/* Heading */}
-          <h1 className="mb-3 text-center text-2xl font-extrabold tracking-tight text-slate-700 sm:text-2xl lg:text-1xl">
+          <h1 className="mb-3 text-center text-2xl font-extrabold tracking-tight 
+          text-transparent bg-clip-text 
+          bg-gradient-to-r from-indigo-600 via-pink-500 to-red-500
+          sm:text-3xl lg:text-3xl [text-shadow:0_2px_4px_rgba(0,0,0,0.15)]">
             Technology Database Management Portal
           </h1>
-          <p className="mb-6 text-center text-xs font-semibold   uppercase tracking-[0.22em] text-blue-600 sm:text-sm">
-         Developed by Technology Management Directorate (TMD), CSIR-HQ
+
+
+
+          {/* <p className="mb-2 text-center text-xs font-bold uppercase tracking-[0.22em] text-blue-600 sm:text-s">
+            Designed, Developed and Hosted by
           </p>
-  
+          <p className="mb-6 text-center text-xs font-extrabold  uppercase tracking-[0.22em] text-blue-600 sm:text-sm">
+            Technology Management Directorate (TMD), CSIR-HQ
+          </p> */}
+
           {/* Small divider */}
           <div className="mb-4 h-px w-20 rounded-full bg-gradient-to-r from-transparent via-indigo-400 to-transparent" />
 
           {/* Short tagline */}
-          <p className="max-w-2xl text-center text-xs text-slate-600 sm:text-s">
-            “A digital gateway that transforms CSIR’s innovations into accessible knowledge, enabling industry, government, and citizens to explore, 
+          <p className="max-w-2xl text-center text-sm font-medium 
+          text-transparent bg-clip-text 
+          bg-gradient-to-r from-slate-500 via-slate-700 to-slate-500
+          italic tracking-wide
+          [mask-image:linear-gradient(to_right,black)]">
+            “A digital gateway that transforms CSIR’s innovations into accessible knowledge, enabling industry, government, and citizens to explore,
             evaluate, and engage with our diverse technology portfolio.”
           </p>
+
         </section>
 
         {/* Info / Description */}
-        <section className="mt-8 w-full max-w-5xl rounded-3xl bg-gradient-to-r from-indigo-50 via-sky-50 to-blue-50 p-5 sm:p-7 lg:p-8 shadow-sm ring-1 ring-indigo-100/70">
-          <h2 className="mb-3 text-base font-bold text-slate-800 sm:text-lg">
+        <section className="mt-8 w-full max-w-5xl rounded-3xl 
+         bg-gradient-to-br from-indigo-100 via-sky-100 to-blue-200 
+         p-5 sm:p-7 lg:p-8 
+         shadow-[0_15px_35px_rgba(0,0,0,0.12)] 
+         ring-1 ring-white/50 backdrop-blur-md">
+
+          <h2 className="mb-3 text-base font-extrabold 
+          text-transparent bg-clip-text 
+          bg-gradient-to-r from-indigo-600 to-blue-700 sm:text-lg">
+
             About the Technology Management Directorate (TMD)
           </h2>
 
@@ -60,18 +97,18 @@ const WelcomePage = () => {
             innovative solutions and services.
           </p>
 
-          <ul className="mt-2 space-y-2 text-sm text-slate-800 sm:text-base">
+          <ul className="mt-2 space-y-2 text-sm text-slate-800 sm:text-base italic tracking-wide">
             <li className="flex items-start gap-2">
               <span className="mt-[6px] h-2 w-2 flex-shrink-0 rounded-full bg-indigo-500" />
-              <span>Robust portal for managing CSIR lab technologies</span>
+              <span>Robust portal for managing CSIR lab technologies.</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-[6px] h-2 w-2 flex-shrink-0 rounded-full bg-indigo-500" />
-              <span>Enables collaboration and fast access to validated data</span>
+              <span>Enables collaboration and fast access to CSIR lab technologies.</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-[6px] h-2 w-2 flex-shrink-0 rounded-full bg-indigo-500" />
-              <span>Supports commercialization, licensing, and policy decisions</span>
+              <span>facilitates licensing commercialisation,and another tot factor.</span>
             </li>
           </ul>
         </section>
@@ -79,8 +116,7 @@ const WelcomePage = () => {
 
       {/* Footer */}
       <footer className="w-full bg-indigo-700/95 py-2 text-center text-xs text-indigo-50 sm:text-sm">
-        Created &amp; Maintained by CSIR - Technology Management Directorate,
-        New Delhi
+        Designed, Developed and Hosted by Technology Management Directorate (TMD), CSIR-HQ
       </footer>
     </div>
   );

@@ -1033,10 +1033,7 @@
 
 // export default SectionOne;
 
-
-
 import axios from "axios";
-import Section from "Components/common/section";
 import NavBar from "Components/common/navBar";
 import FooterBar from "Components/common/footer";
 import { Formik, Field, Form, ErrorMessage } from "formik";
@@ -1057,7 +1054,6 @@ import { labDetails } from "Components/data/labDetails";
 
 import FileViewerModal from "Components/pages/view/FileViewerModal";
 
-// optional icons (agar heroicons install hai)
 import {
   SparklesIcon,
   ClipboardDocumentCheckIcon,
@@ -1185,7 +1181,7 @@ const SectionOne = () => {
         })
         .finally(() => setLoading(false));
     } else {
-      // --- New create ---
+      // New entry
       setInitialValues({
         id: null,
         technologyRefNo: "",
@@ -1216,7 +1212,7 @@ const SectionOne = () => {
     }
   }, [passedTRN, navigate]);
 
-  // --- Yup Validation ---
+  // --- Validation ---
   const validationSchema = Yup.object({
     nameTechnology: Yup.string().required("Required").max(500, "Max 500 chars"),
     keywordTechnology: Yup.string()
@@ -1291,7 +1287,7 @@ const SectionOne = () => {
       .nullable(),
   });
 
-  // --- File Handlers ---
+  // --- File handlers ---
   const handleViewFile = () => {
     if (existingFileUrl) {
       const viewUrl = existingFileUrl.replace("/download/", "/view/");
@@ -1319,7 +1315,7 @@ const SectionOne = () => {
     });
   };
 
-  // --- Submit handler ---
+  // --- Submit ---
   const handleSubmit = (values, { setSubmitting }, action) => {
     const isUpdate = !!passedTRN;
 
@@ -1429,9 +1425,11 @@ const SectionOne = () => {
     return (
       <>
         <NavBar />
-        <p className="mt-6 text-center text-gray-200 bg-slate-900 min-h-screen">
-          Loading existing data...
-        </p>
+        <div className="min-h-screen bg-gradient-to-br from-sky-100 via-orange-50 to-sky-200 flex items-center justify-center">
+          <p className="text-center text-slate-700">
+            Loading existing data...
+          </p>
+        </div>
         <FooterBar />
       </>
     );
@@ -1443,34 +1441,33 @@ const SectionOne = () => {
     <>
       <NavBar />
 
-      {/* Main background */}
-      <div className="relative min-h-screen bg-gradient-to-br from-slate-500 via-slate-950 to-indigo-900">
-        {/* Blurred blobs */}
+      {/* Same background style as SectionTwo */}
+      <div className="relative min-h-screen bg-gradient-to-br from-sky-100 via-orange-50 to-sky-200">
+        {/* Soft blobs */}
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-indigo-500/25 blur-3xl" />
-          <div className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-purple-500/30 blur-3xl" />
+          <div className="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-sky-300/40 blur-3xl" />
+          <div className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-orange-300/40 blur-3xl" />
         </div>
 
-        {/* Content */}
         <div className="relative z-10 flex min-h-screen">
-          {/* Left content */}
-          <div className="w-full md:w-3/4 border-s border-white/10/0">
+          {/* Left main content (75%) */}
+          <div className="w-full md:w-3/4">
             <div className="ml-0 md:ml-60 mr-auto max-w-5xl px-4 py-6 md:px-8 md:py-10">
-              {/* Section heading card */}
+              {/* Heading style same family as SectionTwo */}
               <div className="mb-5 md:mb-7">
-                <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-3 py-1 border border-indigo-400/40 text-[11px] font-medium text-indigo-200 uppercase tracking-[0.2em]">
+                <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-3 py-1 border border-indigo-400/40 text-[11px] font-medium text-indigo-700 uppercase tracking-[0.2em]">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                   Section 1
                 </div>
                 <div className="mt-3 flex items-center gap-3">
-                  <h1 className="text-xl md:text-2xl font-semibold text-white">
+                  <h1 className="text-xl md:text-2xl font-semibold text-slate-900">
                     Key Details of the Technology / Knowhow
                   </h1>
                   {SparklesIcon && (
-                    <SparklesIcon className="h-5 w-5 text-indigo-300 hidden sm:block" />
+                    <SparklesIcon className="h-5 w-5 text-indigo-400 hidden sm:block" />
                   )}
                 </div>
-                <p className="mt-1 text-xs md:text-sm text-slate-300">
+                <p className="mt-1 text-xs md:text-sm text-slate-600">
                   Start by capturing the core details of your technology. You can
                   always refine other sections later.
                 </p>
@@ -1492,7 +1489,7 @@ const SectionOne = () => {
                   touched,
                 }) => (
                   <Form className="space-y-6 rounded-2xl border border-slate-100/70 bg-white/95 shadow-2xl px-4 py-5 md:px-8 md:py-7">
-                    {/* Header: Ref No */}
+                    {/* Technology Ref No */}
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div className="md:col-span-2">
                         <label className="mb-1 block text-sm font-semibold text-slate-800">
@@ -1510,7 +1507,7 @@ const SectionOne = () => {
                       </div>
                     </div>
 
-                    {/* Main Grid */}
+                    {/* Main grid */}
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       {/* Name of Technology */}
                       <div className="md:col-span-2">
@@ -1646,7 +1643,7 @@ const SectionOne = () => {
                         />
                       </div>
 
-                      {/* Multi Lab Radio */}
+                      {/* Multi-lab radio */}
                       <div className="rounded-lg border bg-slate-50 p-3.5">
                         <label className="mb-1 block text-sm font-semibold text-slate-800">
                           Multi Laboratories Involved?{" "}
@@ -1710,7 +1707,7 @@ const SectionOne = () => {
                         />
                       </div>
 
-                      {/* Associated Labs if Yes */}
+                      {/* Associated Labs */}
                       {values.multiLabInstitute === "Yes" && (
                         <div className="md:col-span-2">
                           <label
@@ -1813,7 +1810,7 @@ const SectionOne = () => {
                         />
                       </div>
 
-                      {/* Brief Details */}
+                      {/* Brief details */}
                       <div className="md:col-span-2">
                         <label
                           htmlFor="briefTech"
@@ -1891,8 +1888,7 @@ const SectionOne = () => {
                           rows="4"
                           maxLength="1500"
                           className={`w-full rounded-lg border p-2.5 text-sm md:text-base outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-400 ${
-                            errors.technoEconomics &&
-                            touched.technoEconomics
+                            errors.technoEconomics && touched.technoEconomics
                               ? "border-red-500"
                               : "border-slate-300"
                           }`}
@@ -2112,18 +2108,18 @@ const SectionOne = () => {
             </div>
           </div>
 
-          {/* Right side info panel */}
+          {/* Right info panel (same style family as SectionTwo) */}
           <div className="hidden md:flex md:w-1/4 items-start justify-center pr-6 py-10">
-            <div className="w-full max-w-xs rounded-3xl bg-white/10 backdrop-blur-2xl border border-white/20 shadow-xl px-5 py-6 space-y-4 text-slate-50">
+            <div className="w-full max-w-xs rounded-3xl bg-white/40 backdrop-blur-2xl border border-white/60 shadow-xl px-5 py-6 space-y-4 text-slate-800">
               <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-2xl bg-emerald-400/90 flex items-center justify-center text-slate-900">
+                <div className="h-9 w-9 rounded-2xl bg-emerald-500 flex items-center justify-center text-white">
                   {ClipboardDocumentCheckIcon && (
                     <ClipboardDocumentCheckIcon className="h-5 w-5" />
                   )}
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-200">
-                    Section Overview
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-indigo-700">
+                    Section 1 Guide
                   </p>
                   <p className="text-sm font-medium">
                     Key Technology Details
@@ -2131,27 +2127,27 @@ const SectionOne = () => {
                 </div>
               </div>
 
-              <p className="text-xs text-indigo-100/90">
+              <p className="text-xs text-slate-700">
                 Capture a crisp, complete summary of your technology. These
                 details will be visible to stakeholders browsing the portfolio.
               </p>
 
               <div className="grid grid-cols-2 gap-3 text-[11px]">
-                <div className="rounded-2xl bg-white/10 border border-white/20 px-3 py-2">
-                  <p className="text-indigo-100/80">Current TRN</p>
-                  <p className="mt-1 text-xs font-semibold truncate">
+                <div className="rounded-2xl bg-white/70 border border-slate-200 px-3 py-2">
+                  <p className="text-slate-500">Current TRN</p>
+                  <p className="mt-1 text-xs font-semibold truncate text-slate-800">
                     {generatedRefNo || "Not generated"}
                   </p>
                 </div>
-                <div className="rounded-2xl bg-white/10 border border-white/20 px-3 py-2">
-                  <p className="text-indigo-100/80">Mode</p>
-                  <p className="mt-1 text-xs font-semibold">
+                <div className="rounded-2xl bg-white/70 border border-slate-200 px-3 py-2">
+                  <p className="text-slate-500">Mode</p>
+                  <p className="mt-1 text-xs font-semibold text-slate-800">
                     {passedTRN ? "Edit / Update" : "New Entry"}
                   </p>
                 </div>
               </div>
 
-              <ul className="mt-2 space-y-1.5 text-[11px] text-indigo-100/90">
+              <ul className="mt-2 space-y-1.5 text-[11px] text-slate-700">
                 <li>• Section 1 focuses on identity and positioning.</li>
                 <li>• File upload is optional and can be updated later.</li>
                 <li>• You can move to Section 2 after saving once.</li>
