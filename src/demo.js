@@ -1826,3 +1826,63 @@
 // };
 
 // export default SectionOne;
+
+// src/
+// │
+// ├── Components/
+// │   ├── auth/                       ← Authentication system
+// │   │   ├── Login.js
+// │   │   ├── Signup.js
+// │   │   ├── OtpLoginVerify.js
+// │   │   ├── OtpVerify.js
+// │   │   ├── ChangePassword.js
+// │   │   ├── privateRoute.js         ← protects routes
+// │   │   └── AuthContext.js          ← token + user state
+// │   │
+// │   ├── common/                     ← shared & reusable UI components
+// │   │   ├── navBar.js
+// │   │   ├── footer.js
+// │   │   ├── header.js
+// │   │   └── searchBar.js
+// │   │
+// │   ├── data/                       ← static dropdown & metadata options
+// │   │   ├── country.js
+// │   │   ├── industrialSector.js
+// │   │   ├── labDetails.js
+// │   │   ├── theme.js
+// │   │   ├── potentialMinistries.js
+// │   │   └── potentialApplicationAreas.js
+// │   │
+// │   ├── pages/
+// │   │   ├── pendingPage/            ← Pending / Draft submitted forms
+// │   │   │   └── pendingData.js
+// │   │   │
+// │   │   ├── techSearch/             ← Search & Preview before Final Submit
+// │   │   │   ├── TechSearch.js
+// │   │   │   ├── TechSearchForm.js
+// │   │   │   ├── AllSectionPreview.js
+// │   │   │   ├── PreviewPopUp.js
+// │   │   │   ├── SectionOnePreview.js
+// │   │   │   ├── SectionTwoPreview.js
+// │   │   │   ├── SectionThreePreview.js
+// │   │   │   └── SectionFourPreview.js
+// │   │   │
+// │   │   ├── view/                   ← Final view of data after submission
+// │   │   │   ├── TechnologyDetails.js
+// │   │   │   ├── viewTechnology.js
+// │   │   │   ├── FileViewerModal.js
+// │   │   │
+// │   │   └── welcomePage.js          ← First landing UI after login
+// │   │
+// │   ├── section/                    ← Forms to fill Technology Data
+// │   │   ├── SectionOne.js
+// │   │   ├── SectionTwo.js
+// │   │   ├── SectionThree.js
+// │   │   └── SectionFour.js
+// │
+// ├── utils/                          ← helper functions / axios configs
+// │
+// ├── Routes.js                       ← Central routes manager
+// ├── App.js                          ← Base wrapper component
+// ├── index.js                        ← React root entry
+// └── index.css                       ← Tailwind / custom css

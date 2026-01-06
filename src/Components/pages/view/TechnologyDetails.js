@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import FileViewerModal from "./FileViewerModal";
 import { countryOptions } from "Components/data/country";
-import NavBar from "Components/common/navBar";
+// import NavBar from "Components/common/navBar";
 import FooterBar from "Components/common/footer";
 
 // --- Icon Imports for a Professional Look (Assuming you have access to a library like Heroicons) ---
@@ -176,7 +176,7 @@ const TechnologyDetails = () => {
       `}
     </style>
 
-    <NavBar className="no-print" />
+    {/* <NavBar /> */}
 
     <div className="min-h-screen bg-slate-50 py-8 px-3 sm:px-4">
       {/* Top bar */}

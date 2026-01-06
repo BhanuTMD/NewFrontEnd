@@ -67,20 +67,22 @@ const OTPLoginVerify = () => {
           email
         )}&otp=${encodeURIComponent(otp)}`
       );
-
       const { jwtToken, userName } = res.data;
-
       login(jwtToken, userName);
       verifyOtp();
-
       Swal.fire({
         title: "Verified!",
         text: "OTP verified successfully. Redirecting...",
         icon: "success",
-        timer: 1800,
+        background: "linear-gradient(135deg, #0b1c47 0%, #1e3a8a 40%, #ff8c00 100%)",
+        color: "#fff",
+        iconColor: "#ffae42",
         showConfirmButton: false,
+        timer: 1800,
+        customClass: {
+          popup: "rounded-xl shadow-lg backdrop-blur-md",
+        }
       });
-
       navigate("/welcomePage", { replace: true });
     } catch (err) {
       console.error(err);

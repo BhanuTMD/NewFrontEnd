@@ -17,53 +17,134 @@ function Login() {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    const err = Validation(values);
-    setErrors(err);
+  e.preventDefault();
+  const err = Validation(values);
+  setErrors(err);
 
-    if (Object.keys(err).length === 0) {
-      setIsSubmitting(true);
+  if (Object.keys(err).length === 0) {
+    setIsSubmitting(true);
 
-      Swal.fire({
-        title: "Request sent",
-        text: "Please wait while we process your login...",
-        icon: "info",
-        showConfirmButton: false,
-        timer: 8000,
-      });
+    // Stylish "Request sent" modal (Tailwind HTML)
+    Swal.fire({
+      html: `
+        <div class="w-full max-w-sm">
+          <div class="rounded-2xl p-5 bg-gradient-to-br from-indigo-700 to-violet-700 text-white border border-white/10 shadow-2xl">
+            <div class="flex items-center gap-3">
+              <div class="h-12 w-12 rounded-xl flex items-center justify-center text-2xl bg-emerald-300 text-slate-900 font-semibold">🔒</div>
+              <div>
+                <p class="text-sm font-semibold">Request sent</p>
+                <p class="text-xs mt-1 text-indigo-100/85">Processing your login — sending OTP to <span class="font-medium">${values.email}</span></p>
+              </div>
+            </div>
 
-      axios
-        .post("http://172.16.2.246:8080/auth/login", values)
-        .then((res) => {
-          const userName = res.data.userName;
-          const userEmail = values.email;
+            <div class="mt-4">
+              <div class="h-2 w-full bg-indigo-900/40 rounded-full overflow-hidden">
+                <div class="animate-pulse h-full w-1/3 bg-white/30 rounded-full"></div>
+              </div>
+              <p class="text-[11px] text-indigo-100/80 mt-3">This normally completes in a few seconds.</p>
+            </div>
+          </div>
+        </div>
+      `,
+      showConfirmButton: false,
+      background: 'transparent',
+      customClass: {
+        popup: 'rounded-3xl p-0',
+        container: 'backdrop-blur-sm'
+      },
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
 
-          localStorage.setItem("userName", userName);
-          localStorage.setItem("userEmail", userEmail);
+    axios
+      .post("http://172.16.2.246:8080/auth/login", values)
+      .then((res) => {
+        const userName = res.data.userName;
+        const userEmail = values.email;
 
-          Swal.fire({
-            title: "OTP Sent!",
-            text: "Please check your email for the OTP.",
-            icon: "success",
-            confirmButtonColor: "#4F46E5",
-          }).then(() => {
-            navigate("/otpLoginVerify", { state: { email: values.email } });
-          });
-        })
-        .catch((err) => {
-          console.error("Login error:", err);
-          Swal.fire({
-            title: "Login Failed",
-            text: "Invalid credentials or server error.",
-            icon: "error",
-            confirmButtonColor: "#EF4444",
-          });
-        })
-        .finally(() => {
-          setIsSubmitting(false);
+        localStorage.setItem("userName", userName);
+        localStorage.setItem("userEmail", userEmail);
+
+        // close loader
+        Swal.close();
+
+        // OTP Sent modal (Tailwind HTML)
+        Swal.fire({
+          html: `
+            <div class="w-full max-w-xs">
+              <div class="rounded-2xl p-5 bg-gradient-to-br from-indigo-800 to-violet-800 text-white border border-white/10 shadow-2xl">
+                <div class="flex items-center gap-4">
+                  <div class="h-14 w-14 rounded-xl bg-white/10 flex items-center justify-center text-3xl">✅</div>
+                  <div>
+                    <p class="text-lg font-bold">OTP Sent!</p>
+                    <p class="text-sm mt-1 text-indigo-100/85">Check <span class="font-medium">${values.email}</span> for the verification code.</p>
+                  </div>
+                </div>
+
+                <div class="mt-5">
+                  <button id="swal-continue" class="w-full py-2.5 rounded-xl text-sm font-semibold bg-white/10 border border-white/20 hover:bg-white/20 transition">
+                    Continue to verify
+                  </button>
+                </div>
+              </div>
+            </div>
+          `,
+          showConfirmButton: false,
+          background: 'transparent',
+          customClass: {
+            popup: 'rounded-3xl p-0',
+            container: 'backdrop-blur-sm'
+          },
+          didOpen: () => {
+            const btn = Swal.getHtmlContainer().querySelector('#swal-continue');
+            if (btn) {
+              btn.addEventListener('click', () => {
+                Swal.close();
+                navigate("/otpLoginVerify", { state: { email: values.email } });
+              });
+            }
+          }
         });
-    }
-  };
+      })
+      .catch((err) => {
+        console.error("Login error:", err);
+        Swal.close();
+
+        // Error modal with Tailwind styling
+        Swal.fire({
+          html: `
+            <div class="w-full max-w-sm">
+              <div class="rounded-2xl p-4 bg-slate-800 text-white border border-white/8 shadow-lg">
+                <div class="flex items-start gap-3">
+                  <div class="mt-1">
+                    <svg class="h-6 w-6 text-red-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 9v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="font-semibold">Login Failed</p>
+                    <p class="text-sm text-slate-300 mt-1">Invalid credentials or server error. Please try again.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `,
+          showConfirmButton: true,
+          confirmButtonText: 'Okay',
+          confirmButtonColor: '#EF4444',
+          background: 'transparent',
+          customClass: {
+            popup: 'rounded-2xl p-0'
+          }
+        });
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
+  }
+};
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-900 overflow-hidden">
@@ -226,7 +307,6 @@ function Login() {
                   <span>Remember this device</span>
                 </label>
               </div>
-
               {/* Submit button */}
               <button
                 type="submit"
@@ -245,7 +325,6 @@ function Login() {
                   </>
                 )}
               </button>
-
               {/* Divider */}
               <div className="flex items-center gap-3 my-3">
                 <div className="h-px flex-1 bg-slate-700/60" />
@@ -254,7 +333,6 @@ function Login() {
                 </span>
                 <div className="h-px flex-1 bg-slate-700/60" />
               </div>
-
               {/* Signup link */}
               <p className="text-xs sm:text-sm text-center text-slate-300">
                 Don&apos;t have an account?{" "}

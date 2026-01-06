@@ -70,7 +70,7 @@ function NavBar() {
               >
                 <span className="relative h-9 w-9 rounded-2xl bg-gradient-to-tr from-white via-sky-100 to-amber-100 text-indigo-700 flex items-center justify-center text-lg font-extrabold shadow-md">
                   <span className="absolute inset-0 rounded-2xl border border-white/70/0" />
-                  <img src="./logo.jpg" alt="CSIR Logo" className="h-15 w-15 rounded-2xl object-contain" />
+                  <img src="./logo.jpg" alt="logo"className="h-15 w-15 rounded-2xl object-contain" />
                 </span>
                 <span className="hidden sm:flex flex-col leading-tight">
                   <span className="flex items-center gap-1 text-[10px] uppercase tracking-[0.2em] text-white/100">

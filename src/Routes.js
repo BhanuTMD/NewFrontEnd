@@ -12,10 +12,7 @@ import WelcomePage from "Components/pages/welcomePage/WelcomePage";
 import PreviewPopUp from "Components/pages/techSearch/PreviewPopUp";
 import PrivateRoute from "Components/auth/privateRoute";
 import PendingData from "Components/pages/pendingPage/pendingData";
-import EditSectionOne from "Components/pages/editForm/editSectionOne";
-import EditSectionTwo from "Components/pages/editForm/editSectionTwo";
-import EditSectionThree from "Components/pages/editForm/editSectionThree";
-import EditSectionFour from "Components/pages/editForm/EditSectionFour";
+
 import OTPLoginVerify from "Components/auth/OtpLoginVerify";
 import ForgetPassword from "Components/auth/forgetPassword";
 import ViewTechnology from "Components/pages/view/viewTechnology";
@@ -77,7 +74,6 @@ const AppRoutes = () => {
           </PrivateRoute>
         }
       />
-
       {/* SectionOne by ref (this might be used for edit/prefill - protect if needed) */}
       <Route
         path="/sectionOne/:technologyRefNo"
@@ -137,41 +133,6 @@ const AppRoutes = () => {
           </PrivateRoute>
         }
       />
-
-      {/* Edit routes */}
-      <Route
-        path="/editSectionOne"
-        element={
-          <PrivateRoute>
-            <EditSectionOne />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/editSectionTwo"
-        element={
-          <PrivateRoute>
-            <EditSectionTwo />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/editSectionThree"
-        element={
-          <PrivateRoute>
-            <EditSectionThree />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/editSectionFour"
-        element={
-          <PrivateRoute>
-            <EditSectionFour />
-          </PrivateRoute>
-        }
-      />
-
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
