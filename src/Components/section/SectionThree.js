@@ -2,9 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import FooterBar from "Components/common/footer";
 import NavBar from "Components/common/navBar";
-import Section from "Components/common/section";
 import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
+import { validationSchema } from "Components/section/SectionThreeValidation";
 import Swal from "sweetalert2";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -109,28 +108,6 @@ const SectionThree = () => {
     }
   }, [technologyRefNo]);
 
-  // Validation
-  const validationSchema = Yup.object({
-    licenseName: Yup.string()
-      .max(300, "Max. 300 characters")
-      .required("Required"),
-    address: Yup.string().max(500, "Max. 500 characters").nullable(),
-    email: Yup.string().email("Invalid email format").nullable(),
-    contact: Yup.string()
-      .matches(/^[0-9]{10}$/, "Must be 10 digits")
-      .nullable(),
-    dateOfAgreementSigning: Yup.date().nullable().required("Required"),
-    typeOfLicense: Yup.string().required("Required"),
-    staRegionalGeography: Yup.string().nullable(),
-    detailsOfExclusivity: Yup.string()
-      .max(300, "Max. 300 characters")
-      .nullable(),
-    dateOfLicense: Yup.date().nullable().required("Required"),
-    licenseValidUntil: Yup.date().nullable().required("Required"),
-    paymentTerms: Yup.string().max(300, "Max. 300 characters").nullable(),
-  });
-
-  // Save all
   const handleSubmit = () => {
     if (editingIndex !== null) {
       Swal.fire("Update Pending", "Finish editing before saving.", "warning");
@@ -315,9 +292,6 @@ const SectionThree = () => {
                   technology.
                 </p>
               </div>
-
-              {/* Optional original Section line */}
-              {/* <Section sectionLine="Section 3 : Details of Licensee" /> */}
 
               <Formik
                 initialValues={initialLicenseeValues}
