@@ -29,7 +29,7 @@ const ViewTechnology = () => {
         const token = localStorage.getItem("token");
 
         const res = await axios.get(
-          `http://172.16.2.246:8080/api/section-one/technologies?page=${
+          `http://172.16.2.246:8282/api/section-one/technologies?page=${
             currentPage - 1
           }&size=${itemsPerPage}`,
           { headers: { Authorization: `Bearer ${token}` } }

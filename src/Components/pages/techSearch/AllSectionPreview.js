@@ -55,7 +55,7 @@ const AllSectionPreview = ({ data, currentPage, totalPages, onPageChange }) => {
                 <div className="md:col-span-2">
                   <strong>File:</strong><br />
                   <img
-                    src={`http://172.16.2.246:8080/apf/tdmp/images/${item.technologyRefNo}`}
+                    src={`http://172.16.2.246:8282/apf/tdmp/images/${item.technologyRefNo}`}
                     alt="xyz"
                     className="mt-2 w-48 h-48 object-contain border rounded"
                   />

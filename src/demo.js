@@ -636,7 +636,7 @@
 // //   const handleSubmit = (values) => {
 // //     console.log("handle submit is calling********", values);
 
-// //     const url = "http://172.16.2.246:8080/apf/tdmp/saveSectionOne";
+// //     const url = "http://172.16.2.246:8282/apf/tdmp/saveSectionOne";
 
 // //     // Create FormData object
 // //     const formData = new FormData();
@@ -1238,7 +1238,7 @@
 
 //       const token = localStorage.getItem("token");
 //       axios
-//         .get(`http://172.16.2.246:8080/apf/tdmp/sectionOne/${passedTRN}`, {
+//         .get(`http://172.16.2.246:8282/apf/tdmp/sectionOne/${passedTRN}`, {
 //           headers: { Authorization: `Bearer ${token}` },
 //         })
 //         .then((res) => {
@@ -1302,7 +1302,7 @@
 //       confirmButtonText: "Yes, Submit it!",
 //     }).then((result) => {
 //       if (result.isConfirmed) {
-//         const url = "http://172.16.2.246:8080/apf/tdmp/saveSectionOne";
+//         const url = "http://172.16.2.246:8282/apf/tdmp/saveSectionOne";
 //         const formData = new FormData();
 
 //         for (let key in values) {
@@ -1984,7 +1984,7 @@
 
 //     axios
 //       .post(
-//         `http://172.16.2.246:8080/api/section-three/save/${technologyRefNo}`,
+//         `http://172.16.2.246:8282/api/section-three/save/${technologyRefNo}`,
 //         licensees,
 //         {
 //           headers: { "Content-Type": "application/json" },

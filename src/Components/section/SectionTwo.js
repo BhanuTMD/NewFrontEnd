@@ -40,7 +40,7 @@ const SectionTwo = () => {
 
     axios
       .get(
-        `http://172.16.2.246:8080/api/section-two/fetch/${csirRegistrationNumber}`
+        `http://172.16.2.246:8282/api/section-two/fetch/${csirRegistrationNumber}`
       )
       .then((response) => {
         const formattedData = response.data.map((ipr) => ({
@@ -87,7 +87,7 @@ const SectionTwo = () => {
 
     axios
       .post(
-        `http://172.16.2.246:8080/api/section-two/save/${technologyRefNo}`,
+        `http://172.16.2.246:8282/api/section-two/save/${technologyRefNo}`,
         payload,
         {
           headers: { "Content-Type": "application/json" },

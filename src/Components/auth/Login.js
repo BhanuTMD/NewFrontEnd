@@ -57,7 +57,7 @@ function Login() {
     });
 
     axios
-      .post("http://172.16.2.246:8080/auth/login", values)
+      .post("http://172.16.2.246:8282/api/auth/login", values)
       .then((res) => {
         const userName = res.data.userName;
         const userEmail = values.email;

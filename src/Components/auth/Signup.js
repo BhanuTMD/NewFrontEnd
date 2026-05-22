@@ -35,7 +35,7 @@ function Signup() {
         setIsSubmitting(true);
 
         const response = await axios.post(
-          "http://172.16.2.246:8080/auth/register",
+          "http://172.16.2.246:8282/api/auth/register",
           values,
           {
             headers: {

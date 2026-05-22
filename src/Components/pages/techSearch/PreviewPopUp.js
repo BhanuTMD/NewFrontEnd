@@ -150,7 +150,7 @@ const PreviewPopUp = ({ item = {}, activeSection = 'all', onClose, onEdit }) => 
                   'File',
                   previewItem.sectionOne.technologyRefNo ? (
                     <img
-                      src={`http://172.16.2.246:8080/apf/tdmp/images/${previewItem.sectionOne.technologyRefNo}`}
+                      src={`http://172.16.2.246:8282/apf/tdmp/images/${previewItem.sectionOne.technologyRefNo}`}
                       alt="Preview"
                       className="w-40 h-40 object-contain"
                     />

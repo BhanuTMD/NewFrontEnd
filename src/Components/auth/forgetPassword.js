@@ -12,7 +12,7 @@ const ForgetPassword = () => {
   const handleSendOtp = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://172.16.2.246:8080/auth/forgot-password", { email });
+      await axios.post(`http://172.16.2.246:8282/api/auth/forgot-password?email=${email}`);
       alert("OTP sent to your email");
       setStep(2);
     } catch (err) {
@@ -23,7 +23,7 @@ const ForgetPassword = () => {
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`http://172.16.2.246:8080/auth/forgot-password/verify-otp?email=${email}&otp=${otp}`);
+      await axios.post(`http://172.16.2.246:8282/api/auth/verify-otp?email=${email}&otp=${otp}`);
       alert("OTP verified successfully");
       setStep(3);
     } catch (err) {
@@ -35,10 +35,7 @@ const ForgetPassword = () => {
     e.preventDefault();
     if (password !== confirmPassword) return alert("Passwords do not match");
     try {
-      await axios.post("http://172.16.2.246:8080/auth/forgot-password/reset", {
-        email,
-        newPassword: password,
-      });
+      await axios.post(`http://172.16.2.246:8282/api/auth/reset-password?email=${email}&newPassword=${password}&otp=${otp}`);
       alert("Password reset successful! Please login.");
       // navigate to login if using react-router
     } catch (err) {

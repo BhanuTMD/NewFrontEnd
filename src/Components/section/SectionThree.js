@@ -57,7 +57,7 @@ const SectionThree = () => {
   useEffect(() => {
     if (technologyRefNo) {
       axios
-        .get(`http://172.16.2.246:8080/api/section-three/${technologyRefNo}`)
+        .get(`http://172.16.2.246:8282/api/section-three/${technologyRefNo}`)
         .then((response) => {
           const formattedLicensees = response.data.map((lic) => {
             const formattedRoyalty = lic.royalty.map((r) => ({
@@ -150,7 +150,7 @@ const SectionThree = () => {
 
     axios
       .post(
-        `http://172.16.2.246:8080/api/section-three/save/${technologyRefNo}`,
+        `http://172.16.2.246:8282/api/section-three/save/${technologyRefNo}`,
         payload,
         { headers: { "Content-Type": "application/json" } }
       )

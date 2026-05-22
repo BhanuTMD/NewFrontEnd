@@ -35,7 +35,7 @@ const SectionOnePreview = ({ data }) => {
               <div>
                 <strong>File:</strong>
                 <img
-                  src={`http://172.16.2.246:8080/apf/tdmp/images/${item.technologyRefNo}`}
+                  src={`http://172.16.2.246:8282/apf/tdmp/images/${item.technologyRefNo}`}
                   alt="xyz"
                   style={{ width: '200px', height: '200px', marginTop: '10px' }}
                 />

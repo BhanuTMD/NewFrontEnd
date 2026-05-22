@@ -43,7 +43,7 @@ const TechSearch = () => {
     try {
       const token = localStorage.getItem('token');
 
-      const response = await fetch('http://172.16.2.246:8080/apf/tdmp/search', {
+      const response = await fetch('http://172.16.2.246:8282/apf/tdmp/search', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
