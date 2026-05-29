@@ -12,33 +12,38 @@ import WelcomePage from "Components/pages/welcomePage/WelcomePage";
 import PreviewPopUp from "Components/pages/techSearch/PreviewPopUp";
 import PrivateRoute from "Components/auth/privateRoute";
 import PendingData from "Components/pages/pendingPage/pendingData";
-
 import OTPLoginVerify from "Components/auth/OtpLoginVerify";
 import ForgetPassword from "Components/auth/forgetPassword";
 import ViewTechnology from "Components/pages/view/viewTechnology";
 import TechnologyDetails from "Components/pages/view/TechnologyDetails";
 import { useAuth } from "Components/auth/AuthContext";
+import ExcelUpload from "Components/excel/ExcelUpload";
+
+// Admin pages
+// import AdminDashboard      from "Components/admin/AdminDashboard";
+import UserManagement      from "Components/admin/UserManagement";
+import TechnologyManagement from "Components/admin/TechnologyManagement";
 
 const AppRoutes = () => {
   const { isOtpVerified, isAuthenticated } = useAuth();
 
   return (
     <Routes>
-      {/* Public / unprotected */}
-      <Route path="/" element={<WelcomePage />} />
+      {/* Public */}
+      <Route path="/"           element={<WelcomePage />} />
       <Route path="/welcomePage" element={<WelcomePage />} />
 
-      {/* If user is already authenticated, redirect away from login/signup */}
+      {/* Auth — redirect if already logged in */}
       <Route
         path="/login"
-        element={isAuthenticated ? <Navigate to="/WelcomPage" replace /> : <Login />}
+        element={isAuthenticated ? <Navigate to="/welcomePage" replace /> : <Login />}
       />
       <Route
         path="/signup"
         element={isAuthenticated ? <Navigate to="/login" replace /> : <Signup />}
       />
 
-      {/* Keep pending/OTP/forget publicly accessible but redirect OTP if already verified */}
+      {/* OTP + password */}
       <Route path="/pendingData" element={<PendingData />} />
       <Route
         path="/otpLoginVerify"
@@ -49,90 +54,39 @@ const AppRoutes = () => {
       {/* Dashboard alias */}
       <Route
         path="/dashboard"
-        element={isAuthenticated ? <WelcomePage /> : <Navigate to="/WelcomePage" replace />}
+        element={isAuthenticated ? <WelcomePage /> : <Navigate to="/welcomePage" replace />}
       />
 
-      {/* ViewTechnology protected */}
+      {/* ViewTechnology (protected) */}
       <Route
         path="/viewTechnology"
-        element={
-          <PrivateRoute>
-            <ViewTechnology />
-          </PrivateRoute>
-        }
+        element={<PrivateRoute><ViewTechnology /></PrivateRoute>}
       />
-
-      {/* Keep old-cased route for backwards compatibility but redirect to canonical one */}
       <Route path="/ViewTechnology" element={<Navigate to="/viewTechnology" replace />} />
 
-      {/* Technology details (protected if needed) */}
+      {/* Technology details */}
       <Route
         path="/technology/:trnNo"
-        element={
-          <PrivateRoute>
-            <TechnologyDetails />
-          </PrivateRoute>
-        }
-      />
-      {/* SectionOne by ref (this might be used for edit/prefill - protect if needed) */}
-      <Route
-        path="/sectionOne/:technologyRefNo"
-        element={
-          <PrivateRoute>
-            <SectionOne />
-          </PrivateRoute>
-        }
+        element={<PrivateRoute><TechnologyDetails /></PrivateRoute>}
       />
 
-      {/* Protected pages grouped */}
-      <Route
-        path="/SectionOne"
-        element={
-          <PrivateRoute>
-            <SectionOne />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/SectionTwo"
-        element={
-          <PrivateRoute>
-            <SectionTwo />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/SectionThree"
-        element={
-          <PrivateRoute>
-            <SectionThree />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/SectionFour"
-        element={
-          <PrivateRoute>
-            <SectionFour />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/techSearch"
-        element={
-          <PrivateRoute>
-            <TechSearch />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/PreviewPopUp"
-        element={
-          <PrivateRoute>
-            <PreviewPopUp />
-          </PrivateRoute>
-        }
-      />
+      {/* Section routes */}
+      <Route path="/sectionOne/:technologyRefNo" element={<PrivateRoute><SectionOne /></PrivateRoute>} />
+      <Route path="/SectionOne"   element={<PrivateRoute><SectionOne /></PrivateRoute>} />
+      <Route path="/SectionTwo"   element={<PrivateRoute><SectionTwo /></PrivateRoute>} />
+      <Route path="/SectionThree" element={<PrivateRoute><SectionThree /></PrivateRoute>} />
+      <Route path="/SectionFour"  element={<PrivateRoute><SectionFour /></PrivateRoute>} />
+
+      {/* Other protected */}
+      <Route path="/techSearch"  element={<PrivateRoute><TechSearch /></PrivateRoute>} />
+      <Route path="/PreviewPopUp" element={<PrivateRoute><PreviewPopUp /></PrivateRoute>} />
+      <Route path="/ExcelUpload"  element={<PrivateRoute><ExcelUpload /></PrivateRoute>} />
+
+      {/* ── Admin routes ── */}
+      {/* <Route path="/admin/dashboard"       element={<PrivateRoute><AdminDashboard /></PrivateRoute>} /> */}
+      <Route path="/admin/users"           element={<PrivateRoute><UserManagement /></PrivateRoute>} />
+      <Route path="/admin/tech-management" element={<PrivateRoute><TechnologyManagement /></PrivateRoute>} />
+
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

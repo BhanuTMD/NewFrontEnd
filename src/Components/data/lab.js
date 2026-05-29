@@ -1,4 +1,6 @@
-const labNames = [
+// src/Components/data/lab.js
+
+const labs = [
   "CSIR-Advanced Materials and Processes Research Institute (CSIR-AMPRI), Bhopal",
   "CSIR-Central Building Research Institute (CSIR-CBRI), Roorkee",
   "CSIR-Centre for Cellular and Molecular Biology (CSIR-CCMB), Hyderabad",
@@ -37,10 +39,20 @@ const labNames = [
   "CSIR-National Institute of Science Communication & Policy Research (CSIR-NIScPR), Delhi",
   "CSIR-Madras Complex (CSIR-CMC), Chennai",
   "CSIR-Structural Engineering Research Centre (CSIR-SERC), Chennai",
-  "CSIR-Council of Scientific & Industrial Research (CSIR-HQ), Delhi"
-  // "Other than CSIR" // Kept simple
+  "CSIR-Council of Scientific & Industrial Research (CSIR-HQ), Delhi",
 ];
 
-const createOptions = (names) => names.map(name => ({ label: name, value: name }));
+// Build options array once — shared by both exports below
+const labOptionsList = labs.map((name) => ({
+  label: name,
+  value: name,
+}));
 
-export const labOptions = createOptions(labNames);
+// Used in SectionOne, NavBar, TechnologyDetails, etc.
+export const labOptions = labOptionsList;
+
+// Used in SectionOne (associateInstitutes field) and Signup (lab dropdown)
+// Same data — just a separate named export so both import names work
+export const associateInstituteOptions = labOptionsList;
+
+export default labs;

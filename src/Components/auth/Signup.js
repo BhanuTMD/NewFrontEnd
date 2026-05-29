@@ -3,8 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import Validation from "Components/auth/SignupValidation";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { EyeIcon, EyeSlashIcon, UserPlusIcon } from "@heroicons/react/24/outline";
-import { labOptions } from "Components/data/lab";
+import {
+  EyeIcon,
+  EyeSlashIcon,
+  UserPlusIcon,
+} from "@heroicons/react/24/outline";
+
+// ✅ FIXED: correct named import
+import { associateInstituteOptions } from "Components/data/lab";
 
 function Signup() {
   const [values, setValues] = useState({
@@ -16,7 +22,7 @@ function Signup() {
     password: "",
     employeeId: "",
   });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors]           = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
@@ -30,62 +36,57 @@ function Signup() {
     const validationErrors = Validation(values);
     setErrors(validationErrors);
 
-    if (Object.keys(validationErrors).length === 0) {
-      try {
-        setIsSubmitting(true);
+    if (Object.keys(validationErrors).length > 0) {
+      Swal.fire("Validation Error", "Please fix the errors in the form.", "warning");
+      return;
+    }
 
-        const response = await axios.post(
-          "http://172.16.2.246:8282/api/auth/register",
-          values,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+    try {
+      setIsSubmitting(true);
 
-        if (response.status === 200 || response.status === 201) {
-          Swal.fire({
-            title: "Success!",
-            text: "Registration successful!",
-            icon: "success",
-            confirmButtonText: "OK",
-            confirmButtonColor: "#4F46E5",
-          }).then(() => {
-            navigate("/login");
-          });
-        } else {
-          Swal.fire(
-            "Error",
-            response.data?.message ||
-              "Registration failed. Please check your details.",
-            "error"
-          );
-        }
-      } catch (error) {
-        console.error("Signup error:", error.response?.data || error.message);
-        Swal.fire(
-          "Error",
-          error.response?.data?.message ||
-            "Something went wrong during registration.",
-          "error"
-        );
-      } finally {
-        setIsSubmitting(false);
-      }
-    } else {
-      console.log("Validation Errors:", validationErrors);
-      Swal.fire(
-        "Validation Error",
-        "Please fix the errors in the form.",
-        "warning"
+      // ✅ Map form fields to what backend RegisterRequest expects
+      const payload = {
+        email:    values.email.trim(),
+        password: values.password,
+        fullName: values.name.trim(),
+        // Extra fields stored as part of fullName context
+        // OR you can extend RegisterRequest on backend to accept these
+        designation: values.designation,
+        lab:         values.lab,
+        phoneNumber: values.phoneNumber,
+        employeeId:  values.employeeId,
+      };
+
+      const response = await axios.post(
+        "http://172.16.2.246:8282/api/auth/register",
+        payload,
+        { headers: { "Content-Type": "application/json" } }
       );
+
+      if (response.status === 200 || response.status === 201) {
+        Swal.fire({
+          title: "Success!",
+          text: "Registration successful! You can now log in.",
+          icon: "success",
+          confirmButtonText: "Go to Login",
+          confirmButtonColor: "#4F46E5",
+        }).then(() => navigate("/login"));
+      }
+    } catch (error) {
+      const msg =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Something went wrong during registration.";
+      Swal.fire("Registration Failed", msg, "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-900 overflow-hidden py-10">
-      {/* Blur circles in background */}
+
+      {/* Background blobs */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-indigo-500/30 blur-3xl" />
         <div className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-purple-500/20 blur-3xl" />
@@ -93,7 +94,8 @@ function Signup() {
 
       <div className="relative z-10 w-full max-w-5xl mx-4 md:mx-6 lg:mx-8">
         <div className="flex flex-col md:flex-row bg-white/10 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/15 overflow-hidden">
-          {/* Left side - illustration / info */}
+
+          {/* ── Left panel ──────────────────────────────────────────── */}
           <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 relative p-8 lg:p-10 items-center">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.25),_transparent_60%)]" />
 
@@ -115,7 +117,7 @@ function Signup() {
                 designation to get personalized access to the platform.
               </p>
 
-              <div className="mt-4 grid grid-cols-2 gap-3 text-xs lg:text-sm">
+              <div className="grid grid-cols-2 gap-3 text-xs lg:text-sm">
                 <div className="bg-white/15 rounded-2xl px-4 py-3 border border-white/20 backdrop-blur-md">
                   <p className="text-indigo-100/80">Labs onboarded</p>
                   <p className="mt-1 text-lg font-semibold">45+</p>
@@ -126,7 +128,7 @@ function Signup() {
                 </div>
               </div>
 
-              <div className="mt-4 bg-white/10 rounded-2xl border border-white/25 p-4 backdrop-blur-md flex items-center gap-3">
+              <div className="bg-white/10 rounded-2xl border border-white/25 p-4 backdrop-blur-md flex items-center gap-3">
                 <div className="h-10 w-10 rounded-2xl bg-emerald-400/90 flex items-center justify-center text-slate-900">
                   <UserPlusIcon className="h-6 w-6" />
                 </div>
@@ -140,76 +142,63 @@ function Signup() {
             </div>
           </div>
 
-          {/* Right side - Signup form */}
+          {/* ── Right panel — form ───────────────────────────────────── */}
           <div className="w-full md:w-1/2 bg-slate-900/60 px-6 py-7 sm:px-8 sm:py-10 lg:px-10 lg:py-12 max-h-[90vh] overflow-y-auto">
-            <div className="flex flex-col gap-1 mb-6 sm:mb-8">
+
+            <div className="mb-6 sm:mb-8">
               <p className="text-xs font-medium tracking-[0.22em] text-indigo-300 uppercase">
                 Sign up
               </p>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white">
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mt-1">
                 Create your account
               </h2>
-              <p className="text-xs sm:text-sm text-slate-300">
+              <p className="text-xs sm:text-sm text-slate-300 mt-1">
                 Fill in your official CSIR details to get started.
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
-              <Input
-                label="Name"
+
+              {/* Name */}
+              <FormInput
+                label="Full Name"
                 name="name"
                 type="text"
                 value={values.name}
                 onChange={handleInput}
                 error={errors.name}
+                placeholder="Enter your full name"
               />
 
-              <Input
+              {/* Employee ID */}
+              <FormInput
                 label="Employee ID"
                 name="employeeId"
                 type="text"
                 value={values.employeeId}
                 onChange={handleInput}
                 error={errors.employeeId}
+                placeholder="Enter your employee ID"
               />
 
               {/* Designation */}
-              <div>
-                <label
-                  htmlFor="designation"
-                  className="block text-sm font-medium text-slate-200 mb-1.5"
-                >
-                  Designation
-                </label>
-                <select
-                  id="designation"
-                  name="designation"
-                  value={values.designation}
-                  onChange={handleInput}
-                  className={`w-full rounded-2xl border bg-slate-900/70 text-slate-100 text-sm sm:text-base px-3.5 py-2.5 sm:px-4 sm:py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400/80 focus:border-indigo-400/80 transition ${
-                    errors.designation
-                      ? "border-red-500/80"
-                      : "border-slate-600/70"
-                  }`}
-                >
-                  <option value="">Select Designation</option>
-                  <option value="Director/Head">Director/Head</option>
-                  <option value="Chief Scientist">Chief Scientist</option>
-                  <option value="Senior Principal Scientist">
-                    Senior Principal Scientist
-                  </option>
-                  <option value="Principal Scientist">
-                    Principal Scientist
-                  </option>
-                  <option value="Senior Scientist">Senior Scientist</option>
-                  <option value="Scientist">Scientist</option>
-                  <option value="Technical Officer">Technical Officer</option>
-                  <option value="Technical Assistant">
-                    Technical Assistant
-                  </option>
-                </select>
-                {errors.designation && <Error text={errors.designation} />}
-              </div>
+              <FormSelect
+                label="Designation"
+                name="designation"
+                value={values.designation}
+                onChange={handleInput}
+                error={errors.designation}
+                options={[
+                  "Director/Head",
+                  "Chief Scientist",
+                  "Senior Principal Scientist",
+                  "Principal Scientist",
+                  "Senior Scientist",
+                  "Scientist",
+                  "Technical Officer",
+                  "Technical Assistant",
+                ]}
+              />
 
               {/* Lab */}
               <div>
@@ -224,39 +213,49 @@ function Signup() {
                   name="lab"
                   value={values.lab}
                   onChange={handleInput}
-                  className={`w-full rounded-2xl border bg-slate-900/70 text-slate-100 text-sm sm:text-base px-3.5 py-2.5 sm:px-4 sm:py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400/80 focus:border-indigo-400/80 transition ${
-                    errors.lab ? "border-red-500/80" : "border-slate-600/70"
-                  }`}
+                  className={`w-full rounded-2xl border bg-slate-900/70
+                              text-slate-100 text-sm px-3.5 py-2.5
+                              focus:outline-none focus:ring-2
+                              focus:ring-indigo-400/80
+                              focus:border-indigo-400/80 transition
+                              ${errors.lab
+                                ? "border-red-500/80"
+                                : "border-slate-600/70"}`}
                 >
                   <option value="">Select Lab / Institute</option>
-                  {labOptions.map((l) => (
-                    <option key={l.value} value={l.value}>
-                      {l.label}
+                  {/* ✅ FIXED: using correct variable name */}
+                  {associateInstituteOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
                     </option>
                   ))}
                 </select>
-                {errors.lab && <Error text={errors.lab} />}
+                {errors.lab && <FormError text={errors.lab} />}
               </div>
 
-              <Input
+              {/* Phone */}
+              <FormInput
                 label="Mobile Number"
                 name="phoneNumber"
                 type="tel"
                 value={values.phoneNumber}
                 onChange={handleInput}
                 error={errors.phoneNumber}
+                placeholder="Enter your mobile number"
               />
 
-              <Input
+              {/* Email */}
+              <FormInput
                 label="CSIR Email ID"
                 name="email"
                 type="email"
                 value={values.email}
                 onChange={handleInput}
                 error={errors.email}
+                placeholder="yourname@csir.res.in"
               />
 
-              {/* Password with show/hide */}
+              {/* Password */}
               <div>
                 <label
                   htmlFor="password"
@@ -271,33 +270,42 @@ function Signup() {
                     type={showPassword ? "text" : "password"}
                     value={values.password}
                     onChange={handleInput}
-                    placeholder="Enter your password"
-                    className={`w-full rounded-2xl border bg-slate-900/70 text-slate-100 text-sm sm:text-base px-3.5 py-2.5 sm:px-4 sm:py-3 pr-11 focus:outline-none focus:ring-2 focus:ring-indigo-400/80 focus:border-indigo-400/80 transition ${
-                      errors.password
-                        ? "border-red-500/80"
-                        : "border-slate-600/70"
-                    }`}
+                    placeholder="Create a strong password"
+                    className={`w-full rounded-2xl border bg-slate-900/70
+                                text-slate-100 text-sm px-3.5 py-2.5 pr-11
+                                focus:outline-none focus:ring-2
+                                focus:ring-indigo-400/80
+                                focus:border-indigo-400/80 transition
+                                ${errors.password
+                                  ? "border-red-500/80"
+                                  : "border-slate-600/70"}`}
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-200"
+                    onClick={() => setShowPassword((p) => !p)}
+                    className="absolute inset-y-0 right-0 flex items-center
+                               pr-3 text-slate-400 hover:text-slate-200"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
-                    {showPassword ? (
-                      <EyeSlashIcon className="h-5 w-5" />
-                    ) : (
-                      <EyeIcon className="h-5 w-5" />
-                    )}
+                    {showPassword
+                      ? <EyeSlashIcon className="h-5 w-5" />
+                      : <EyeIcon className="h-5 w-5" />
+                    }
                   </button>
                 </div>
-                {errors.password && <Error text={errors.password} />}
+                {errors.password && <FormError text={errors.password} />}
               </div>
 
               {/* Submit */}
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="mt-2 w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500/60 text-white font-semibold text-sm sm:text-base py-2.5 sm:py-3 px-4 shadow-lg shadow-emerald-500/30 transition-transform hover:-translate-y-0.5 disabled:hover:translate-y-0"
+                className="mt-2 w-full inline-flex items-center justify-center
+                           gap-2 rounded-2xl bg-emerald-500 hover:bg-emerald-600
+                           disabled:bg-emerald-500/60 text-white font-semibold
+                           text-sm sm:text-base py-2.5 sm:py-3 px-4
+                           shadow-lg shadow-emerald-500/30 transition-transform
+                           hover:-translate-y-0.5 disabled:hover:translate-y-0"
               >
                 {isSubmitting ? (
                   <>
@@ -317,7 +325,8 @@ function Signup() {
                 Already have an account?{" "}
                 <Link
                   to="/login"
-                  className="font-semibold text-indigo-300 hover:text-indigo-200 underline underline-offset-2"
+                  className="font-semibold text-indigo-300
+                             hover:text-indigo-200 underline underline-offset-2"
                 >
                   Login here
                 </Link>
@@ -330,8 +339,9 @@ function Signup() {
   );
 }
 
-// Reusable Input for dark theme
-const Input = ({ label, name, type, value, onChange, error }) => (
+// ── Reusable sub-components ───────────────────────────────────────────────────
+
+const FormInput = ({ label, name, type, value, onChange, error, placeholder }) => (
   <div>
     <label
       htmlFor={name}
@@ -345,16 +355,44 @@ const Input = ({ label, name, type, value, onChange, error }) => (
       type={type}
       value={value}
       onChange={onChange}
-      placeholder={`Enter your ${label.toLowerCase()}`}
-      className={`w-full rounded-2xl border bg-slate-900/70 text-slate-100 text-sm sm:text-base px-3.5 py-2.5 sm:px-4 sm:py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400/80 focus:border-indigo-400/80 transition ${
-        error ? "border-red-500/80" : "border-slate-600/70"
-      }`}
+      placeholder={placeholder || `Enter your ${label.toLowerCase()}`}
+      className={`w-full rounded-2xl border bg-slate-900/70 text-slate-100
+                  text-sm px-3.5 py-2.5 focus:outline-none focus:ring-2
+                  focus:ring-indigo-400/80 focus:border-indigo-400/80 transition
+                  ${error ? "border-red-500/80" : "border-slate-600/70"}`}
     />
-    {error && <Error text={error} />}
+    {error && <FormError text={error} />}
   </div>
 );
 
-const Error = ({ text }) => (
+const FormSelect = ({ label, name, value, onChange, error, options }) => (
+  <div>
+    <label
+      htmlFor={name}
+      className="block text-sm font-medium text-slate-200 mb-1.5"
+    >
+      {label}
+    </label>
+    <select
+      id={name}
+      name={name}
+      value={value}
+      onChange={onChange}
+      className={`w-full rounded-2xl border bg-slate-900/70 text-slate-100
+                  text-sm px-3.5 py-2.5 focus:outline-none focus:ring-2
+                  focus:ring-indigo-400/80 focus:border-indigo-400/80 transition
+                  ${error ? "border-red-500/80" : "border-slate-600/70"}`}
+    >
+      <option value="">Select {label}</option>
+      {options.map((opt) => (
+        <option key={opt} value={opt}>{opt}</option>
+      ))}
+    </select>
+    {error && <FormError text={error} />}
+  </div>
+);
+
+const FormError = ({ text }) => (
   <p className="text-red-400 text-xs mt-1">{text}</p>
 );
 

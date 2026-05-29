@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import Swal from "sweetalert2";
+
 import NavBar from "Components/common/navBar";
 import {
   PencilIcon,
@@ -10,6 +10,27 @@ import {
   ChevronRightIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
+
+
+
+// ── Add this helper above the component ──────────────────────────────────────
+// const formatStatus = (status) => {
+//   if (!status || status === "UNKNOWN") return "Unknown";
+//   // "SECTION_TWO_PENDING" → "Section Two Pending"
+//   return status
+//     .toLowerCase()
+//     .replace(/_/g, " ")
+//     .replace(/\b\w/g, (c) => c.toUpperCase());
+// };
+
+// const statusBadgeClass = (status) => {
+//   if (!status || status === "UNKNOWN") return "bg-slate-100 text-slate-500";
+//   if (status.includes("PENDING"))      return "bg-amber-50 text-amber-700";
+//   if (status === "SUBMITTED")          return "bg-green-50 text-green-700";
+//   if (status === "APPROVED")           return "bg-blue-50 text-blue-700";
+//   if (status === "REJECTED")           return "bg-red-50 text-red-700";
+//   return "bg-slate-100 text-slate-600";
+// };
 
 const PendingData = () => {
   const [pendingItems, setPendingItems] = useState([]);
@@ -64,29 +85,28 @@ const PendingData = () => {
 
   const totalPages = Math.ceil(totalElements / itemsPerPage) || 1;
 
-  const handleEdit = (item) => {
-    const statusToRoute = {
-      SectionOne: "/sectionOne",
-      SectionTwo: "/sectionTwo",
-      SectionThree: "/sectionThree",
-      SectionFour: "/sectionFour",
-    };
-
-    const route = statusToRoute[item.status];
-
-    if (route) {
-      navigate(route, {
-        state: { technologyRefNo: item.technologyRefNo },
-      });
-    } else {
-      console.warn("No valid edit route found for status:", item.status);
-      Swal.fire(
-        "Navigation Error",
-        `Cannot edit item with status: ${item.status}. No matching route defined.`,
-        "warning"
-      );
-    }
+  // ── Fix handleEdit ────────────────────────────────────────────────────────────
+const handleEdit = (item) => {
+  const statusToRoute = {
+    SECTION_TWO_PENDING:   "/sectionTwo",
+    SECTION_THREE_PENDING: "/sectionThree",
+    SECTION_FOUR_PENDING:  "/sectionFour",
+    PENDING_REVIEW:        "/sectionFour",   // continue from last section
+    REVISION_REQUESTED:    "/sectionOne",    // send back to start for revision
+    // legacy string fallbacks
+    SectionOne:   "/sectionOne",
+    SectionTwo:   "/sectionTwo",
+    SectionThree: "/sectionThree",
+    SectionFour:  "/sectionFour",
   };
+
+  const route = statusToRoute[item.status];
+  if (route) {
+    navigate(route, { state: { technologyRefNo: item.technologyRefNo } });
+  } else {
+    navigate("/sectionOne", { state: { technologyRefNo: item.technologyRefNo } });
+  }
+};
 
   // Client-side filter on current page data
   const filteredPendingItems = pendingItems.filter(

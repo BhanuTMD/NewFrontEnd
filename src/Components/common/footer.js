@@ -1,5 +1,4 @@
 import React from "react";
-
 const FooterBar = () => {
   return (
     <footer className="w-full mt-10">
@@ -12,7 +11,7 @@ const FooterBar = () => {
               href="https://www.csir.res.in/technology-management-directorate/"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-semibold underline-offset-4 hover:underline"
+              className="font-semibold underline-offset-4 hover:underline"s
             >
               Technology Management Directorate (TMD), CSIR-HQ
             </a>

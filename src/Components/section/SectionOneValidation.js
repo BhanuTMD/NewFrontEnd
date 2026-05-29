@@ -28,11 +28,11 @@ export const sectionOneValidationSchema = Yup.object({
 
   multiLabInstitute: Yup.string().required("Please select Yes or No"),
 
-  lab: Yup.array().when("multiLabInstitute", {
-    is: "Yes",
-    then: (schema) =>
-      schema.min(1, "Select associated labs if 'Yes'"),
-  }),
+  associateInstitutes: Yup.array().when("multiLabInstitute", {
+  is: "Yes",
+  then: (schema) =>
+    schema.min(1, "Select at least one associate institute if 'Yes'"),
+}),
 
   technologyLevel: Yup.string().required("TRL is required"),
 
